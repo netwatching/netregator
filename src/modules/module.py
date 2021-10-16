@@ -1,0 +1,45 @@
+import threading
+import time
+from src.device import Device
+
+
+class Module(threading.Thread):
+    def __init__(self, device: Device=None, *args, **kwargs):
+        if(device is not None):
+            self.device = device
+        else:
+            if "deviceid" in kwargs and "devicename" in kwargs and "deviceip" in kwargs and "devicetype" in kwargs:
+                self.device = Device(id=kwargs["deviceid"], name=kwargs["devicename"], ip=kwargs["deviceip"], type=kwargs["devicetype"])
+            else:
+                self.device = None
+
+        customkwargs = kwargs
+        del customkwargs["devicename"]
+        del customkwargs["deviceid"]
+        del customkwargs["deviceip"]
+        del customkwargs["devicetype"]
+        super().__init__(*args, **customkwargs)
+        self._stop = threading.Event()
+
+    @property
+    def device(self):
+        return self.__device
+
+    @device.setter
+    def device(self, device):
+        self.__device = device
+
+    def is_stopped(self):
+        return self._stop.is_set()
+
+    def stop(self):
+        self._stop.set()
+        print(self._stop.is_set())
+
+    def run(self):
+        while not self.is_stopped():
+            self.worker()
+            time.sleep(1)
+
+    def worker(self):
+        print(f"Worker class of Type {self.device.type} not yet implemented!")
