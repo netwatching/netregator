@@ -5,6 +5,7 @@ from src.device import Device
 
 class Module(threading.Thread):
     def __init__(self, device: Device=None, *args, **kwargs):
+        self.__data = []
         if(device is not None):
             self.device = device
         else:
@@ -22,6 +23,16 @@ class Module(threading.Thread):
         self._stop = threading.Event()
 
     @property
+    def data(self):
+        cData = self.__data
+        self.__data = []
+        return cData
+
+    @data.setter
+    def data(self, data):
+        self.__data.append(data)
+
+    @property
     def device(self):
         return self.__device
 
@@ -34,12 +45,17 @@ class Module(threading.Thread):
 
     def stop(self):
         self._stop.set()
-        print(self._stop.is_set())
 
     def run(self):
         while not self.is_stopped():
-            self.worker()
+            timestamp = time.time()
+            workerdict = self.worker()
+            if "timestamp" in workerdict:
+                timestamp = workerdict["timestamp"]
+            for key in workerdict:
+                if key is not "timestamp":
+                    self.data = {"timestamp": timestamp, "key": key, "value": workerdict[key]}
             time.sleep(1)
 
     def worker(self):
-        print(f"Worker class of Type {self.device.type} not yet implemented!")
+        return {"Error": f"Worker class of Type {self.device.type} not yet implemented!"}

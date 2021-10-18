@@ -22,6 +22,7 @@ class ModuleHander():
         #self._workers["1"] = Module(id=1, ip="129.168.0.1", name="myThread", type="Cisco")
         #self._workers["1"].setDaemon(True)
         #self._workers["1"].start()
+            self.get_data_from_devices()
             time.sleep(5)
         #self._workers["1"].stop()
 
@@ -31,11 +32,19 @@ class ModuleHander():
             self._imported_modules.append(packagename)
             print(f"Successfully imported module {packagename}")
 
+    def get_data_from_devices(self):
+        output = {}
+        devices = []
+        for deviceid in self._workers:
+            devices.append({"id": deviceid,
+                            "data": self._workers[deviceid].data})
+        output["devices"] = devices
+        print(output)
+
     def check_devices(self):
         runningDevices = self.get_running_devices()
         devicesToStart = self._utilities.compare_dict(runningDevices, self._workers)
         devicesToStop = self._utilities.compare_dict(self._workers, runningDevices)
-        print(devicesToStop)
 
         # starts new Devices
         for cID in devicesToStart:
@@ -48,7 +57,6 @@ class ModuleHander():
 
         #stop devices
         for cID in devicesToStop:
-            print(self._workers[cID].device.id)
             self.stop_device(self._workers[cID].device)
 
 
@@ -62,11 +70,16 @@ class ModuleHander():
         return True
 
     def stop_device(self, device: Device):
-        print(device.id)
         self._workers[str(device.id)].stop()
         del self._workers[str(device.id)]
         print(f"Stopped device {device.name}")
         return True
 
     def get_running_devices(self):
-        return self._api.get_running_threads()
+        running_devices = self._api.get_running_threads()
+        output = {}
+        for cDevice in running_devices:
+            id = cDevice["id"]
+            del cDevice["id"]
+            output["id"] = cDevice
+        return output

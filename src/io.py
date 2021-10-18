@@ -1,4 +1,6 @@
 import requests
+import jwt
+import datetime
 
 class Config:
     def __init__(self, path="../src/config/config.json"):
@@ -30,17 +32,82 @@ class Config:
         self.reload_file()
         return self._data
 
+
 class API:
     def __init__(self):
+        self._session = requests.session()
+        self._demo = True
+        self._id = None
+        self._secret = "mysecret"
+        self._token = None
+        self._url = "https://lassnig.xyz"
         self.__conter = 0
-        pass
+
+    def login(self):
+        # generate new token or use old one
+        reauth = False
+        jwt_options = {
+            'verify_signature': False,
+            'verify_exp': False,
+            'verify_nbf': False,
+            'verify_iat': True,
+            'verify_aud': False
+        }
+        # first run of code
+        if self._token is None:
+            reauth = True
+        # if not first Run
+        if reauth is False:
+            try:
+                time = datetime.datetime.utcfromtimestamp(jwt.decode(self._token, algorithms=["HS512", "HS256"], options=jwt_options)["exp"])
+                # check if code already expired
+                if datetime.datetime.utcnow() > (time - datetime.timedelta(seconds=60)):
+                    reauth = True
+            except jwt.exceptions.DecodeError:
+                reauth = True
+        # generate new Code
+        if reauth:
+            payload = {
+                "token": self._secret
+            }
+            req = self._session.post(f"{self._url}/api/aggregator-login", timeout=5, json=payload)
+            if req.status_code == requests.codes.ok:
+                output = req.json()
+                self._id = output["id"]
+                self._token = output["token"]
+                return self._token
+        else:
+            return self._token
+    
+    def send_data(self, data):
+        req = self._session.post(f"{self._url}/api/devices/data", auth=JWTAuth(self), json=data)
+        if req.status_code == requests.codes.ok:
+            return True
+        else:
+            return False
 
     def get_running_threads(self):
-        data = {}
-        data["1"] = {"name": "myThread", "type": "Cisco", "ip": "192.168.0.1"}
-        data["2"] = {"name": "myThread2", "type": "Ubiquiti", "ip": "192.168.1.1"}
+        if not self._demo:
+            req = self._session.post(f"{self._url}/api/aggregator/{self._id}")
+            if req.status_code == requests.codes.ok:
+                output = req.json()
+                return output["devices"]
+            else:
+                return []
+        else:
+            data = []
+            data.append({"id": "1", "name": "myThread", "type": "Cisco", "ip": "192.168.0.1"})
+            data.append({"id": "2", "name": "myThread2", "type": "Ubiquiti", "ip": "192.168.1.1"})
 
-        if(self.__conter % 5 == 0):
-            data["3"] = {"name": "myThread3", "type": "Ubiquiti", "ip": "192.168.3.1"}
-        self.__conter +=1
-        return data
+            if(self.__conter % 5 == 0):
+                data.append({"id": "3", "name": "myThread3", "type": "Ubiquiti", "ip": "192.168.3.1"})
+            self.__conter +=1
+            print(data)
+            return data
+    
+class JWTAuth(requests.auth.AuthBase):
+    def __init__(self, api: API):
+        self.token = api.login()
+    def __call__(self, r):
+        r.headers["authorization"] = "Bearer " + self.token
+        return r
