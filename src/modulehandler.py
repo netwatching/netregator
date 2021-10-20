@@ -38,8 +38,10 @@ class ModuleHander():
         for deviceid in self._workers:
             devices.append({"id": deviceid,
                             "data": self._workers[deviceid].data})
-        output["devices"] = devices
-        print(output)
+        if devices != []:
+            output["devices"] = devices
+            self._api.send_data(output)
+            print(output)
 
     def check_devices(self):
         runningDevices = self.get_running_devices()
@@ -81,5 +83,5 @@ class ModuleHander():
         for cDevice in running_devices:
             id = cDevice["id"]
             del cDevice["id"]
-            output["id"] = cDevice
+            output[id] = cDevice
         return output

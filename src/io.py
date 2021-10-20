@@ -1,6 +1,7 @@
 import requests
 import jwt
 import datetime
+import json
 
 class Config:
     def __init__(self, path="../src/config/config.json"):
@@ -36,12 +37,14 @@ class Config:
 class API:
     def __init__(self):
         self._session = requests.session()
-        self._demo = True
+        self._demo = False
         self._id = None
-        self._secret = "mysecret"
+        self._secret = "admin"
         self._token = None
-        self._url = "https://lassnig.xyz"
+        self._url = "http://ddns.stefanmrb.eu:8082"
         self.__conter = 0
+        self._session.auth = JWTAuth(self)
+        self._session.headers['Content-Type'] = 'application/json'
 
     def login(self):
         # generate new token or use old one
@@ -59,7 +62,7 @@ class API:
         # if not first Run
         if reauth is False:
             try:
-                time = datetime.datetime.utcfromtimestamp(jwt.decode(self._token, algorithms=["HS512", "HS256"], options=jwt_options)["exp"])
+                time = datetime.datetime.utcfromtimestamp(jwt.decode(self._token, algorithms=["HS512", "HS256"], options=jwt_options)["expires"])
                 # check if code already expired
                 if datetime.datetime.utcnow() > (time - datetime.timedelta(seconds=60)):
                     reauth = True
@@ -73,7 +76,7 @@ class API:
             req = self._session.post(f"{self._url}/api/aggregator-login", timeout=5, json=payload)
             if req.status_code == requests.codes.ok:
                 output = req.json()
-                self._id = output["id"]
+                self._id = output["aggregator_id"]
                 self._token = output["token"]
                 return self._token
         else:
@@ -88,11 +91,16 @@ class API:
 
     def get_running_threads(self):
         if not self._demo:
-            req = self._session.post(f"{self._url}/api/aggregator/{self._id}")
-            if req.status_code == requests.codes.ok:
-                output = req.json()
-                return output["devices"]
-            else:
+            try:
+                req = self._session.get(f"{self._url}/api/aggregator/{self._id}", auth=JWTAuth(self), timeout=5)
+                if req.status_code == requests.codes.ok:
+                    output = req.json()
+                    print(output["devices"])
+                    return output["devices"]
+                else:
+                    return []
+            except Exception as ex:
+                print(ex)
                 return []
         else:
             data = []
@@ -109,5 +117,6 @@ class JWTAuth(requests.auth.AuthBase):
     def __init__(self, api: API):
         self.token = api.login()
     def __call__(self, r):
-        r.headers["authorization"] = "Bearer " + self.token
+        print(self.token)
+        r.headers["Authorization"] = "Bearer " + self.token
         return r
