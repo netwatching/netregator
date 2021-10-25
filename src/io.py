@@ -95,7 +95,7 @@ class API:
                 req = self._session.get(f"{self._url}/api/aggregator/{self._id}", auth=JWTAuth(self), timeout=5)
                 if req.status_code == requests.codes.ok:
                     output = req.json()
-                    print(output["devices"])
+                    # print(output["devices"])
                     return output["devices"]
                 else:
                     return []
@@ -110,13 +110,13 @@ class API:
             if(self.__conter % 5 == 0):
                 data.append({"id": "3", "name": "myThread3", "type": "Ubiquiti", "ip": "192.168.3.1"})
             self.__conter +=1
-            print(data)
+            # print(data)
             return data
     
 class JWTAuth(requests.auth.AuthBase):
     def __init__(self, api: API):
         self.token = api.login()
     def __call__(self, r):
-        print(self.token)
+        # print(self.token)
         r.headers["Authorization"] = "Bearer " + self.token
         return r
