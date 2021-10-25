@@ -19,12 +19,8 @@ class ModuleHander():
     def mainloop(self):
         while self._running:
             self.check_devices()
-        #self._workers["1"] = Module(id=1, ip="129.168.0.1", name="myThread", type="Cisco")
-        #self._workers["1"].setDaemon(True)
-        #self._workers["1"].start()
             self.get_data_from_devices()
             time.sleep(5)
-        #self._workers["1"].stop()
 
     def import_module(self, filename, packagename):
         if packagename not in self._imported_modules:
@@ -44,22 +40,22 @@ class ModuleHander():
             print(output)
 
     def check_devices(self):
-        runningDevices = self.get_running_devices()
-        devicesToStart = self._utilities.compare_dict(runningDevices, self._workers)
-        devicesToStop = self._utilities.compare_dict(self._workers, runningDevices)
+        running_devices = self.get_running_devices()
+        devices_to_start = self._utilities.compare_dict(running_devices, self._workers)
+        devices_to_stop = self._utilities.compare_dict(self._workers, running_devices)
 
         # starts new Devices
-        for cID in devicesToStart:
-            type = runningDevices[cID]["type"]
-            ip = runningDevices[cID]["ip"]
-            name = runningDevices[cID]["name"]
-            self.import_module(filename=type.lower(), packagename=type)
-            self.start_device(Device(id=cID, name=name, type=type, ip=ip))
-            print(runningDevices[cID])
+        for c_id in devices_to_start:
+            device_type = running_devices[c_id]["type"]
+            ip = running_devices[c_id]["ip"]
+            name = running_devices[c_id]["name"]
+            self.import_module(filename=device_type.lower(), packagename=device_type)
+            self.start_device(Device(id=c_id, name=name, type=device_type, ip=ip))
+            print(running_devices[c_id])
 
         #stop devices
-        for cID in devicesToStop:
-            self.stop_device(self._workers[cID].device)
+        for c_id in devices_to_stop:
+            self.stop_device(self._workers[c_id].device)
 
 
     def start_device(self, device: Device):
@@ -80,8 +76,8 @@ class ModuleHander():
     def get_running_devices(self):
         running_devices = self._api.get_running_threads()
         output = {}
-        for cDevice in running_devices:
-            id = cDevice["id"]
-            del cDevice["id"]
-            output[id] = cDevice
+        for c_device in running_devices:
+            device_id = c_device["id"]
+            del c_device["id"]
+            output[device_id] = c_device
         return output

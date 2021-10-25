@@ -24,9 +24,9 @@ class Module(threading.Thread):
 
     @property
     def data(self):
-        cData = self.__data
+        c_data = self.__data
         self.__data = []
-        return cData
+        return c_data
 
     @data.setter
     def data(self, data):
@@ -53,7 +53,7 @@ class Module(threading.Thread):
             if "timestamp" in workerdict:
                 timestamp = workerdict["timestamp"]
             for key in workerdict:
-                if key is not "timestamp":
+                if key != "timestamp":
                     self.data = {"timestamp": timestamp, "key": key, "value": workerdict[key]}
             time.sleep(1)
 

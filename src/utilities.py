@@ -1,6 +1,4 @@
-class Utilities():
-    def __init__(self):
-        pass
+class Utilities:
 
     def compare_dict(self, dict1, dict2):
         output = []
