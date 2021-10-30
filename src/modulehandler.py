@@ -54,14 +54,18 @@ class ModuleHander():
             self.start_device(Device(id=c_id, name=name, type=device_type, ip=ip, timeout=timeout))
             print(running_devices[c_id])
 
-        #stop devices
+        # stop devices
         for c_id in devices_to_stop:
             self.stop_device(self._workers[c_id].device)
 
-        #update timeout
+        # update timeout and check for dead devices/threads and restart them
         for c_id in running_devices:
+            # check if device is still running. if not, restart it.
+            if not self._workers[c_id].is_alive() or self._workers[c_id].is_stopped():
+                c_device = self._workers[c_id].device
+                self.start_device(c_device)
+            # update timeout
             self._workers[c_id].device.timeout = running_devices[c_id]["timeout"]
-
 
     def start_device(self, device: Device):
         code = f"global cmodule;cmodule = {device.type}(deviceid={device.id},devicetype='{device.type}',devicename='{device.name}',deviceip='{device.ip}', devicetimeout={device.timeout})"
