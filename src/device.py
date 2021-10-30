@@ -1,10 +1,11 @@
 class Device:
 
-    def __init__(self, id, name, ip, type):
+    def __init__(self, id, name: str, ip: str, type: str, timeout: int):
         self.name = name
         self.id = id
         self.ip = ip
         self.type = type
+        self.timeout = timeout
 
     @property
     def ip(self):
@@ -37,3 +38,11 @@ class Device:
     @type.setter
     def type(self, type):
         self.__type = type
+
+    @property
+    def timeout(self):
+        return self.__timeout
+
+    @timeout.setter
+    def timeout(self, timeout: int):
+        self.__timeout = int(timeout)
