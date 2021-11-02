@@ -3,7 +3,7 @@ ENV PYTHONUNBUFFERED definitely
 ENV TZ Europe/Vienna
 WORKDIR /usr/src/app
 
-RUN apk add --no-cache --update gcc libc-dev linux-headers git && rm -rf /var/cache/apk/*
+# RUN apk add --no-cache --update gcc libc-dev linux-headers && rm -rf /var/cache/apk/*
 
 RUN adduser -s /bin/bash -S netuser && chown netuser:root /usr/src/app
 USER netuser
