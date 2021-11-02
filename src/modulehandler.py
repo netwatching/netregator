@@ -32,8 +32,11 @@ class ModuleHander():
         output = {}
         devices = []
         for deviceid in self._workers:
-            devices.append({"id": deviceid,
-                            "data": self._workers[deviceid].data})
+            c_data = self._workers[deviceid].data
+            if c_data:
+                devices.append({"id": deviceid,
+                                "type": self._workers[deviceid].device.type,
+                                "data": c_data})
         if devices != []:
             output["devices"] = devices
             self._api.send_data(output)
