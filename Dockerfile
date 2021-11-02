@@ -6,7 +6,7 @@ RUN apk add --no-cache --update gcc libc-dev linux-headers git && rm -rf /var/ca
 COPY .git .
 COPY .env.template .
 RUN [ -e "/usr/src/app/.env" ] && echo "Env already exists" || mv .env.template .env
-RUN sed -i "s/%VER%/$(git describe --abbrev)/" .env
+RUN sed -i "s/%VER%/$(git describe --always --abbrev)/" .env
 
 # main container
 FROM python:3-alpine
