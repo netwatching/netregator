@@ -62,7 +62,7 @@ class ZabbixDevice:
 
     def serialize(self):
         output = {
-            #"id": self.hostid,
+            "id": self.hostid,
             "timestamp": self.timestamp,
             "severity": self.severity,
             "name": self.name,
