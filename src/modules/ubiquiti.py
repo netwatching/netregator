@@ -94,25 +94,25 @@ class DataSources:
         services_key = int(self.__snmp.get_single_value_by_name('sysServices'))  # https://oidref.com/1.3.6.1.2.1.1.7
         services = {}  # services by OSI layers
 
-        services["l7"] = services_key >= 64
+        services["ApplicationLayer"] = services_key >= 64
         if services_key >= 64:
             services_key -= 64
-        services["l6"] = services_key >= 32
+        services["PresentationLayer"] = services_key >= 32
         if services_key >= 32:
             services_key -= 32
-        services["l5"] = services_key >= 16
+        services["SessionLayer"] = services_key >= 16
         if services_key >= 16:
             services_key -= 16
-        services["l4"] = services_key >= 8
+        services["TransportLayer"] = services_key >= 8
         if services_key >= 8:
             services_key -= 8
-        services["l3"] = services_key >= 4
+        services["NetworkLayer"] = services_key >= 4
         if services_key >= 4:
             services_key -= 4
-        services["l2"] = services_key >= 2
+        services["DataLinkLayer"] = services_key >= 2
         if services_key >= 2:
             services_key -= 2
-        services["l1"] = services_key >= 1
+        services["PhysicalLayer"] = services_key >= 1
         if services_key >= 1:
             services_key -= 1
 
