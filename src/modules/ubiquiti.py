@@ -7,4 +7,4 @@ class Ubiquiti(Module):
         super().__init__(device, *args, **kwargs)
 
     def worker(self):
-        return {"msg": f"hello from module Cisco"}
+        return {"msg": f"hello from module Ubiquiti."}
