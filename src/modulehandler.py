@@ -32,8 +32,11 @@ class ModuleHander():
         output = {}
         devices = []
         for deviceid in self._workers:
-            devices.append({"id": deviceid,
-                            "data": self._workers[deviceid].data})
+            c_data = self._workers[deviceid].data
+            if c_data:
+                devices.append({"id": deviceid,
+                                "type": self._workers[deviceid].device.type,
+                                "data": c_data})
         if devices != []:
             output["devices"] = devices
             self._api.send_data(output)
@@ -49,17 +52,26 @@ class ModuleHander():
             device_type = running_devices[c_id]["type"]
             ip = running_devices[c_id]["ip"]
             name = running_devices[c_id]["name"]
+            timeout = running_devices[c_id]["timeout"]
             self.import_module(filename=device_type.lower(), packagename=device_type)
-            self.start_device(Device(id=c_id, name=name, type=device_type, ip=ip))
+            self.start_device(Device(id=c_id, name=name, type=device_type, ip=ip, timeout=timeout))
             print(running_devices[c_id])
 
-        #stop devices
+        # stop devices
         for c_id in devices_to_stop:
             self.stop_device(self._workers[c_id].device)
 
+        # update timeout and check for dead devices/threads and restart them
+        for c_id in running_devices:
+            # check if device is still running. if not, restart it.
+            if not self._workers[c_id].is_alive() or self._workers[c_id].is_stopped():
+                c_device = self._workers[c_id].device
+                self.start_device(c_device)
+            # update timeout
+            self._workers[c_id].device.timeout = running_devices[c_id]["timeout"]
 
     def start_device(self, device: Device):
-        code = f"global cmodule;cmodule = {device.type}(deviceid={device.id},devicetype='{device.type}',devicename='{device.name}',deviceip='{device.ip}')"
+        code = f"global cmodule;cmodule = {device.type}(deviceid={device.id},devicetype='{device.type}',devicename='{device.name}',deviceip='{device.ip}', devicetimeout={device.timeout})"
         exec(code, globals())
         self._workers[device.id] = cmodule
         self._workers[device.id].setDaemon(True)

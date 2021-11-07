@@ -41,7 +41,7 @@ class API:
         self._id = None
         self._secret = "admin"
         self._token = None
-        self._url = "http://oracle2.stefanmrb.eu:8081"
+        self._url = "http://127.0.0.1:8081"
         self.__conter = 0
         self._session.auth = JWTAuth(self)
         self._session.headers['Content-Type'] = 'application/json'
