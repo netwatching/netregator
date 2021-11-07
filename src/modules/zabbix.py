@@ -70,7 +70,7 @@ class ZabbixDevice:
         self.__timestamp = timestamp
 
     def serialize(self):
-        output = {"hostname": self.hostname, "name": self.name, "timestamp": self.timestamp, "severity": self.severity,
+        output = {"id": self.hostid, "hostname": self.hostname, "name": self.name, "timestamp": self.timestamp, "severity": self.severity,
                   "tag": self.tag, "problem": self.problem}
         return output
 
