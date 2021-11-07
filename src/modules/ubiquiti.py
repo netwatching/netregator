@@ -15,13 +15,11 @@ class Ubiquiti(Module):
         data.update(self.__ds.get_object_id())
         data.update(self.__ds.get_uptime())
         data.update(self.__ds.get_description())
-        data.update(self.__ds.get_interfaces())
         data.update(self.__ds.get_contact())
         data.update(self.__ds.get_name())
-        data.update(self.__ds.get_description())
         data.update(self.__ds.get_services())
         data.update(self.__ds.get_interfaces())
         # TODO: add other DataSource functions above
 
-        print(data)
+        print(data)  # TODO: logging class
         return data
