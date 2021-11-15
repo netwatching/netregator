@@ -2,6 +2,7 @@ import requests
 import jwt
 import datetime
 import json
+from decouple import config
 
 class Config:
     def __init__(self, path="../src/config/config.json"):
@@ -41,7 +42,7 @@ class API:
         self._id = None
         self._secret = "admin"
         self._token = None
-        self._url = "http://127.0.0.1:8081"
+        self._url = config("IP")
         self.__conter = 0
         self._session.auth = JWTAuth(self)
         self._session.headers['Content-Type'] = 'application/json'

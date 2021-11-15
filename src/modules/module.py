@@ -18,11 +18,11 @@ class Module(threading.Thread):
 
         customkwargs = kwargs
         if deviceCreated:
-            del customkwargs["devicename"]
-            del customkwargs["deviceid"]
-            del customkwargs["deviceip"]
-            del customkwargs["devicetype"]
-            del customkwargs["devicetimeout"]
+            customkwargs.pop("devicename")
+            customkwargs.pop("deviceid")
+            customkwargs.pop("deviceip")
+            customkwargs.pop("devicetype")
+            customkwargs.pop("devicetimeout")
         super().__init__(*args, **customkwargs)
         self._stop = threading.Event()
 
