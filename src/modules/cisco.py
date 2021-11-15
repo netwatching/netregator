@@ -6,9 +6,11 @@ import src.modules.helpers.snmp as snmp
 class Cisco(Module):
     def __init__(self, device: Device = None, *args, **kwargs):
         super().__init__(device, *args, **kwargs)
+        return
         self.__ds = snmp.DataSources(snmp.SNMP("snmp_rw", self.device.ip, 161))
 
     def worker(self):
+        return {}
         data = {}
 
         data.update(self.__ds.get_hostname())

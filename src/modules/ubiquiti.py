@@ -9,6 +9,7 @@ class Ubiquiti(Module):
         self.__ds = snmp.DataSources(snmp.SNMP("HTL-Villach", self.device.ip, 161))
 
     def worker(self):
+        return {}
         data = {}
 
         data.update(self.__ds.get_hostname())

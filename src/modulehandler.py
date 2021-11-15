@@ -104,7 +104,11 @@ class ModuleHander():
                 self._system_threads[c_key].terminate()
 
     def check_system_threads(self):
-        return None
+        for c_key in self._known_system_threads:
+            if not self._system_threads[c_key].is_alive():
+                self.start_system_thread(c_key)
+        for c_key in self._utilities.compare_list(self._known_system_threads, self._system_threads):
+            self.start_system_thread(c_key)
 
     def stop_device(self, device: Device):
         self._workers[str(device.id)].stop()
