@@ -19,13 +19,13 @@ class SNMP:
         name, value = var_binds[0]  # name is ObjectName object - value is number object
         return value.prettyPrint()
 
-    def get_single_value_by_name(self, name):
+    def get_single_value_by_name(self, name, mib_name='SNMPv2-MIB'):
         iterator = getCmd(
             SnmpEngine(),
             CommunityData(self.__community_string, mpModel=0),
             UdpTransportTarget((self.__hostname, self.__port), timeout=1, retries=5),
             ContextData(),
-            ObjectType(ObjectIdentity('SNMPv2-MIB', name, 0))
+            ObjectType(ObjectIdentity(mib_name, name, 0))
         )
         (error_indication, error_status, error_index, var_binds) = next(iterator)
         name, value = var_binds[0]  # name is ObjectName object - value is number object
