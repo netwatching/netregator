@@ -3,3 +3,4 @@ PyJWT~=2.3.0
 py-zabbix~=1.1.7
 python-decouple~=3.5
 pysnmp==4.4.12
+pysnmp-mibs==0.1.6
