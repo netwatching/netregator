@@ -84,10 +84,14 @@ class Device(threading.Thread):
 
     @data.setter
     def data(self, data):
-        self.__data.append(data)
+        self.__data.extend(data)
 
     def run(self):
         self.start_modules()
+        time.sleep(5)
+        while True:
+            self.get_data()
+            time.sleep(5)
         #while self.running:
         #    print(f"WORKING! - {self.name}")
         #    time.sleep(100)
@@ -108,3 +112,7 @@ class Device(threading.Thread):
         exec(f"from src.modules.{config['filename']} import {config['classname']}", globals())
         self._imported_modules.append(module_name)
         print(f"Successfully imported module {module_name}")
+
+    def get_data(self):
+        for c_module in self._workers:
+            self.data = self._workers[c_module].data

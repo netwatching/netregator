@@ -48,6 +48,10 @@ class ModuleHander():
             if devices != []:
                 output["devices"] = devices
                 self._api.send_data(output)
+                print("--------------")
+                print("--------------")
+                print("--------------")
+                print("--------------")
                 print(output)
             time.sleep(5)
 

@@ -56,4 +56,4 @@ class Module(threading.Thread):
             time.sleep(int(self.timeout))
 
     def worker(self):
-        return {"Error": f"Worker class of Type {self.device.type} not yet implemented!"}
+        return {"Error": f"Worker class of Type {self.ip} not yet implemented!"}

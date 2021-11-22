@@ -9,7 +9,7 @@ class SNMB(Module):
         self.__ds = snmp.DataSources(snmp.SNMP("HTL-Villach", ip, 161))
 
     def worker(self):
-        return {}
+        return {"asd":"123"}
         data = {}
 
         data.update(self.__ds.get_hostname())
