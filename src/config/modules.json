@@ -1,12 +1,10 @@
-[
-  {
-    "name": "snmb",
+{
+  "snmb": {
     "filename": "snmb",
     "classname": "SNMB"
   },
-  {
-    "name": "problems",
+  "problems": {
     "filename": "zabbix",
     "classname": "Problems"
   }
-]
+}

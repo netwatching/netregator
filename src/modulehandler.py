@@ -65,7 +65,7 @@ class ModuleHander():
                 timeout = running_devices[c_id]["timeout"]
                 modules = running_devices[c_id]["modules"]
                 self.import_module(filename=device_type.lower(), packagename=device_type)
-                self.start_device(Device(id=c_id, name=name, type=device_type, ip=ip, timeout=timeout, modules=modules))
+                self.start_device(Device(id=c_id, name=name, device_type=device_type, ip=ip, timeout=timeout, modules=modules))
                 print(running_devices[c_id])
     
             # stop devices
@@ -74,18 +74,21 @@ class ModuleHander():
     
             # update timeout and check for dead devices/threads and restart them
             for c_id in running_devices:
-                # check if device is still running. if not, restart it.
-                if not self._workers[c_id].is_alive() or self._workers[c_id].is_stopped():
-                    c_device = self._workers[c_id].device
-                    self.start_device(c_device)
+                pass
+                #TODO: FIX
+                #check if device is still running. if not, restart it.
+                #if not self._workers[c_id].is_alive() or self._workers[c_id].is_stopped():
+                    #c_device = self._workers[c_id].device
+                    #self.start_device(c_device)
                 # update timeout
-                self._workers[c_id].device.timeout = running_devices[c_id]["timeout"]
+                #self._workers[c_id].device.timeout = running_devices[c_id]["timeout"]
             time.sleep(5)
 
     def start_device(self, device: Device):
-        code = f"global cmodule;cmodule = {device.type}(deviceid={device.id},devicetype='{device.type}',devicename='{device.name}',deviceip='{device.ip}', devicetimeout={device.timeout}, devicemodules={device.modules})"
+        #code = f"global cmodule;cmodule = {device.type}(deviceid={device.id},devicetype='{device.type}',devicename='{device.name}',deviceip='{device.ip}', devicetimeout={device.timeout}, devicemodules={device.modules})"
+        code = f"global c_device;c_device = Device(id={device.id}, name='{device.name}', ip='{device.ip}', device_type='{device.device_type}', timeout={device.timeout}, modules={device.modules})"
         exec(code, globals())
-        self._workers[device.id] = cmodule
+        self._workers[device.id] = c_device
         #self._workers[device.id].setDaemon(True)
         self._workers[device.id].start()
         print(f"Started device {device.name}")

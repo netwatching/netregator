@@ -3,10 +3,10 @@ from src.device import Device
 import src.modules.helpers.snmp as snmp
 
 
-class Ubiquiti(Module):
-    def __init__(self, device: Device = None, *args, **kwargs):
-        super().__init__(device, *args, **kwargs)
-        self.__ds = snmp.DataSources(snmp.SNMP("HTL-Villach", self.device.ip, 161))
+class SNMB(Module):
+    def __init__(self, ip: str = None, timeout: int= None, *args, **kwargs):
+        super().__init__(ip, timeout, *args, **kwargs)
+        self.__ds = snmp.DataSources(snmp.SNMP("HTL-Villach", ip, 161))
 
     def worker(self):
         return {}

@@ -75,10 +75,10 @@ class ZabbixDevice:
         return output
 
 
-class Zabbix(Module):
-    def __init__(self, device: Device = None, *args, **kwargs):
-        super().__init__(device, *args, **kwargs)
-        self.url = f"https://{self.device.ip}"
+class Problems(Module):
+    def __init__(self, ip: str = None, timeout: int = None, *args, **kwargs):
+        super().__init__(ip, timeout, *args, **kwargs)
+        self.url = f"https://{ip}"
         self.user = config("ZABBIX_USERNAME")
         self.password = config("ZABBIX_PASSWORD")
         self.__connection = self.__create_connection()
@@ -120,4 +120,5 @@ class Zabbix(Module):
     def worker(self):
         hosts = self.get_hosts()
         problems = self.get_infos(hosts)
+        print(problems)
         return {"problems": problems}
