@@ -63,8 +63,9 @@ class ModuleHander():
                 ip = running_devices[c_id]["ip"]
                 name = running_devices[c_id]["name"]
                 timeout = running_devices[c_id]["timeout"]
+                modules = running_devices[c_id]["modules"]
                 self.import_module(filename=device_type.lower(), packagename=device_type)
-                self.start_device(Device(id=c_id, name=name, type=device_type, ip=ip, timeout=timeout))
+                self.start_device(Device(id=c_id, name=name, type=device_type, ip=ip, timeout=timeout, modules=modules))
                 print(running_devices[c_id])
     
             # stop devices
@@ -82,7 +83,7 @@ class ModuleHander():
             time.sleep(5)
 
     def start_device(self, device: Device):
-        code = f"global cmodule;cmodule = {device.type}(deviceid={device.id},devicetype='{device.type}',devicename='{device.name}',deviceip='{device.ip}', devicetimeout={device.timeout})"
+        code = f"global cmodule;cmodule = {device.type}(deviceid={device.id},devicetype='{device.type}',devicename='{device.name}',deviceip='{device.ip}', devicetimeout={device.timeout}, devicemodules={device.modules})"
         exec(code, globals())
         self._workers[device.id] = cmodule
         #self._workers[device.id].setDaemon(True)

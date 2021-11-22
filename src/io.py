@@ -38,7 +38,7 @@ class Config:
 class API:
     def __init__(self):
         self._session = requests.session()
-        self._demo = False
+        self._demo = True
         self._id = None
         self._secret = "admin"
         self._token = None
@@ -105,11 +105,14 @@ class API:
                 return []
         else:
             data = []
-            data.append({"id": "1", "name": "myThread", "type": "Cisco", "ip": "192.168.0.1"})
-            data.append({"id": "2", "name": "myThread2", "type": "Ubiquiti", "ip": "192.168.1.1"})
+            modules = []
+            modules.append({"name": "snmb", "config": {}})
+            data.append({"id": "1", "name": "Ubi", "timeout": 10, "type": "Ubiquiti", "ip": "172.31.37.95", "modules": modules})
+            data.append({"id": "2", "name": "Zabbi", "timeout": 10, "type": "Ubiquiti", "ip": "zabbux.htl-vil.local", "modules": {"name": "zabbix", "config": {}}})
+            data.append({"id": "3", "name": "Ubi", "timeout": 10, "type": "Cisco", "ip": "172.31.8.81", "modules": modules})
 
-            if(self.__conter % 5 == 0):
-                data.append({"id": "3", "name": "myThread3", "type": "Ubiquiti", "ip": "192.168.3.1"})
+            #if(self.__conter % 5 == 0):
+            #data.append({"id": "3", "name": "myThread3", "timeout": 10, "type": "Ubiquiti", "ip": "192.168.3.1", "modules": modules})
             self.__conter +=1
             # print(data)
             return data

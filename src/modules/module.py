@@ -10,8 +10,8 @@ class Module(threading.Thread):
         if(device is not None):
             self.device = device
         else:
-            if "deviceid" in kwargs and "devicename" in kwargs and "deviceip" in kwargs and "devicetype" in kwargs and "devicetimeout" in kwargs:
-                self.device = Device(id=kwargs["deviceid"], name=kwargs["devicename"], ip=kwargs["deviceip"], type=kwargs["devicetype"], timeout=kwargs["devicetimeout"])
+            if "deviceid" in kwargs and "devicename" in kwargs and "deviceip" in kwargs and "devicetype" in kwargs and "devicetimeout" in kwargs and "devicemodules" in kwargs:
+                self.device = Device(id=kwargs["deviceid"], name=kwargs["devicename"], ip=kwargs["deviceip"], type=kwargs["devicetype"], timeout=kwargs["devicetimeout"], modules=kwargs["devicemodules"])
                 deviceCreated = True
             else:
                 self.device = None
@@ -23,6 +23,7 @@ class Module(threading.Thread):
             customkwargs.pop("deviceip")
             customkwargs.pop("devicetype")
             customkwargs.pop("devicetimeout")
+            customkwargs.pop("devicemodules")
         super().__init__(*args, **customkwargs)
         self._stop = threading.Event()
 

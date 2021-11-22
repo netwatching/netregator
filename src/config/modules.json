@@ -1,0 +1,12 @@
+[
+  {
+    "name": "snmb",
+    "filename": "snmb",
+    "classname": "SNMB"
+  },
+  {
+    "name": "problems",
+    "filename": "zabbix",
+    "classname": "Problems"
+  }
+]
