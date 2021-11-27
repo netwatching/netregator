@@ -1,0 +1,10 @@
+{
+  "snmb": {
+    "filename": "snmb",
+    "classname": "SNMB"
+  },
+  "problems": {
+    "filename": "zabbix",
+    "classname": "Problems"
+  }
+}

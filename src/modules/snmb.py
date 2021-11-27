@@ -3,14 +3,13 @@ from src.device import Device
 import src.modules.helpers.snmp as snmp
 
 
-class Cisco(Module):
-    def __init__(self, device: Device = None, *args, **kwargs):
-        super().__init__(device, *args, **kwargs)
-        return
-        self.__ds = snmp.DataSources(snmp.SNMP("snmp_rw", self.device.ip, 161))
+class SNMB(Module):
+    def __init__(self, ip: str = None, timeout: int= None, *args, **kwargs):
+        super().__init__(ip, timeout, *args, **kwargs)
+        self.__ds = snmp.DataSources(snmp.SNMP("HTL-Villach", ip, 161))
 
     def worker(self):
-        return {}
+        return {"asd":"123"}
         data = {}
 
         data.update(self.__ds.get_hostname())

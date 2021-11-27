@@ -4,8 +4,9 @@ from pyzabbix.api import ZabbixAPI
 from decouple import config
 
 class ZabbixDevice:
-    def __init__(self, hostid: str = None, name: str = None, problem: str = None, timestamp: float = None, severity: str = None, tag: list = None):
+    def __init__(self, hostid: str = None, hostname: str = None, name: str = None, problem: str = None, timestamp: float = None, severity: str = None, tag: list = None):
         self.hostid = hostid
+        self.hostname = hostname
         self.name = name
         self.problem = problem
         self.timestamp = timestamp
@@ -19,6 +20,14 @@ class ZabbixDevice:
     @hostid.setter
     def hostid(self, host_id):
         self.__hostid = host_id
+
+    @property
+    def hostname(self):
+        return self.__hostname
+
+    @hostname.setter
+    def hostname(self, host_name):
+        self.__hostname = host_name
 
     @property
     def name(self):
@@ -61,20 +70,15 @@ class ZabbixDevice:
         self.__timestamp = timestamp
 
     def serialize(self):
-        output = {
-            "id": self.hostid,
-            "timestamp": self.timestamp,
-            "severity": self.severity,
-            "name": self.name,
-            "tag": self.tag,
-            "problem": self.problem}
+        output = {"id": self.hostid, "hostname": self.hostname, "name": self.name, "timestamp": self.timestamp, "severity": self.severity,
+                  "tag": self.tag, "problem": self.problem}
         return output
 
 
-class Zabbix(Module):
-    def __init__(self, device: Device = None, *args, **kwargs):
-        super().__init__(device, *args, **kwargs)
-        self.url = f"https://{self.device.ip}"
+class Problems(Module):
+    def __init__(self, ip: str = None, timeout: int = None, *args, **kwargs):
+        super().__init__(ip, timeout, *args, **kwargs)
+        self.url = f"https://{ip}"
         self.user = config("ZABBIX_USERNAME")
         self.password = config("ZABBIX_PASSWORD")
         self.__connection = self.__create_connection()
@@ -83,7 +87,7 @@ class Zabbix(Module):
         return ZabbixAPI(url=self.url, user=self.user, password=self.password)
 
     def get_hosts(self):
-        hosts = self.__connection.host.get(output=["hostid", "name"])
+        hosts = self.__connection.host.get(output=["hostid", "host", "name"])
         return hosts
 
     def get_infos(self, hosts):
@@ -94,6 +98,7 @@ class Zabbix(Module):
             if problem_obj:
                 for obj in problem_obj:
                     z_device.hostid = host["hostid"]
+                    z_device.hostname = host["host"]
                     z_device.name = host["name"]
                     z_device.timestamp = obj["clock"]
                     z_device.severity = obj["severity"]
@@ -115,4 +120,5 @@ class Zabbix(Module):
     def worker(self):
         hosts = self.get_hosts()
         problems = self.get_infos(hosts)
+        print(problems)
         return {"problems": problems}

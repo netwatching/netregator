@@ -4,26 +4,12 @@ from src.device import Device
 
 
 class Module(threading.Thread):
-    def __init__(self, device: Device=None, *args, **kwargs):
+    def __init__(self, ip: str, timeout: int, *args, **kwargs):
         deviceCreated = False
         self.__data = []
-        if(device is not None):
-            self.device = device
-        else:
-            if "deviceid" in kwargs and "devicename" in kwargs and "deviceip" in kwargs and "devicetype" in kwargs and "devicetimeout" in kwargs:
-                self.device = Device(id=kwargs["deviceid"], name=kwargs["devicename"], ip=kwargs["deviceip"], type=kwargs["devicetype"], timeout=kwargs["devicetimeout"])
-                deviceCreated = True
-            else:
-                self.device = None
-
-        customkwargs = kwargs
-        if deviceCreated:
-            del customkwargs["devicename"]
-            del customkwargs["deviceid"]
-            del customkwargs["deviceip"]
-            del customkwargs["devicetype"]
-            del customkwargs["devicetimeout"]
-        super().__init__(*args, **customkwargs)
+        self.timeout=timeout
+        self.ip=ip
+        super().__init__(*args, **kwargs)
         self._stop = threading.Event()
 
     @property
@@ -37,12 +23,20 @@ class Module(threading.Thread):
         self.__data.append(data)
 
     @property
-    def device(self):
-        return self.__device
+    def timeout(self):
+        return self.__timeout
 
-    @device.setter
-    def device(self, device):
-        self.__device = device
+    @timeout.setter
+    def timeout(self, timeout):
+        self.__timeout = int(timeout)
+
+    @property
+    def ip(self):
+        return self.__ip
+
+    @ip.setter
+    def ip(self, ip):
+        self.__ip = ip
 
     def is_stopped(self):
         return self._stop.is_set()
@@ -59,7 +53,7 @@ class Module(threading.Thread):
             for key in workerdict:
                 if key != "timestamp":
                     self.data = {"timestamp": timestamp, "key": key, "value": workerdict[key]}
-            time.sleep(self.device.timeout)
+            time.sleep(int(self.timeout))
 
     def worker(self):
-        return {"Error": f"Worker class of Type {self.device.type} not yet implemented!"}
+        return {"Error": f"Worker class of Type {self.ip} not yet implemented!"}
