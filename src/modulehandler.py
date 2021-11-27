@@ -74,7 +74,7 @@ class ModuleHander():
     
             # stop devices
             for c_id in devices_to_stop:
-                self.stop_device(self._workers[c_id].device)
+                self.stop_device(self._workers[c_id].id, self._workers[c_id].name)
     
             # update timeout, modules and check for dead devices/threads and restart them
             for c_id in running_devices:
@@ -122,10 +122,10 @@ class ModuleHander():
         for c_key in self._utilities.compare_list(self._known_system_threads, self._system_threads):
             self.start_system_thread(c_key)
 
-    def stop_device(self, device: Device):
-        self._workers[str(device.id)].stop()
-        del self._workers[str(device.id)]
-        print(f"Stopped device {device.name}")
+    def stop_device(self, device_id, device_name):
+        self._workers[str(device_id)].running = False
+        del self._workers[str(device_id)]
+        print(f"Stopped device {device_name}")
         return True
 
     def get_running_devices(self):

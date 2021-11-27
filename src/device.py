@@ -93,10 +93,13 @@ class Device(threading.Thread):
             self.__data[module_name] = self.__data[module_name] + module_data
 
     def run(self):
-        while True:
+        while self.running:
             self.get_data()
             self.check_modules()
             time.sleep(5)
+        worker_names = list(self._workers.keys())
+        for c_worker in worker_names:
+            self.stop_module(c_worker)
 
     def start_module(self, module):
         if module["name"] not in self._imported_modules:
@@ -131,6 +134,7 @@ class Device(threading.Thread):
     def stop_module(self, module_name):
         self._workers[module_name].stop()
         self._workers.pop(module_name)
+        print(f"Stopped module {module_name}")
 
     def get_data(self):
         for c_module in self._workers:
