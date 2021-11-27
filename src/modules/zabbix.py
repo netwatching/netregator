@@ -111,7 +111,7 @@ class Problems(Module):
                     for t in tags:
                         z_tags.append(t['tag'])
                     z_device.tag = z_tags
-                    print(z_device.serialize())
+                    #print(z_device.serialize())
                     zabbix_devices.append(z_device.serialize())
 
         return zabbix_devices
@@ -120,5 +120,5 @@ class Problems(Module):
     def worker(self):
         hosts = self.get_hosts()
         problems = self.get_infos(hosts)
-        print(problems)
+        #print(problems)
         return {"problems": problems}

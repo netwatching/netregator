@@ -111,10 +111,14 @@ class API:
             data.append({"id": "2", "name": "Zabbi", "timeout": 10, "type": "Ubiquiti", "ip": "zabbix.htl-vil.local", "modules": [{"name": "problems", "config": {}}]})
             data.append({"id": "3", "name": "Cisco", "timeout": 10, "type": "Cisco", "ip": "172.31.8.81", "modules": modules})
 
-            #if(self.__conter % 5 == 0):
-            #data.append({"id": "3", "name": "myThread3", "timeout": 10, "type": "Ubiquiti", "ip": "192.168.3.1", "modules": modules})
+            if(self.__conter % 5 == 0):
+                data.append({"id": "3", "name": "Cisco", "timeout": 10, "type": "Cisco", "ip": "172.31.8.81",
+                             "modules": []})
+            else:
+                data.append({"id": "3", "name": "Cisco", "timeout": 10, "type": "Cisco", "ip": "172.31.8.81",
+                             "modules": modules})
             self.__conter +=1
-            print(data)
+            #print(data)
             return data
     
 class JWTAuth(requests.auth.AuthBase):

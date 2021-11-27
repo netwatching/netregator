@@ -48,11 +48,11 @@ class ModuleHander():
             if devices != []:
                 output["devices"] = devices
                 self._api.send_data(output)
-                print("--------------")
-                print("--------------")
-                print("--------------")
-                print("--------------")
-                print(output)
+                #print("--------------")
+                #print("--------------")
+                #print("--------------")
+                #print("--------------")
+                #print(output)
             time.sleep(5)
 
     def check_devices(self):
@@ -70,7 +70,7 @@ class ModuleHander():
                 modules = running_devices[c_id]["modules"]
                 self.import_module(filename=device_type.lower(), packagename=device_type)
                 self.start_device(Device(id=c_id, name=name, device_type=device_type, ip=ip, timeout=timeout, modules=modules))
-                print(running_devices[c_id])
+                #print(running_devices[c_id])
     
             # stop devices
             for c_id in devices_to_stop:
@@ -135,5 +135,5 @@ class ModuleHander():
             device_id = c_device["id"]
             del c_device["id"]
             output[device_id] = c_device
-        print(output)
+        #print(output)
         return output

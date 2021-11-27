@@ -2,6 +2,7 @@ import threading
 import time
 from src.io import Config
 import json
+from src.utilities import Utilities
 
 
 class Device(threading.Thread):
@@ -18,6 +19,7 @@ class Device(threading.Thread):
         self.timeout = timeout
         self.modules = modules
         self.running = True
+        self._utilities = Utilities()
         super().__init__(*args, **kwargs)
 
     @property
@@ -91,29 +93,33 @@ class Device(threading.Thread):
             self.__data[module_name] = self.__data[module_name] + module_data
 
     def run(self):
-        self.start_modules()
-        time.sleep(5)
         while True:
             self.get_data()
+            self.check_modules()
             time.sleep(5)
-        # while self.running:
-        #    print(f"WORKING! - {self.name}")
-        #    time.sleep(100)
 
-    def start_modules(self):
-        for c_module in self.modules:
-            if c_module["name"] not in self._imported_modules:
-                self.import_module(c_module["name"])
-            # code = f"global c_worker;c_worker = {self._module_config[c_module['name']]['classname']}(deviceid={self.id},devicetype='{self.device_type}',devicename='{self.name}',deviceip='{self.ip}', devicetimeout={self.timeout}, devicemodules={self.modules})"
-            code = f"global c_worker;c_worker = {self._module_config[c_module['name']]['classname']}(ip='{self.ip}', timeout={self.timeout})"
-            print(code)
-            exec(code, globals())
-            self._workers[c_module["name"]] = c_worker
-            c_worker.start()
+    def start_module(self, module):
+        if module["name"] not in self._imported_modules:
+            self.import_module(module["name"])
+        code = f"global c_worker;c_worker = {self._module_config[module['name']]['classname']}(ip='{self.ip}', timeout={self.timeout})"
+        exec(code, globals())
+        self._workers[module["name"]] = c_worker
+        c_worker.start()
 
     def check_modules(self):
+        # start modules
+        module_names = []
         for c_module in self.modules:
-            pass
+            module_names.append(c_module["name"])
+            if c_module["name"] not in self._workers:
+                print(f"Started module {c_module['name']}")
+                self.start_module(c_module)
+
+        # stop modules
+        modules_to_stop = self._utilities.compare_list(self._workers.keys(), module_names)
+        for c_module in modules_to_stop:
+            print(f"Stopped module {c_module}")
+            self.stop_module(c_module)
 
 
     def import_module(self, module_name):
@@ -121,6 +127,10 @@ class Device(threading.Thread):
         exec(f"from src.modules.{config['filename']} import {config['classname']}", globals())
         self._imported_modules.append(module_name)
         print(f"Successfully imported module {module_name}")
+
+    def stop_module(self, module_name):
+        self._workers[module_name].stop()
+        self._workers.pop(module_name)
 
     def get_data(self):
         for c_module in self._workers:
