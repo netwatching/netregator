@@ -43,7 +43,7 @@ class ModuleHander():
                 c_data = self._workers[deviceid].data
                 if c_data:
                     devices.append({"id": deviceid,
-                                    "type": self._workers[deviceid].device.type,
+                                    "name": self._workers[deviceid].name,
                                     "data": c_data})
             if devices != []:
                 output["devices"] = devices
@@ -76,16 +76,20 @@ class ModuleHander():
             for c_id in devices_to_stop:
                 self.stop_device(self._workers[c_id].device)
     
-            # update timeout and check for dead devices/threads and restart them
+            # update timeout, modules and check for dead devices/threads and restart them
             for c_id in running_devices:
-                pass
-                #TODO: FIX
                 #check if device is still running. if not, restart it.
-                #if not self._workers[c_id].is_alive() or self._workers[c_id].is_stopped():
-                    #c_device = self._workers[c_id].device
-                    #self.start_device(c_device)
+                if not self._workers[c_id].is_alive() or not self._workers[c_id].running:
+                    c_id = self._workers[c_id].id
+                    name = self._workers[c_id].name
+                    device_type = self._workers[c_id].device_type
+                    ip = self._workers[c_id].ip
+                    timeout = self._workers[c_id].timeout
+                    modules = self._workers[c_id].modules
+                    self.start_device(Device(id=c_id, name=name, device_type=device_type, ip=ip, timeout=timeout, modules=modules))
                 # update timeout
-                #self._workers[c_id].device.timeout = running_devices[c_id]["timeout"]
+                self._workers[c_id].timeout = running_devices[c_id]["timeout"]
+                self._workers[c_id].modules = running_devices[c_id]["modules"]
             time.sleep(5)
 
     def start_device(self, device: Device):
