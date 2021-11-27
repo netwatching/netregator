@@ -41,7 +41,7 @@ class API:
         self._id = None
         self._secret = "admin"
         self._token = None
-        self._url = "http://oracle2.stefanmrb.eu:8081"
+        self._url = "http://palguin.htl-vil.local:8081"
         self.__conter = 0
         self._session.auth = JWTAuth(self)
         self._session.headers['Content-Type'] = 'application/json'
@@ -62,7 +62,7 @@ class API:
         # if not first Run
         if reauth is False:
             try:
-                time = datetime.datetime.utcfromtimestamp(jwt.decode(self._token, algorithms=["HS512", "HS256"], options=jwt_options)["expires"])
+                time = datetime.datetime.utcfromtimestamp(jwt.decode(self._token, algorithms=["HS512", "HS256"], options=jwt_options)["exp"])
                 # check if code already expired
                 if datetime.datetime.utcnow() > (time - datetime.timedelta(seconds=60)):
                     reauth = True
