@@ -2,6 +2,7 @@ import requests
 import jwt
 import datetime
 import json
+from decouple import config
 
 class Config:
     def __init__(self, path="../src/config/config.json"):
@@ -37,7 +38,7 @@ class Config:
 class API:
     def __init__(self):
         self._session = requests.session()
-        self._demo = False
+        self._demo = True
         self._id = None
         self._secret = "admin"
         self._token = None
