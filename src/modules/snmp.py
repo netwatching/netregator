@@ -3,7 +3,7 @@ from src.device import Device
 import src.modules.helpers.snmp as snmp
 
 
-class SNMB(Module):
+class SNMP(Module):
     def __init__(self, ip: str = None, timeout: int= None, *args, **kwargs):
         super().__init__(ip, timeout, *args, **kwargs)
         self.__ds = snmp.DataSources(snmp.SNMP("HTL-Villach", ip, 161))

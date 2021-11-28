@@ -1,7 +1,7 @@
 {
-  "snmb": {
-    "filename": "snmb",
-    "classname": "SNMB"
+  "snmp": {
+    "filename": "snmp",
+    "classname": "SNMP"
   },
   "problems": {
     "filename": "zabbix",
