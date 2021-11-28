@@ -42,12 +42,16 @@ class ModuleHander():
             for deviceid in self._workers:
                 c_data = self._workers[deviceid].data
                 if c_data:
-                    devices.append({"id": deviceid,
-                                    "name": self._workers[deviceid].name,
-                                    "data": c_data})
+                    current_metadata = {"id": deviceid,
+                                    "name": self._workers[deviceid].name}
+                    current_metadata.update(c_data)
+                    devices.append(current_metadata)
+                self._workers[deviceid].clear_data()
             if devices != []:
                 output["devices"] = devices
-                self._api.send_data(output)
+                print(output)
+                # TODO: send data
+                #self._api.send_data(output)
                 #print("--------------")
                 #print("--------------")
                 #print("--------------")

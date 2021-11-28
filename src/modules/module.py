@@ -1,12 +1,14 @@
 import threading
 import time
 from src.device import Device
+from src.module_data import ModuleData
+from src.device_data import DeviceData
 
 
 class Module(threading.Thread):
     def __init__(self, ip: str, timeout: int, *args, **kwargs):
         deviceCreated = False
-        self.__data = []
+        self.__data = DeviceData()
         self.timeout=timeout
         self.ip=ip
         super().__init__(*args, **kwargs)
@@ -14,13 +16,11 @@ class Module(threading.Thread):
 
     @property
     def data(self):
-        c_data = self.__data
-        self.__data = []
-        return c_data
+        return self.__data
 
     @data.setter
-    def data(self, data):
-        self.__data.append(data)
+    def data(self, data: ModuleData):
+        self.__data.add_module_data(data)
 
     @property
     def timeout(self):
@@ -44,16 +44,23 @@ class Module(threading.Thread):
     def stop(self):
         self._stop.set()
 
+    def clear_data(self):
+        self.__data = DeviceData()
+
     def run(self):
         while not self.is_stopped():
-            timestamp = time.time()
-            workerdict = self.worker()
-            if "timestamp" in workerdict:
-                timestamp = workerdict["timestamp"]
-            for key in workerdict:
-                if key != "timestamp":
-                    self.data = {"timestamp": timestamp, "key": key, "value": workerdict[key]}
+            #timestamp = time.time()
+            #worker_data: ModuleData = self.worker()
+            #if "timestamp" in workerdict:
+            #    timestamp = workerdict["timestamp"]
+            #for key in workerdict:
+            #    if key != "timestamp":
+            #        self.data = {"timestamp": timestamp, "key": key, "value": workerdict[key]}
+            #static_data = worker_data.static_data
+            #live_data = worker_data.live_data
+            self.data = self.worker()
+
             time.sleep(int(self.timeout))
 
     def worker(self):
-        return {"Error": f"Worker class of Type {self.ip} not yet implemented!"}
+        return ModuleData({"Error": f"Worker class of Type {self.ip} not yet implemented!"}, {}, {})

@@ -3,6 +3,8 @@ import time
 from src.io import Config
 import json
 from src.utilities import Utilities
+from src.module_data import ModuleData
+from src.device_data import DeviceData
 
 
 class Device(threading.Thread):
@@ -11,7 +13,7 @@ class Device(threading.Thread):
         self._module_config = Config("./src/config/modules.json").get_whole_file()
         self._imported_modules = []
         self._workers = {}
-        self.__data = {}
+        self.__data = DeviceData()
         self.name = name
         self.id = id
         self.ip = ip
@@ -80,17 +82,17 @@ class Device(threading.Thread):
 
     @property
     def data(self):
-        c_data = self.__data
-        self.__data = {}
-        return c_data
+        return self.__data.serialize()
 
     @data.setter
     def data(self, module_name):
         module_data = self._workers[module_name].data
-        if module_data:
-            if not module_name in self.__data:
-                self.__data[module_name] = list()
-            self.__data[module_name] = self.__data[module_name] + module_data
+        self.__data.add_module_data(module_data)
+        print(module_data)
+        #if module_data:
+        #    self.__data["static_data"].update(module_data.static_data)
+        #    self.__data["live_data"].update(module_data.live_data)
+        #    self.__data["events"].update(self.__data["events"])
 
     def run(self):
         while self.running:
@@ -139,3 +141,7 @@ class Device(threading.Thread):
     def get_data(self):
         for c_module in self._workers:
             self.data = c_module
+            self._workers[c_module].clear_data()
+
+    def clear_data(self):
+        self.__data = DeviceData()

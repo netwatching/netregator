@@ -1,15 +1,42 @@
 from src.modules.module import Module
 from src.device import Device
+from src.module_data import ModuleData
 import src.modules.helpers.snmp as snmp
 
 
 class SNMP(Module):
-    def __init__(self, ip: str = None, timeout: int= None, *args, **kwargs):
+    def __init__(self, ip: str = None, timeout: int = None, *args, **kwargs):
         super().__init__(ip, timeout, *args, **kwargs)
         self.__ds = snmp.DataSources(snmp.SNMP("HTL-Villach", ip, 161))
+        self.counter = 0
 
     def worker(self):
-        return {"asd":"123"}
+        self.counter += 1
+        return ModuleData(static_data={
+            "ipAddr": {
+                "127.0.0.1": {
+                    "Addr": "127.0.0.1",
+                    "netmask": "255.255.255.255"
+                },
+                "169.65.2.5": {
+                    "Addr": "169.65.2.5",
+                    "netmask": "255.255.255.0"
+                }
+            },
+            "interface": {
+                "1": {
+                    "ifIndex": 1,
+                    "ifDescr": "LinkAggregate1",
+                    "ifAdminStatus": "up"
+                },
+                "52": {
+                    "ifIndex": 52,
+                    "ifDescr": "LinkAggregate52",
+                    "ifAdminStatus": "down"
+                }
+            },
+            "hostname": "ciscoSW1"
+        }, live_data={}, events={})
         data = {}
 
         data.update(self.__ds.get_hostname())

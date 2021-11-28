@@ -2,6 +2,7 @@ from src.modules.module import Module
 from src.device import Device
 from pyzabbix.api import ZabbixAPI
 from decouple import config
+from src.module_data import ModuleData
 
 class ZabbixDevice:
     def __init__(self, hostid: str = None, hostname: str = None, name: str = None, problem: str = None, timestamp: float = None, severity: str = None, tag: list = None):
@@ -121,4 +122,4 @@ class Problems(Module):
         hosts = self.get_hosts()
         problems = self.get_infos(hosts)
         #print(problems)
-        return {"problems": problems}
+        return ModuleData({}, {}, {"problems": problems})
