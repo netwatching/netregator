@@ -166,3 +166,12 @@ class DataSources:
                  'ifOutErrors']
 
         return {"interfaces": self.__snmp.get_table(_keys, "IF-MIB")}
+
+    def get_ip_addresses(self):
+        _keys = ['ipAdEntAddr',
+                 'ipAdEntIfIndex',
+                 'ipAdEntNetMask',
+                 'ipAdEntBcastAddr',
+                 'ipAdEntReasmMaxSize']
+
+        return {"ipAddresses": self.__snmp.get_table(_keys, "IP-MIB")}
