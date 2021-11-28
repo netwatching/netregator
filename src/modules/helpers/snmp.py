@@ -32,7 +32,7 @@ class SNMP:
         return value.prettyPrint()
 
     def get_table(self, arguments_list: list, mib_name):
-        all_entries = []
+        all_entries = {}
         _var_binds = []
 
         for key in arguments_list:
@@ -57,11 +57,12 @@ class SNMP:
                 break
             else:
                 if var_binds:
-                    interface_data = {}
+                    #interface_data = {}
                     oid, _ = var_binds[0]
                     _, _, index = oid.getMibSymbol()
                     index = index[0].prettyPrint()
-                    interface_data[index] = {}
+                    #interface_data[index] = {}
+                    all_entries[index] = {}
                     for var_bind in var_binds:
                         oid, value = var_bind
                         mib, name, index = oid.getMibSymbol()
@@ -69,7 +70,7 @@ class SNMP:
                         index = index[0].prettyPrint()
                         # interface_data.append((mib, name, index, value))
                         # if index in interface_data:
-                        interface_data[index].update({name: value})
+                        #interface_data[index].update({name: value})
                         # else:
                         #     interface_data[index] = {name: value}
 
@@ -77,7 +78,7 @@ class SNMP:
                         # print(f"{name=}")
                         # print(f"{index=}")
                         # print(f"{value.prettyPrint()=}")
-                    all_entries.append(interface_data)
+                        all_entries[index].update({name: value})
                 else:
                     print("no value returned")
         return all_entries
