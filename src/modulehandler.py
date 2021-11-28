@@ -29,11 +29,6 @@ class ModuleHander():
             os._exit(1)
         #self.stop_system_thread()
 
-    def import_module(self, filename, packagename):
-        if packagename not in self._imported_modules:
-            exec(f"from src.modules.{filename} import {packagename}", globals())
-            self._imported_modules.append(packagename)
-            print(f"Successfully imported module {packagename}")
 
     def get_data_from_devices(self):
         while True:
@@ -72,7 +67,6 @@ class ModuleHander():
                 name = running_devices[c_id]["name"]
                 timeout = running_devices[c_id]["timeout"]
                 modules = running_devices[c_id]["modules"]
-                self.import_module(filename=device_type.lower(), packagename=device_type)
                 self.start_device(Device(id=c_id, name=name, device_type=device_type, ip=ip, timeout=timeout, modules=modules))
                 #print(running_devices[c_id])
     
