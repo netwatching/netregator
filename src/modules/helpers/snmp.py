@@ -141,7 +141,7 @@ class DataSources:
         if services_key >= 1:
             services_key -= 1
 
-        return {"services": services}
+        return {"services": {"services": services}}
 
     def get_interfaces(self):  # 1.3.6.1.2.1.2.2.1
         _keys = ['ifIndex',
