@@ -88,7 +88,7 @@ class Device(threading.Thread):
     def data(self, module_name):
         module_data = self._workers[module_name].data
         self.__data.add_module_data(module_data)
-        print(module_data)
+        #(module_data)
         #if module_data:
         #    self.__data["static_data"].update(module_data.static_data)
         #    self.__data["live_data"].update(module_data.live_data)

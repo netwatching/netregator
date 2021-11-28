@@ -51,7 +51,7 @@ class ModuleHander():
                 output["devices"] = devices
                 print(output)
                 # TODO: send data
-                #self._api.send_data(output)
+                self._api.send_data(output)
                 #print("--------------")
                 #print("--------------")
                 #print("--------------")
