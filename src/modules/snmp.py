@@ -48,5 +48,5 @@ class SNMP(Module):
         data.update(self.__ds.get_ip_addresses())
         # TODO: add other DataSource functions above
 
-        print(data)  # TODO: logging class
+        # print(data)  # TODO: logging class
         return ModuleData(static_data=data, live_data={}, events={})
