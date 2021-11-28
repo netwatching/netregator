@@ -31,6 +31,57 @@ class SNMP:
         name, value = var_binds[0]  # name is ObjectName object - value is number object
         return value.prettyPrint()
 
+    def get_table(self, arguments_list: list, mib_name):
+        all_entries = []
+        _var_binds = []
+
+        for key in arguments_list:
+            _var_binds.append(ObjectType(ObjectIdentity(mib_name, key)))
+
+        iterator = nextCmd(
+            SnmpEngine(),
+            CommunityData(self.__community_string),
+            UdpTransportTarget((self.__hostname, 161)),
+            ContextData(),
+            *_var_binds,
+            lexicographicMode=False,
+            lookupMib=True
+        )
+
+        for error_indication, error_status, error_index, var_binds in iterator:
+            if error_indication:
+                print(error_indication)
+                break
+            elif error_status:
+                print('%s at %s' % (error_status.prettyPrint(), error_index and var_binds[int(error_index) - 1][0] or '?'))
+                break
+            else:
+                if var_binds:
+                    interface_data = {}
+                    oid, _ = var_binds[0]
+                    _, _, index = oid.getMibSymbol()
+                    index = index[0].prettyPrint()
+                    interface_data[index] = {}
+                    for var_bind in var_binds:
+                        oid, value = var_bind
+                        mib, name, index = oid.getMibSymbol()
+                        value = value.prettyPrint()
+                        index = index[0].prettyPrint()
+                        # interface_data.append((mib, name, index, value))
+                        # if index in interface_data:
+                        interface_data[index].update({name: value})
+                        # else:
+                        #     interface_data[index] = {name: value}
+
+                        # print(f"{mib=}")
+                        # print(f"{name=}")
+                        # print(f"{index=}")
+                        # print(f"{value.prettyPrint()=}")
+                    all_entries.append(interface_data)
+                else:
+                    print("no value returned")
+        return all_entries
+
 
 class DataSources:
     def __init__(self, snmp: SNMP):
@@ -93,17 +144,25 @@ class DataSources:
         return {"services": services}
 
     def get_interfaces(self):  # 1.3.6.1.2.1.2.2.1
-        # get if number
-        # number = int(snmp.get_single_value_by_oid('1.3.6.1.2.1.2.1.0'))
-        # get ifnumber times descr
-        # get ifnumber times type
-        # get ifnumber times mtu
-        # get ifnumber times speed
-        # get ifnumber times phys addr
-        # get ifnumber times admin status
-        # get ifnumber times oper status
-        # get ifnumber times last change
-        # get ifnumber times InOctets
-        # get ifnumber times Ucast pkts
+        _keys = ['ifIndex',
+                 'ifDescr',
+                 'ifType',
+                 'ifMtu',
+                 'ifSpeed',
+                 'ifPhysAddress',
+                 'ifAdminStatus',
+                 'ifOperStatus',
+                 'ifLastChange',
+                 'ifInOctets',
+                 'ifInUcastPkts',
+                 'ifInNUcastPkts',
+                 'ifInDiscards',
+                 'ifInErrors',
+                 'ifInUnknownProtos',
+                 'ifOutOctets',
+                 'ifOutUcastPkts',
+                 'ifOutNUcastPkts',
+                 'ifOutDiscards',
+                 'ifOutErrors']
 
-        return {"interfaces": []}
+        return {"interfaces": self.__snmp.get_table(_keys, "IF-MIB")}
