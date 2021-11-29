@@ -29,7 +29,6 @@ class ModuleHander():
             os._exit(1)
         #self.stop_system_thread()
 
-
     def get_data_from_devices(self):
         while True:
             output = {}
@@ -44,7 +43,7 @@ class ModuleHander():
                 self._workers[deviceid].clear_data()
             if devices != []:
                 output["devices"] = devices
-                print(output)
+                print(json.dumps(output))
                 # TODO: send data
                 self._api.send_data(output)
                 #print("--------------")

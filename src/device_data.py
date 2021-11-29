@@ -15,20 +15,28 @@ class DeviceData:
 
     def convert_to_key_value_list(self, input_dict: dict):
         key_val = []
+        system_data = {}
         for key, val in input_dict.items():
             if type(val) == dict:
+                first_run = True
+                is_single_dict = False
                 for current_key, current_value in val.items():
+                    if first_run and type(current_value) != dict:
+                        is_single_dict = True
+                        break
                     key_val.append({
                         "key": key,
                         "identifier": current_key,
                         "value": current_value
                     })
+                    first_run = False
+                if is_single_dict:
+                    key_val.append({"key": key, "identifier": None, "value": val})
             else:
-                key_val.append({
-                    "key": key,
-                    "identifier": None,
-                    "value": val
-                })
+                system_data[key] = val
+        # single values
+        if system_data:
+            key_val.append({"key": "system", "identifier": None, "value": system_data})
         return key_val
 
     def serialize(self):
