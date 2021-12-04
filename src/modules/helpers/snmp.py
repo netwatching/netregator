@@ -137,9 +137,30 @@ class DataSources:
 
     def get_ip_data(self):
         ip_data = {}
-        ip_data.update(self.__snmp.get_single_value_by_name_with_name("ipForwarding", "IP-MIB"))
-        ip_data.update(self.__snmp.get_single_value_by_name_with_name("ipDefaultTTL", "IP-MIB"))
-        ip_data.update(self.__snmp.get_single_value_by_name_with_name("ipInReceives", "IP-MIB"))
+        keys = [
+            "ipForwarding",
+            "ipDefaultTTL",
+            "ipInReceives",
+            "ipInHdrErrors",
+            "ipInAddrErrors",
+            "ipForwDatagrams",
+            "ipInUnknownProtos",
+            "ipInDiscards",
+            "ipInDelivers",
+            "ipOutRequests",
+            "ipOutDiscards",
+            "ipOutNoRoutes",
+            "ipReasmTimeout",
+            "ipReasmReqds",
+            "ipReasmOKs",
+            "ipReasmFails",
+            "ipFragOKs",
+            "ipFragFails",
+            "ipFragCreates",
+            "ipRoutingDiscards",
+        ]
+        for key in keys:
+            ip_data.update(self.__snmp.get_single_value_by_name_with_name(key, "IP-MIB"))
         return {"ip": ip_data}
 
     def get_services(self):
@@ -200,5 +221,12 @@ class DataSources:
                  'ipAdEntNetMask',
                  'ipAdEntBcastAddr',
                  'ipAdEntReasmMaxSize']
-
         return {"ipAddresses": self.__snmp.get_table(_keys, "IP-MIB")}
+
+    def get_ip_routes(self):
+        _keys = ['ipRouteDest',
+                 'ipRouteIfIndex',
+                 'ipRouteMetric1',
+                 'ipRouteMetric2',
+                 'ipRouteMetric3']
+        return {"ipRoutes": self.__snmp.get_table(_keys, "IP-MIB")}

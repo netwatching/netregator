@@ -20,8 +20,9 @@ class SNMP(Module):
         data.update(self.__ds.get_name())
         data.update(self.__ds.get_services())
         data.update(self.__ds.get_interfaces())
-        data.update(self.__ds.get_ip_addresses())
         data.update(self.__ds.get_ip_data())
+        data.update(self.__ds.get_ip_addresses())
+        data.update(self.__ds.get_ip_routes())
         # TODO: add other DataSource functions above
 
         print(data)  # TODO: logging class
