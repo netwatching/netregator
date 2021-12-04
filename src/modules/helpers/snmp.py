@@ -19,11 +19,11 @@ class SNMP:
         name, value = var_binds[0]  # name is ObjectName object - value is number object
         return value.prettyPrint()
 
-    def __getvar_binds_by_name(self, name, mib_name):
+    def __get_var_binds_by_name(self, name, mib_name):
         iterator = getCmd(
             SnmpEngine(),
             CommunityData(self.__community_string, mpModel=0),
-            UdpTransportTarget((self.__hostname, self.__port), timeout=1, retries=5),
+            UdpTransportTarget((self.__hostname, self.__port), timeout=1, retries=5),  # TODO: add timout and retry everywhere
             ContextData(),
             ObjectType(ObjectIdentity(mib_name, name, 0))
         )
@@ -41,11 +41,11 @@ class SNMP:
                 raise Exception(f"no value returned for {name} in MIB: {mib_name}")
 
     def get_single_value_by_name(self, name, mib_name='SNMPv2-MIB'):
-        name, value = self.__getvar_binds_by_name(name, mib_name)[0]  # name is ObjectName object - value is number object
+        name, value = self.__get_var_binds_by_name(name, mib_name)[0]  # name is ObjectName object - value is number object
         return value.prettyPrint()
 
     def get_single_value_by_name_with_name(self, name, mib_name='SNMPv2-MIB'):
-        oid, value = self.__getvar_binds_by_name(name, mib_name)[0]  # name is ObjectName object - value is number object
+        oid, value = self.__get_var_binds_by_name(name, mib_name)[0]  # name is ObjectName object - value is number object
         _, name, index = oid.getMibSymbol()  # _ is MIB name
         value = value.prettyPrint()
         return {name: value}
