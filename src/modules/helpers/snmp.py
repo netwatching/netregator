@@ -19,7 +19,7 @@ class SNMP:
         name, value = var_binds[0]  # name is ObjectName object - value is number object
         return value.prettyPrint()
 
-    def get_single_value_by_name(self, name, mib_name='SNMPv2-MIB'):
+    def __getvar_binds_by_name(self, name, mib_name):
         iterator = getCmd(
             SnmpEngine(),
             CommunityData(self.__community_string, mpModel=0),
@@ -28,8 +28,27 @@ class SNMP:
             ObjectType(ObjectIdentity(mib_name, name, 0))
         )
         (error_indication, error_status, error_index, var_binds) = next(iterator)
-        name, value = var_binds[0]  # name is ObjectName object - value is number object
+
+        if error_indication:
+            print(error_indication)
+            raise Exception(error_indication)
+        elif error_status:
+            raise Exception('%s at %s' % (error_status.prettyPrint(), error_index and var_binds[int(error_index) - 1][0] or '?'))
+        else:
+            if var_binds:
+                return var_binds
+            else:
+                raise Exception(f"no value returned for {name} in MIB: {mib_name}")
+
+    def get_single_value_by_name(self, name, mib_name='SNMPv2-MIB'):
+        name, value = self.__getvar_binds_by_name(name, mib_name)[0]  # name is ObjectName object - value is number object
         return value.prettyPrint()
+
+    def get_single_value_by_name_with_name(self, name, mib_name='SNMPv2-MIB'):
+        oid, value = self.__getvar_binds_by_name(name, mib_name)[0]  # name is ObjectName object - value is number object
+        _, name, index = oid.getMibSymbol()  # _ is MIB name
+        value = value.prettyPrint()
+        return {name: value}
 
     def get_table(self, arguments_list: list, mib_name):
         all_entries = {}
@@ -115,6 +134,12 @@ class DataSources:
     def get_location(self):
         location = self.__snmp.get_single_value_by_name('sysLocation')
         return {"location": location}
+
+    def get_icmp_data(self):
+        icmp_data = {}
+        icmp_data.update(self.__snmp.get_single_value_by_name_with_name("icmpInMsgs"))
+        icmp_data.update(self.__snmp.get_single_value_by_name_with_name("icmpInErrors"))
+        return {"icmp": icmp_data}
 
     def get_services(self):
         services_key = int(self.__snmp.get_single_value_by_name('sysServices'))  # https://oidref.com/1.3.6.1.2.1.1.7
