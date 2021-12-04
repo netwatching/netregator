@@ -135,11 +135,12 @@ class DataSources:
         location = self.__snmp.get_single_value_by_name('sysLocation')
         return {"location": location}
 
-    def get_icmp_data(self):
-        icmp_data = {}
-        icmp_data.update(self.__snmp.get_single_value_by_name_with_name("icmpInMsgs"))
-        icmp_data.update(self.__snmp.get_single_value_by_name_with_name("icmpInErrors"))
-        return {"icmp": icmp_data}
+    def get_ip_data(self):
+        ip_data = {}
+        ip_data.update(self.__snmp.get_single_value_by_name_with_name("ipForwarding", "IP-MIB"))
+        ip_data.update(self.__snmp.get_single_value_by_name_with_name("ipDefaultTTL", "IP-MIB"))
+        ip_data.update(self.__snmp.get_single_value_by_name_with_name("ipInReceives", "IP-MIB"))
+        return {"ip": ip_data}
 
     def get_services(self):
         services_key = int(self.__snmp.get_single_value_by_name('sysServices'))  # https://oidref.com/1.3.6.1.2.1.1.7
