@@ -147,7 +147,7 @@ class DataSources:
         ]
         for key in keys:
             system_data.update(self.__snmp.get_single_value_by_name_with_name(key))
-        return {"ip": system_data}
+        return {"system": system_data}
 
     def get_ip_data(self):
         ip_data = {}
