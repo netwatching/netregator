@@ -222,11 +222,3 @@ class DataSources:
                  'ipAdEntBcastAddr',
                  'ipAdEntReasmMaxSize']
         return {"ipAddresses": self.__snmp.get_table(_keys, "IP-MIB")}
-
-    def get_ip_routes(self):
-        _keys = ['ipRouteDest',
-                 'ipRouteIfIndex',
-                 'ipRouteMetric1',
-                 'ipRouteMetric2',
-                 'ipRouteMetric3']
-        return {"ipRoutes": self.__snmp.get_table(_keys, "IP-MIB")}
