@@ -12,12 +12,13 @@ class SNMP(Module):
     def worker(self):
         data = {}
 
-        data.update(self.__ds.get_hostname())
-        data.update(self.__ds.get_object_id())
-        data.update(self.__ds.get_uptime())
-        data.update(self.__ds.get_description())
-        data.update(self.__ds.get_contact())
-        data.update(self.__ds.get_name())
+        # data.update(self.__ds.get_hostname())
+        # data.update(self.__ds.get_object_id())
+        # data.update(self.__ds.get_uptime())
+        # data.update(self.__ds.get_description())
+        # data.update(self.__ds.get_contact())
+        # data.update(self.__ds.get_name())
+        data.update(self.__ds.get_system_data())
         data.update(self.__ds.get_services())
         data.update(self.__ds.get_interfaces())
         data.update(self.__ds.get_ip_data())

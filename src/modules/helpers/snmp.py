@@ -135,6 +135,20 @@ class DataSources:
         location = self.__snmp.get_single_value_by_name('sysLocation')
         return {"location": location}
 
+    def get_system_data(self):
+        system_data = {}
+        keys = [
+            "sysName",
+            "sysObjectID",
+            "sysUpTime",
+            "sysDescr",
+            "sysContact",
+            "sysLocation"
+        ]
+        for key in keys:
+            system_data.update(self.__snmp.get_single_value_by_name_with_name(key, "IP-MIB"))
+        return {"ip": system_data}
+
     def get_ip_data(self):
         ip_data = {}
         keys = [
@@ -157,7 +171,7 @@ class DataSources:
             "ipFragOKs",
             "ipFragFails",
             "ipFragCreates",
-            "ipRoutingDiscards",
+            "ipRoutingDiscards"
         ]
         for key in keys:
             ip_data.update(self.__snmp.get_single_value_by_name_with_name(key, "IP-MIB"))
@@ -192,33 +206,36 @@ class DataSources:
         return {"services": services}
 
     def get_interfaces(self):  # 1.3.6.1.2.1.2.2.1
-        _keys = ['ifIndex',
-                 'ifDescr',
-                 'ifType',
-                 'ifMtu',
-                 'ifSpeed',
-                 'ifPhysAddress',
-                 'ifAdminStatus',
-                 'ifOperStatus',
-                 'ifLastChange',
-                 'ifInOctets',
-                 'ifInUcastPkts',
-                 'ifInNUcastPkts',
-                 'ifInDiscards',
-                 'ifInErrors',
-                 'ifInUnknownProtos',
-                 'ifOutOctets',
-                 'ifOutUcastPkts',
-                 'ifOutNUcastPkts',
-                 'ifOutDiscards',
-                 'ifOutErrors']
-
+        _keys = [
+            'ifIndex',
+            'ifDescr',
+            'ifType',
+            'ifMtu',
+            'ifSpeed',
+            'ifPhysAddress',
+            'ifAdminStatus',
+            'ifOperStatus',
+            'ifLastChange',
+            'ifInOctets',
+            'ifInUcastPkts',
+            'ifInNUcastPkts',
+            'ifInDiscards',
+            'ifInErrors',
+            'ifInUnknownProtos',
+            'ifOutOctets',
+            'ifOutUcastPkts',
+            'ifOutNUcastPkts',
+            'ifOutDiscards',
+            'ifOutErrors'
+        ]
         return {"interfaces": self.__snmp.get_table(_keys, "IF-MIB")}
 
     def get_ip_addresses(self):
-        _keys = ['ipAdEntAddr',
-                 'ipAdEntIfIndex',
-                 'ipAdEntNetMask',
-                 'ipAdEntBcastAddr',
-                 'ipAdEntReasmMaxSize']
+        _keys = [
+            'ipAdEntAddr',
+            'ipAdEntIfIndex',
+            'ipAdEntNetMask',
+            'ipAdEntBcastAddr',
+            'ipAdEntReasmMaxSize'
+        ]
         return {"ipAddresses": self.__snmp.get_table(_keys, "IP-MIB")}
