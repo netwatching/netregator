@@ -18,12 +18,15 @@ class ModuleHander():
         self._running = True
         self._api = API()
         self._utilities = Utilities()
+        self._modules = Config("./src/config/modules.json")
         self.mainloop()
 
     def mainloop(self):
         try:
             self.start_system_thread()
+            time.sleep(1)
             self.set_version()
+            self.set_modules()
             while self._running:
                 self.check_system_threads()
                 time.sleep(5)
@@ -139,3 +142,12 @@ class ModuleHander():
 
     def set_version(self):
         self._api.send_version_string(config("VERSION"))
+
+    def set_modules(self, validate_settings=True):
+        output = []
+        for modulename in self._modules.get_whole_file():
+            output.append({
+                "id": modulename,
+                "config": {}
+            })
+        self._api.send_known_modules(output)

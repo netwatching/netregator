@@ -87,6 +87,7 @@ class API:
 
     def send_data(self, data):
         req = self._session.post(f"{self._url}/api/devices/data", auth=JWTAuth(self), json=data)
+        print(req.request.body)
         if req.status_code == requests.codes.ok:
             return True
         else:
@@ -128,8 +129,16 @@ class API:
     def send_version_string(self, version):
         if version == "%VER%":
             version = "v0.0-DEV"
-        req = self._session.post(f"{self._url}/api/aggregator/{self._id}/version", json={"version": version})
-        print(req.json())
+        req = self._session.post(f"{self._url}/api/aggregator/{self._id}/version", json={"version": version}, auth=JWTAuth(self), timeout=5)
+        #print(req.json())
+        if req.status_code == requests.codes.ok:
+            return True
+        else:
+            return False
+
+    def send_known_modules(self, modules):
+        req = self._session.post(f"{self._url}/api/aggregator/{self._id}/version", json={"modules": modules},
+                                 auth=JWTAuth(self), timeout=5)
         if req.status_code == requests.codes.ok:
             return True
         else:
@@ -143,4 +152,5 @@ class JWTAuth(requests.auth.AuthBase):
     def __call__(self, r):
         # print(self.token)
         r.headers["Authorization"] = "Bearer " + self.token
+        #print(self.token)
         return r
