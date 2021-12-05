@@ -6,6 +6,7 @@ from src.device import Device
 from src.utilities import Utilities
 import time
 import os
+from decouple import config
 
 
 class ModuleHander():
@@ -22,6 +23,7 @@ class ModuleHander():
     def mainloop(self):
         try:
             self.start_system_thread()
+            self.set_version()
             while self._running:
                 self.check_system_threads()
                 time.sleep(5)
@@ -134,3 +136,6 @@ class ModuleHander():
             output[device_id] = c_device
         #print(output)
         return output
+
+    def set_version(self):
+        self._api.send_version_string(config("VERSION"))
