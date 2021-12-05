@@ -55,7 +55,6 @@ class Problems(Module):
         zabbix_devices = {}
         for host in hosts:
             z_device = ZabbixDevice(hostname=host["host"])
-            # print(self.__connection.problem.get(hostids="10400"))
             problem_obj = self.__connection.problem.get(hostids=host['hostid'], selectHosts='extend')
             if problem_obj:
                 for obj in problem_obj:
