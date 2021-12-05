@@ -123,3 +123,10 @@ class Problems(Module):
         problems = self.get_infos(hosts)
         #print(problems)
         return ModuleData({}, {}, {"problems": problems})
+
+    @staticmethod
+    def check_module_configuration():
+        if config("ZABBIX_USERNAME") and config("ZABBIX_PASSWORD"):
+            return True
+        else:
+            return False

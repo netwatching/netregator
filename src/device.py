@@ -126,7 +126,6 @@ class Device(threading.Thread):
             print(f"Stopped module {c_module}")
             self.stop_module(c_module)
 
-
     def import_module(self, module_name):
         config = self._module_config[module_name]
         exec(f"from src.modules.{config['filename']} import {config['classname']}", globals())

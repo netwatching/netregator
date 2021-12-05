@@ -62,5 +62,9 @@ class Module(threading.Thread):
 
             time.sleep(int(self.timeout))
 
+    @staticmethod
+    def check_module_configuration():
+        return True
+
     def worker(self):
         return ModuleData({"Error": f"Worker class of Type {self.ip} not yet implemented!"}, {}, {})

@@ -13,6 +13,7 @@ class ModuleHander():
     def __init__(self):
         self._imported_modules = []
         self._workers = {}
+        self._module_config = Config("./src/config/modules.json").get_whole_file()
         self._system_threads = {}
         self._known_system_threads = ["sendData", "checkDevices"]
         self._running = True
@@ -143,11 +144,22 @@ class ModuleHander():
     def set_version(self):
         self._api.send_version_string(config("VERSION"))
 
+    def validate_module_config_module(self, module_name):
+        config = self._module_config[module_name]
+        exec(f"from src.modules.{config['filename']} import {config['classname']}", globals())
+        self._imported_modules.append(module_name)
+        exec(f"is_valid = {config['classname']}.check_module_configuration()", globals())
+        return is_valid
+
     def set_modules(self, validate_settings=True):
         output = []
-        for modulename in self._modules.get_whole_file():
-            output.append({
-                "id": modulename,
-                "config": {}
-            })
+        for module_name in self._modules.get_whole_file():
+            if validate_settings is False or self.validate_module_config_module(module_name):
+                output.append({
+                    "id": module_name,
+                    "config": {}
+                })
+            else:
+                print(f"{module_name} is not configured correctly!")
+        print(output)
         self._api.send_known_modules(output)
