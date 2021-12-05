@@ -3,7 +3,6 @@ import time
 from src.io import Config
 import json
 from src.utilities import Utilities
-from src.module_data import ModuleData
 from src.device_data import DeviceData
 
 
@@ -82,7 +81,7 @@ class Device(threading.Thread):
 
     @property
     def data(self):
-        return self.__data.serialize()
+        return self.__data.serialize(), self.__data.external_events
 
     @data.setter
     def data(self, module_name):

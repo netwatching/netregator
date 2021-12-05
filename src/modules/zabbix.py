@@ -2,7 +2,7 @@ from src.modules.module import Module
 from src.device import Device
 from pyzabbix.api import ZabbixAPI
 from decouple import config
-from src.module_data import ModuleData
+from src.module_data import ModuleData, OutputType
 
 class ZabbixDevice:
     def __init__(self, hostid: str = None, hostname: str = None, name: str = None, problem: str = None, timestamp: float = None, severity: str = None, tag: list = None):
@@ -71,8 +71,7 @@ class ZabbixDevice:
         self.__timestamp = timestamp
 
     def serialize(self):
-        output = {"id": self.hostid, "hostname": self.hostname, "name": self.name, "timestamp": self.timestamp, "severity": self.severity,
-                  "tag": self.tag, "problem": self.problem}
+        output = {"timestamp": self.timestamp, "severity": self.severity, "problem": self.problem}
         return output
 
 
@@ -92,7 +91,7 @@ class Problems(Module):
         return hosts
 
     def get_infos(self, hosts):
-        zabbix_devices = []
+        zabbix_devices = {}
         for host in hosts:
             z_device = ZabbixDevice()
             problem_obj = self.__connection.problem.get(hostids=host['hostid'], selectHosts='extend')
@@ -113,16 +112,17 @@ class Problems(Module):
                         z_tags.append(t['tag'])
                     z_device.tag = z_tags
                     #print(z_device.serialize())
-                    zabbix_devices.append(z_device.serialize())
-
+                    if not host["host"] in zabbix_devices:
+                        zabbix_devices[host["host"]] = []
+                    zabbix_devices[host["host"]].append(z_device.serialize())
         return zabbix_devices
 
 
     def worker(self):
         hosts = self.get_hosts()
         problems = self.get_infos(hosts)
-        #print(problems)
-        return ModuleData({}, {}, {"problems": problems})
+        print(problems)
+        return ModuleData({}, {}, problems, OutputType.EXTERNAL_DATA_SOURCES)
 
     @staticmethod
     def check_module_configuration():

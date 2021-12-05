@@ -1,13 +1,20 @@
 import time
 import json
+from enum import Enum
+
+
+class OutputType(Enum):
+    DEFAULT = 0
+    EXTERNAL_DATA_SOURCES = 1
 
 
 class ModuleData:
-    def __init__(self, static_data: dict, live_data: dict, events: dict):
+    def __init__(self, static_data: dict, live_data: dict, events: dict, output_type: OutputType = OutputType.DEFAULT):
         self.static_data = static_data
         self.live_data = live_data
         self.events = events
         self.timestamp = time.time()
+        self.output_type = output_type
 
     @property
     def static_data(self):
@@ -34,6 +41,14 @@ class ModuleData:
         self.__events = events
 
     @property
+    def output_type(self):
+        return self.__output_type
+
+    @output_type.setter
+    def output_type(self, output_type: OutputType):
+        self.__output_type = output_type
+
+    @property
     def timestamp(self):
         return self.__timestamp
 
@@ -45,4 +60,5 @@ class ModuleData:
         return json.dumps({"static_data":self.static_data,
                 "live_data":self.live_data,
                 "events":self.events,
-                "timestamp": self.timestamp})
+                "timestamp": self.timestamp,
+                "output_type": self.output_type})

@@ -1,6 +1,6 @@
 import threading
+import enum
 import time
-from src.device import Device
 from src.module_data import ModuleData
 from src.device_data import DeviceData
 

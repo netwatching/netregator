@@ -1,4 +1,4 @@
-from src.module_data import ModuleData
+from src.module_data import ModuleData, OutputType
 import json
 
 
@@ -7,11 +7,21 @@ class DeviceData:
         self.static_data = {}
         self.live_data = {}
         self.events = {}
+        self.external_events = {}
 
     def add_module_data(self, module_data: ModuleData):
         self.static_data.update(module_data.static_data)
         self.live_data.update(module_data.live_data)
-        self.events.update(module_data.events)
+        if type(module_data) is ModuleData:
+            if module_data.output_type == OutputType.DEFAULT:
+                self.events.update(module_data.events)
+            elif module_data.output_type == OutputType.EXTERNAL_DATA_SOURCES:
+                self.external_events.update(module_data.events)
+        elif type(module_data) is DeviceData:
+            self.events.update(module_data.events)
+            self.external_events.update(module_data.external_events)
+
+
 
     def convert_to_key_value_list(self, input_dict: dict):
         key_val = []

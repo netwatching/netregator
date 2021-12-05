@@ -1,7 +1,6 @@
 import threading
 import json
 from src.io import API, Config
-from src.modules.module import Module
 from src.device import Device
 from src.utilities import Utilities
 import time
@@ -39,24 +38,32 @@ class ModuleHander():
         while True:
             output = {}
             devices = []
+            external_events = {}
             for deviceid in self._workers:
-                c_data = self._workers[deviceid].data
+                c_data, c_external_events = self._workers[deviceid].data
+                print(c_data)
                 if c_data:
                     current_metadata = {"id": deviceid,
                                     "name": self._workers[deviceid].name}
                     current_metadata.update(c_data)
                     devices.append(current_metadata)
                 self._workers[deviceid].clear_data()
-            if devices != []:
+                for c_hostname in c_external_events:
+                    print(c_hostname)
+                    if not c_hostname in external_events:
+                        external_events[c_hostname] = []
+                    external_events[c_hostname] = external_events[c_hostname] + c_external_events[c_hostname]
+
+            if devices != [] or external_events != {}:
                 output["devices"] = devices
+                output["external_events"] = external_events
                 print(json.dumps(output))
-                # TODO: send data
                 self._api.send_data(output)
-                #print("--------------")
-                #print("--------------")
-                #print("--------------")
-                #print("--------------")
-                #print(output)
+                print("--------------")
+                print("--------------")
+                print("--------------")
+                print("--------------")
+                print(output)
             time.sleep(5)
 
     def check_devices(self):
