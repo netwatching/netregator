@@ -41,15 +41,13 @@ class ModuleHander():
             external_events = {}
             for deviceid in self._workers:
                 c_data, c_external_events = self._workers[deviceid].data
-                print(c_data)
-                if c_data:
+                if c_data != {'static_data': [], 'live_data': [], 'events': {}}:
                     current_metadata = {"id": deviceid,
                                     "name": self._workers[deviceid].name}
                     current_metadata.update(c_data)
                     devices.append(current_metadata)
                 self._workers[deviceid].clear_data()
                 for c_hostname in c_external_events:
-                    print(c_hostname)
                     if not c_hostname in external_events:
                         external_events[c_hostname] = []
                     external_events[c_hostname] = external_events[c_hostname] + c_external_events[c_hostname]
@@ -57,13 +55,9 @@ class ModuleHander():
             if devices != [] or external_events != {}:
                 output["devices"] = devices
                 output["external_events"] = external_events
-                print(json.dumps(output))
                 self._api.send_data(output)
-                print("--------------")
-                print("--------------")
-                print("--------------")
-                print("--------------")
-                print(output)
+                # print("--------------\n"*4)
+                print(json.dumps(output))
             time.sleep(5)
 
     def check_devices(self):
@@ -168,5 +162,4 @@ class ModuleHander():
                 })
             else:
                 print(f"{module_name} is not configured correctly!")
-        print(output)
         self._api.send_known_modules(output)

@@ -74,7 +74,6 @@ class Zabbix(Module):
 
     def get_hosts(self):
         hosts = self.connection.host.get(output=["hostid", "host", "name"])
-        print(hosts)
         return hosts
 
     @staticmethod
@@ -92,7 +91,6 @@ class Problems(Zabbix):
     def worker(self):
         hosts = self.get_hosts()
         problems = self.get_infos(hosts, ZabbixDataType.PROBLEMS)
-        print(problems)
         return ModuleData({}, {}, problems, OutputType.EXTERNAL_DATA_SOURCES)
 
 
@@ -103,5 +101,4 @@ class Events(Zabbix):
     def worker(self):
         hosts = self.get_hosts()
         events = self.get_infos(hosts, ZabbixDataType.EVENTS)
-        print(events)
         return ModuleData({}, {}, events, OutputType.EXTERNAL_DATA_SOURCES)

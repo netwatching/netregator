@@ -87,7 +87,6 @@ class API:
 
     def send_data(self, data):
         req = self._session.post(f"{self._url}/api/devices/data", auth=JWTAuth(self), json=data)
-        print(req.request.body)
         if req.status_code == requests.codes.ok:
             return True
         else:
