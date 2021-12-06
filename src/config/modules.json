@@ -6,5 +6,9 @@
   "problems": {
     "filename": "zabbix",
     "classname": "Problems"
+  },
+  "events": {
+    "filename": "zabbix",
+    "classname": "Events"
   }
 }

@@ -113,7 +113,7 @@ class API:
             data.append(
                 {"id": "1", "name": "Ubi", "timeout": 1, "type": "Ubiquiti", "ip": "172.31.37.95", "modules": modules})
             data.append({"id": "2", "name": "Zabbi", "timeout": 10, "type": "Ubiquiti", "ip": "zabbix.htl-vil.local",
-                         "modules": [{"name": "problems", "config": {}}]})
+                         "modules": [{"name": "problems", "config": {}}, {"name": "events", "config": {}}]})
             # data.append({"id": "3", "name": "Cisco", "timeout": 10, "type": "Cisco", "ip": "172.31.8.81", "modules": modules})
 
             # if(self.__conter % 5 == 0):
