@@ -41,7 +41,8 @@ class ModuleHander():
             external_events = {}
             for deviceid in self._workers:
                 c_data, c_external_events = self._workers[deviceid].data
-                if c_data != None:
+                print(c_data)
+                if c_data != {'static_data': [], 'live_data': [], 'events': {}}:
                     current_metadata = {"id": deviceid,
                                     "name": self._workers[deviceid].name}
                     current_metadata.update(c_data)
