@@ -124,6 +124,7 @@ class Device(threading.Thread):
         for c_module in modules_to_stop:
             print(f"Stopped module {c_module}")
             self.stop_module(c_module)
+        # TODO: config und Timeout weitergeben.
 
     def import_module(self, module_name):
         config = self._module_config[module_name]
