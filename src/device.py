@@ -109,6 +109,7 @@ class Device(threading.Thread):
         exec(code, globals())
         self._workers[module["name"]] = c_worker
         c_worker.start()
+        print(f"Started module {module['name']}")
 
     def check_modules(self):
         # start modules
@@ -116,7 +117,8 @@ class Device(threading.Thread):
         for c_module in self.modules:
             module_api_out[c_module["name"]] = {"config": c_module["config"]}
             if c_module["name"] not in self._workers:
-                print(f"Started module {c_module['name']}")
+                self.start_module(c_module)
+            if not self._workers[c_module['name']].is_running() or not self._workers[c_module['name']].is_alive():
                 self.start_module(c_module)
 
         # stop modules
@@ -125,11 +127,12 @@ class Device(threading.Thread):
             print(f"Stopped module {c_module}")
             self.stop_module(c_module)
 
-        # check modules
+        # update modules
         for c_module_name, c_module_worker in self._workers.items():
             c_module_worker.timeout = self.timeout
             c_module_worker.config = module_api_out[c_module_name]["config"]
             # TODO: Config timeout nutzen statt Device
+
 
     def import_module(self, module_name):
         config = self._module_config[module_name]

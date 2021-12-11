@@ -1,3 +1,4 @@
+import datetime
 import threading
 import enum
 import time
@@ -11,8 +12,9 @@ class Module(threading.Thread):
         self.timeout = timeout
         self.ip = ip
         self.config = config
+        self.last_updated = datetime.datetime.now()
         super().__init__(*args, **kwargs)
-        self._stop = threading.Event()
+        self.__is_running = True
 
     @property
     def config(self):
@@ -24,6 +26,7 @@ class Module(threading.Thread):
 
     @property
     def data(self):
+        self.last_updated = datetime.datetime.now()
         return self.__data
 
     @data.setter
@@ -36,6 +39,7 @@ class Module(threading.Thread):
 
     @timeout.setter
     def timeout(self, timeout):
+        self.last_updated = datetime.datetime.now()
         self.__timeout = int(timeout)
 
     @property
@@ -44,30 +48,24 @@ class Module(threading.Thread):
 
     @ip.setter
     def ip(self, ip):
+        self.last_updated = datetime.datetime.now()
         self.__ip = ip
 
-    def is_stopped(self):
-        return self._stop.is_set()
+    def is_running(self):
+        return self.__is_running
 
     def stop(self):
-        self._stop.set()
+        self.__is_running = False
 
     def clear_data(self):
+        self.last_updated = datetime.datetime.now()
         self.__data = DeviceData()
 
     def run(self):
-        while not self.is_stopped():
-            #timestamp = time.time()
-            #worker_data: ModuleData = self.worker()
-            #if "timestamp" in workerdict:
-            #    timestamp = workerdict["timestamp"]
-            #for key in workerdict:
-            #    if key != "timestamp":
-            #        self.data = {"timestamp": timestamp, "key": key, "value": workerdict[key]}
-            #static_data = worker_data.static_data
-            #live_data = worker_data.live_data
+        while self.is_running():
+            if (datetime.datetime.now() - self.last_updated) > datetime.timedelta(minutes=5):
+                self.stop()
             self.data = self.worker()
-
             time.sleep(int(self.timeout))
 
     @staticmethod
