@@ -97,7 +97,7 @@ class Device(threading.Thread):
         while self.running:
             self.get_data()
             self.check_modules()
-            time.sleep(5)
+            time.sleep(int(self.timeout))
         worker_names = list(self._workers.keys())
         for c_worker in worker_names:
             self.stop_module(c_worker)
