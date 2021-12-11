@@ -41,7 +41,7 @@ class API:
     def __init__(self):
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         self._session = requests.session()
-        self._demo = True
+        self._demo = config("DEMO", False, cast=bool)
         self._id = None
         self._secret = "admin"
         self._token = None
@@ -102,8 +102,8 @@ class API:
                 req = self._session.get(f"{self._url}/api/aggregator/{self._id}", auth=JWTAuth(self), timeout=5)
                 if req.status_code == requests.codes.ok:
                     output = req.json()
-                    # print(output["devices"])
-                    return output["devices"]
+                    print(output)
+                    return output
                 else:
                     return []
             except Exception as ex:
