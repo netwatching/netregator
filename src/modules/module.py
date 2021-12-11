@@ -6,13 +6,21 @@ from src.device_data import DeviceData
 
 
 class Module(threading.Thread):
-    def __init__(self, ip: str, timeout: int, *args, **kwargs):
-        deviceCreated = False
+    def __init__(self, ip: str, timeout: int, config: dict, *args, **kwargs):
         self.__data = DeviceData()
-        self.timeout=timeout
-        self.ip=ip
+        self.timeout = timeout
+        self.ip = ip
+        self.config = config
         super().__init__(*args, **kwargs)
         self._stop = threading.Event()
+
+    @property
+    def config(self):
+        return self.__config
+
+    @config.setter
+    def config(self, data: dict):
+        self.__config = data
 
     @property
     def data(self):

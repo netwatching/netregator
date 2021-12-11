@@ -3,6 +3,7 @@ import jwt
 import datetime
 import json
 from decouple import config
+import urllib3
 
 
 class Config:
@@ -38,6 +39,7 @@ class Config:
 
 class API:
     def __init__(self):
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         self._session = requests.session()
         self._demo = True
         self._id = None
@@ -45,6 +47,8 @@ class API:
         self._token = None
         self._url = config("IP")
         self.__conter = 0
+        self._session.verify = config("SSL_VERIFY", True, cast=bool)
+        self._session.trust_env = config("SSL_VERIFY", True, cast=bool)
         self._session.auth = JWTAuth(self)
         self._session.headers['Content-Type'] = 'application/json'
 

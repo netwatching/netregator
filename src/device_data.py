@@ -21,8 +21,6 @@ class DeviceData:
             self.events.update(module_data.events)
             self.external_events.update(module_data.external_events)
 
-
-
     def convert_to_key_value_list(self, input_dict: dict):
         key_val = []
         system_data = {}

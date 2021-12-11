@@ -105,26 +105,32 @@ class Device(threading.Thread):
     def start_module(self, module):
         if module["name"] not in self._imported_modules:
             self.import_module(module["name"])
-        code = f"global c_worker;c_worker = {self._module_config[module['name']]['classname']}(ip='{self.ip}', timeout={self.timeout})"
+        code = f"global c_worker;c_worker = {self._module_config[module['name']]['classname']}(ip='{self.ip}', timeout={self.timeout}, config={module['config']})"
         exec(code, globals())
         self._workers[module["name"]] = c_worker
         c_worker.start()
 
     def check_modules(self):
         # start modules
-        module_names = []
+        module_api_out = {}
         for c_module in self.modules:
-            module_names.append(c_module["name"])
+            module_api_out[c_module["name"]] = {"config": c_module["config"]}
             if c_module["name"] not in self._workers:
                 print(f"Started module {c_module['name']}")
                 self.start_module(c_module)
 
         # stop modules
-        modules_to_stop = self._utilities.compare_list(self._workers.keys(), module_names)
+        modules_to_stop = self._utilities.compare_list(self._workers.keys(), module_api_out.keys())
         for c_module in modules_to_stop:
             print(f"Stopped module {c_module}")
             self.stop_module(c_module)
-        # TODO: config und Timeout weitergeben.
+
+        print(self.modules)
+        # check modules
+        for c_module_name, c_module_worker in self._workers.items():
+            c_module_worker.timeout = self.timeout
+            c_module_worker.config = module_api_out[c_module_name]["config"]
+            # TODO: Config timeout nutzen statt Device
 
     def import_module(self, module_name):
         config = self._module_config[module_name]
