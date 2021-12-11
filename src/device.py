@@ -125,7 +125,6 @@ class Device(threading.Thread):
             print(f"Stopped module {c_module}")
             self.stop_module(c_module)
 
-        print(self.modules)
         # check modules
         for c_module_name, c_module_worker in self._workers.items():
             c_module_worker.timeout = self.timeout

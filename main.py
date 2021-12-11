@@ -1,3 +1,3 @@
-from src.modulehandler import ModuleHander
+from src.devicehandler import ModuleHander
 
 moduleHandler = ModuleHander()
