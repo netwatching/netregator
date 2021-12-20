@@ -10,7 +10,7 @@ class SNMP(Module):
         self.__ds = snmp.DataSources(snmp.SNMP("HTL-Villach", ip, 161))
 
     def worker(self):
-        # return ModuleData(static_data={}, live_data={}, events={})
+        #return ModuleData(static_data={}, live_data={}, events={})
         data = {}
 
         # data.update(self.__ds.get_hostname())

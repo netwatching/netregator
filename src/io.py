@@ -43,7 +43,7 @@ class API:
         self._session = requests.session()
         self._demo = config("DEMO", False, cast=bool)
         self._id = None
-        self._secret = "admin"
+        self._secret = config("SECRET", "admin", cast=str)
         self._token = None
         self._url = config("IP")
         self.__conter = 0
@@ -83,6 +83,7 @@ class API:
             req = self._session.post(f"{self._url}/api/aggregator-login", timeout=5, json=payload)
             if req.status_code == requests.codes.ok:
                 output = req.json()
+                print(output)
                 self._id = output["aggregator_id"]
                 self._token = output["token"]
                 return self._token
