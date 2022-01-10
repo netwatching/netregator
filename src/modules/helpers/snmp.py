@@ -297,11 +297,13 @@ class DataSources:
         ]
 
         old_name_values = self.__snmp.get_table(_keys, "IP-MIB")
-        static_data = {
-            "address": int(old_name_values["ipAdEntAddr"]),
-            "interface_index": int(old_name_values["ipAdEntIfIndex"]),
-            "netmask": int(old_name_values["ipAdEntNetMask"]),
-            "broadcast_address": int(old_name_values["ipAdEntBcastAddr"]),
-        }
+        new_values = {}
+        for key, val in old_name_values.items():
+            new_values[key] = {
+                "address": int(val["ipAdEntAddr"]),
+                "interface_index": int(val["ipAdEntIfIndex"]),
+                "netmask": int(val["ipAdEntNetMask"]),
+                "broadcast_address": int(val["ipAdEntBcastAddr"]),
+            }
 
-        return {"ipAddresses": static_data}
+        return {"ipAddresses": new_values}
