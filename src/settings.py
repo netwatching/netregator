@@ -1,4 +1,5 @@
 from enum import Enum
+import json
 
 
 class SettingsItemType(Enum):
@@ -36,11 +37,11 @@ class Settings:
         self._settings_items.update(item.serialize())
 
     def serialize(self):
-        return {
+        return json.dumps({
             "type": "object",
             "properties": self._settings_items,
-            "requires": self._settings_items.keys()
-        }
+            "requires": list(self._settings_items.keys())
+        })
 
 
 if __name__ == "__main__":
