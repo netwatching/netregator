@@ -46,9 +46,10 @@ class SNMP:
 
     def get_single_value_by_name_with_name(self, name, mib_name='SNMPv2-MIB'):
         oid, value = self.__get_var_binds_by_name(name, mib_name)[0]  # name is ObjectName object - value is number object
-        _, name, index = oid.getMibSymbol()  # _ is MIB name
+        #_, name, index = oid.getMibSymbol()  # _ is MIB name
         value = value.prettyPrint()
-        return {name: value}
+        #return {name: value}
+        return value
 
     def get_table(self, arguments_list: list, mib_name):
         all_entries = {}
@@ -137,44 +138,73 @@ class DataSources:
 
     def get_system_data(self):
         system_data = {}
-        keys = [
-            "sysName",
-            "sysObjectID",
-            "sysUpTime",
-            "sysDescr",
-            "sysContact",
-            "sysLocation"
-        ]
-        for key in keys:
-            system_data.update(self.__snmp.get_single_value_by_name_with_name(key))
+        # keys = [
+        #     "sysName",
+        #     "sysObjectID",
+        #     "sysUpTime",
+        #     "sysDescr",
+        #     "sysContact",
+        #     "sysLocation"
+        # ]
+
+        system_data["name"] = self.__snmp.get_single_value_by_name_with_name("sysName")
+        system_data["uptime"] = int(self.__snmp.get_single_value_by_name_with_name("sysUpTime")) * 10
+        system_data["description"] = self.__snmp.get_single_value_by_name_with_name("sysDescr")
+        system_data["contact"] = self.__snmp.get_single_value_by_name_with_name("sysContact")
+        system_data["location"] = self.__snmp.get_single_value_by_name_with_name("sysLocation")
+
+        # for key in keys:
+        #     system_data.update(self.__snmp.get_single_value_by_name_with_name(key))
         return {"system": system_data}
 
     def get_ip_data(self):
         ip_data = {}
-        keys = [
-            "ipForwarding",
-            "ipDefaultTTL",
-            "ipInReceives",
-            "ipInHdrErrors",
-            "ipInAddrErrors",
-            "ipForwDatagrams",
-            "ipInUnknownProtos",
-            "ipInDiscards",
-            "ipInDelivers",
-            "ipOutRequests",
-            "ipOutDiscards",
-            "ipOutNoRoutes",
-            "ipReasmTimeout",
-            "ipReasmReqds",
-            "ipReasmOKs",
-            "ipReasmFails",
-            "ipFragOKs",
-            "ipFragFails",
-            "ipFragCreates",
-            "ipRoutingDiscards"
-        ]
-        for key in keys:
-            ip_data.update(self.__snmp.get_single_value_by_name_with_name(key, "IP-MIB"))
+        # keys = [
+        #     "ipForwarding",
+        #     "ipDefaultTTL",
+        #     "ipInReceives",
+        #     "ipInHdrErrors",
+        #     "ipInAddrErrors",
+        #     "ipForwDatagrams",
+        #     "ipInUnknownProtos",
+        #     "ipInDiscards",
+        #     "ipInDelivers",
+        #     "ipOutRequests",
+        #     "ipOutDiscards",
+        #     "ipOutNoRoutes",
+        #     "ipReasmTimeout",
+        #     "ipReasmReqds",
+        #     "ipReasmOKs",
+        #     "ipReasmFails",
+        #     "ipFragOKs",
+        #     "ipFragFails",
+        #     "ipFragCreates",
+        #     "ipRoutingDiscards"
+        # ]
+
+        ip_data["forwarding"] = self.__snmp.get_single_value_by_name_with_name("ipForwarding")  # TODO: check for value (int / bool can forward / is router or only host)
+        ip_data["default_ttl"] = self.__snmp.get_single_value_by_name_with_name("ipDefaultTTL")
+        ip_data["in_receives"] = self.__snmp.get_single_value_by_name_with_name("ipInReceives")
+        ip_data["in_hdr_errors"] = self.__snmp.get_single_value_by_name_with_name("ipInHdrErrors")
+        ip_data["in_addr_errors"] = self.__snmp.get_single_value_by_name_with_name("ipInAddrErrors")
+        ip_data["forward_datagrams"] = self.__snmp.get_single_value_by_name_with_name("ipForwDatagrams")
+        ip_data["in_unknown_protocol"] = self.__snmp.get_single_value_by_name_with_name("ipInUnknownProtos")
+        ip_data["in_discards"] = self.__snmp.get_single_value_by_name_with_name("ipInDiscards")
+        ip_data["in_delivers"] = self.__snmp.get_single_value_by_name_with_name("ipInDelivers")
+        ip_data["out_requests"] = self.__snmp.get_single_value_by_name_with_name("ipOutRequests")
+        ip_data["out_discards"] = self.__snmp.get_single_value_by_name_with_name("ipOutDiscards")
+        ip_data["out_no_routes"] = self.__snmp.get_single_value_by_name_with_name("ipOutNoRoutes")
+        ip_data["reasm_timeout"] = self.__snmp.get_single_value_by_name_with_name("ipReasmTimeout")
+        # ip_data["reasm_ok"] = self.__snmp.get_single_value_by_name_with_name("ipReasmOKs")  # deprecated
+        # ip_data["reasm_fails"] = self.__snmp.get_single_value_by_name_with_name("ipReasmFails")  # deprecated
+        # ip_data["fragments_ok"] = self.__snmp.get_single_value_by_name_with_name("ipFragOKs")  # deprecated
+        # ip_data["fragments_fails"] = self.__snmp.get_single_value_by_name_with_name("ipFragFails")  # deprecated
+        # ip_data["fragments_creates"] = self.__snmp.get_single_value_by_name_with_name("ipFragCreates")  # deprecated
+        ip_data["routing_discards"] = self.__snmp.get_single_value_by_name_with_name("ipRoutingDiscards")
+
+
+        # for key in keys:
+        #     ip_data.update(self.__snmp.get_single_value_by_name_with_name(key, "IP-MIB"))
         return {"ip": ip_data}
 
     def get_services(self):
@@ -228,7 +258,32 @@ class DataSources:
             'ifOutDiscards',
             'ifOutErrors'
         ]
-        return {"interfaces": self.__snmp.get_table(_keys, "IF-MIB")}
+
+        old_name_values = self.__snmp.get_table(_keys, "IF-MIB")
+        static_data = {
+            "index": int(old_name_values["ifIndex"]),
+            "description": old_name_values["ifDescr"],
+            "type": old_name_values["ifType"],
+            "mtu": int(old_name_values["ifMtu"]),
+            "speed": int(old_name_values["ifSpeed"]),  # e.g. 4294967295
+            "mac_address": old_name_values["ifPhysAddress"],  # e.g. "up"
+            "admin_status": old_name_values["ifAdminStatus"],
+            "operating_status": old_name_values["ifOperStatus"],
+            "last_change": int(old_name_values["ifLastChange"])*10,  # sysuptime timestamp at which operational state changed
+            "in_bytes": int(old_name_values["ifInOctets"]),
+            "in_unicast_packets": int(old_name_values["ifInUcastPkts"]),
+            "in_non_unicast_packets": int(old_name_values["ifInNUcastPkts"]),
+            "in_discards": int(old_name_values["ifInDiscards"]),
+            "in_errors": int(old_name_values["ifInErrors"]),
+            "in_unknown_protocolls": int(old_name_values["ifInUnknownProtos"]),
+            "out_bytes": int(old_name_values["ifOutOctets"]),
+            "out_unicast_packets": int(old_name_values["ifOutUcastPkts"]),
+            "out_non-unicast_packets": int(old_name_values["ifOutNUcastPkts"]),
+            "out_discards": int(old_name_values["ifOutDiscards"]),
+            "out_errors": int(old_name_values["ifOutErrors"])
+        }
+
+        return {"interfaces": static_data}
 
     def get_ip_addresses(self):
         _keys = [
@@ -236,6 +291,15 @@ class DataSources:
             'ipAdEntIfIndex',
             'ipAdEntNetMask',
             'ipAdEntBcastAddr',
-            'ipAdEntReasmMaxSize'
+            # 'ipAdEntReasmMaxSize'
         ]
-        return {"ipAddresses": self.__snmp.get_table(_keys, "IP-MIB")}
+
+        old_name_values = self.__snmp.get_table(_keys, "IP-MIB")
+        static_data = {
+            "address": int(old_name_values["ipAdEntAddr"]),
+            "interface_index": int(old_name_values["ipAdEntIfIndex"]),
+            "netmask": int(old_name_values["ipAdEntNetMask"]),
+            "broadcast_address": int(old_name_values["ipAdEntBcastAddr"]),
+        }
+
+        return {"ipAddresses": static_data}
