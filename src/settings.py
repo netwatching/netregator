@@ -7,27 +7,45 @@ class SettingsItemType(Enum):
     BOOLEAN = "boolean"
     ENUM = "enum"
 
-class Settings:
-    pass
 
+# noinspection PyTypeChecker
 class SettingsItem:
     def __init__(self, settings_type: SettingsItemType, settings_id: str, settings_title: str, settings_enum_items: list = None):
-        self.settings_type = settings_type
-        self.settings_id = settings_id
-        self.settings_title = settings_title
-        self.settings_enum_items = settings_enum_items
+        self._settings_type = settings_type
+        self._settings_id = settings_id
+        self._settings_title = settings_title
+        self._settings_enum_items = settings_enum_items
 
     def serialize(self):
         return_data = {}
         additional = {}
-        if self.settings_type == SettingsItemType.ENUM:
-            additional["enum"] = self.settings_enum_items
-            self.settings_type = SettingsItemType.STRING
-        return_data[self.settings_id] = {"type": self.settings_type.value, "title": self.settings_title}
+        if self._settings_type == SettingsItemType.ENUM:
+            additional["enum"] = self._settings_enum_items
+            self._settings_type = SettingsItemType.STRING
+        return_data[self._settings_id] = {"type": self._settings_type.value, "title": self._settings_title}
         return_data.update(additional)
         return return_data
 
-if __name__ == "__main__":
-    s = SettingsItem(settings_type=SettingsItemType.STRING, settings_id="test", settings_title="MyTestTile")
 
-    print(s.serialize())
+# noinspection PyTypeChecker
+class Settings:
+    def __init__(self):
+        self._settings_items = dict()
+
+    def add(self, item: SettingsItem):
+        self._settings_items.update(item.serialize())
+
+    def serialize(self):
+        return {
+            "type": "object",
+            "properties": self._settings_items,
+            "requires": self._settings_items.keys()
+        }
+
+
+if __name__ == "__main__":
+    settings = Settings()
+    settings.add(SettingsItem(settings_type=SettingsItemType.STRING, settings_id="community_string", settings_title="Community String"))
+    settings.add(SettingsItem(settings_type=SettingsItemType.NUMBER, settings_id="community_number", settings_title="Community Number"))
+
+    print(settings.serialize())
