@@ -300,10 +300,10 @@ class DataSources:
         new_values = {}
         for key, val in old_name_values.items():
             new_values[key] = {
-                "address": int(val["ipAdEntAddr"]),
+                "address": val["ipAdEntAddr"],
                 "interface_index": int(val["ipAdEntIfIndex"]),
-                "netmask": int(val["ipAdEntNetMask"]),
-                "broadcast_address": int(val["ipAdEntBcastAddr"]),
+                "netmask": val["ipAdEntNetMask"],
+                "broadcast_address": val["ipAdEntBcastAddr"],
             }
 
         return {"ipAddresses": new_values}
