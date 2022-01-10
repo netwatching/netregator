@@ -260,30 +260,32 @@ class DataSources:
         ]
 
         old_name_values = self.__snmp.get_table(_keys, "IF-MIB")
-        static_data = {
-            "index": int(old_name_values["ifIndex"]),
-            "description": old_name_values["ifDescr"],
-            "type": old_name_values["ifType"],
-            "mtu": int(old_name_values["ifMtu"]),
-            "speed": int(old_name_values["ifSpeed"]),  # e.g. 4294967295
-            "mac_address": old_name_values["ifPhysAddress"],  # e.g. "up"
-            "admin_status": old_name_values["ifAdminStatus"],
-            "operating_status": old_name_values["ifOperStatus"],
-            "last_change": int(old_name_values["ifLastChange"])*10,  # sysuptime timestamp at which operational state changed
-            "in_bytes": int(old_name_values["ifInOctets"]),
-            "in_unicast_packets": int(old_name_values["ifInUcastPkts"]),
-            "in_non_unicast_packets": int(old_name_values["ifInNUcastPkts"]),
-            "in_discards": int(old_name_values["ifInDiscards"]),
-            "in_errors": int(old_name_values["ifInErrors"]),
-            "in_unknown_protocolls": int(old_name_values["ifInUnknownProtos"]),
-            "out_bytes": int(old_name_values["ifOutOctets"]),
-            "out_unicast_packets": int(old_name_values["ifOutUcastPkts"]),
-            "out_non-unicast_packets": int(old_name_values["ifOutNUcastPkts"]),
-            "out_discards": int(old_name_values["ifOutDiscards"]),
-            "out_errors": int(old_name_values["ifOutErrors"])
-        }
+        new_values = {}
+        for key, val in old_name_values.items():
+            new_values[key] = {
+                "index": int(val["ifIndex"]),
+                "description": val["ifDescr"],
+                "type": val["ifType"],
+                "mtu": int(val["ifMtu"]),
+                "speed": int(val["ifSpeed"]),  # e.g. 4294967295
+                "mac_address": val["ifPhysAddress"],  # e.g. "up"
+                "admin_status": val["ifAdminStatus"],
+                "operating_status": val["ifOperStatus"],
+                "last_change": int(val["ifLastChange"])*10,  # sysuptime timestamp at which operational state changed
+                "in_bytes": int(val["ifInOctets"]),
+                "in_unicast_packets": int(val["ifInUcastPkts"]),
+                "in_non_unicast_packets": int(val["ifInNUcastPkts"]),
+                "in_discards": int(val["ifInDiscards"]),
+                "in_errors": int(val["ifInErrors"]),
+                "in_unknown_protocolls": int(val["ifInUnknownProtos"]),
+                "out_bytes": int(val["ifOutOctets"]),
+                "out_unicast_packets": int(val["ifOutUcastPkts"]),
+                "out_non-unicast_packets": int(val["ifOutNUcastPkts"]),
+                "out_discards": int(val["ifOutDiscards"]),
+                "out_errors": int(val["ifOutErrors"])
+            }
 
-        return {"interfaces": static_data}
+        return {"interfaces": new_values}
 
     def get_ip_addresses(self):
         _keys = [
@@ -295,11 +297,13 @@ class DataSources:
         ]
 
         old_name_values = self.__snmp.get_table(_keys, "IP-MIB")
-        static_data = {
-            "address": int(old_name_values["ipAdEntAddr"]),
-            "interface_index": int(old_name_values["ipAdEntIfIndex"]),
-            "netmask": int(old_name_values["ipAdEntNetMask"]),
-            "broadcast_address": int(old_name_values["ipAdEntBcastAddr"]),
-        }
+        new_values = {}
+        for key, val in old_name_values.items():
+            new_values[key] = {
+                "address": int(val["ipAdEntAddr"]),
+                "interface_index": int(val["ipAdEntIfIndex"]),
+                "netmask": int(val["ipAdEntNetMask"]),
+                "broadcast_address": int(val["ipAdEntBcastAddr"]),
+            }
 
-        return {"ipAddresses": static_data}
+        return {"ipAddresses": new_values}
