@@ -49,7 +49,7 @@ class Settings:
         return json.dumps({
             "type": "object",
             "properties": serialized_settings_items,
-            "requires": list(self._settings_items.keys())
+            "required": list(self._settings_items.keys())
         })
 
     def seed_default_values(self):
