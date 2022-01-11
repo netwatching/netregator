@@ -30,8 +30,10 @@ class SettingsItem:
 
 # noinspection PyTypeChecker
 class Settings:
-    def __init__(self):
+    def __init__(self, seed_default_values: bool = True):
         self._settings_items = dict()
+        if seed_default_values:
+            self.seed_default_values()
 
     def add(self, item: SettingsItem):
         self._settings_items.update(item.serialize())
@@ -42,6 +44,9 @@ class Settings:
             "properties": self._settings_items,
             "requires": list(self._settings_items.keys())
         })
+
+    def seed_default_values(self):
+        self._settings_items.update(SettingsItem(settings_type=SettingsItemType.NUMBER, settings_id="timeout", settings_title="Timeout").serialize())
 
 
 if __name__ == "__main__":
