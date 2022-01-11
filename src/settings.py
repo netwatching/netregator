@@ -20,11 +20,13 @@ class SettingsItem:
     def serialize(self):
         return_data = {}
         additional = {}
+        output_settings_type = self.settings_type
         if self.settings_type == SettingsItemType.ENUM:
             additional["enum"] = self.settings_enum_items
-            self.settings_type = SettingsItemType.STRING
-        return_data[self.settings_id] = {"type": self.settings_type.value, "title": self.settings_title}
-        return_data.update(additional)
+            output_settings_type = SettingsItemType.STRING
+        return_data[self.settings_id] = {"type": output_settings_type.value, "title": self.settings_title}
+        return_data[self.settings_id].update(additional)
+        print(return_data)
         return return_data
 
 
@@ -56,7 +58,11 @@ class Settings:
 
 if __name__ == "__main__":
     settings = Settings()
-    settings.add(SettingsItem(settings_type=SettingsItemType.STRING, settings_id="community_string", settings_title="Community String"))
-    settings.add(SettingsItem(settings_type=SettingsItemType.NUMBER, settings_id="community_number", settings_title="Community Number"))
+    settings.add(SettingsItem(settings_type=SettingsItemType.STRING, settings_id="community_string",
+                              settings_title="Community String"))
+    settings.add(SettingsItem(settings_type=SettingsItemType.NUMBER, settings_id="community_number",
+                              settings_title="Community Number"))
+    settings.add(SettingsItem(settings_type=SettingsItemType.ENUM, settings_id="community_enum",
+                              settings_title="Community Enum", settings_enum_items=["test1", "test2"]))
 
     print(settings.serialize())
