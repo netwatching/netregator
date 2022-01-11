@@ -12,18 +12,18 @@ class SettingsItemType(Enum):
 # noinspection PyTypeChecker
 class SettingsItem:
     def __init__(self, settings_type: SettingsItemType, settings_id: str, settings_title: str, settings_enum_items: list = None):
-        self._settings_type = settings_type
-        self._settings_id = settings_id
-        self._settings_title = settings_title
-        self._settings_enum_items = settings_enum_items
+        self.settings_type = settings_type
+        self.settings_id = settings_id
+        self.settings_title = settings_title
+        self.settings_enum_items = settings_enum_items
 
     def serialize(self):
         return_data = {}
         additional = {}
-        if self._settings_type == SettingsItemType.ENUM:
-            additional["enum"] = self._settings_enum_items
-            self._settings_type = SettingsItemType.STRING
-        return_data[self._settings_id] = {"type": self._settings_type.value, "title": self._settings_title}
+        if self.settings_type == SettingsItemType.ENUM:
+            additional["enum"] = self.settings_enum_items
+            self.settings_type = SettingsItemType.STRING
+        return_data[self.settings_id] = {"type": self.settings_type.value, "title": self.settings_title}
         return_data.update(additional)
         return return_data
 
@@ -36,17 +36,22 @@ class Settings:
             self.seed_default_values()
 
     def add(self, item: SettingsItem):
-        self._settings_items.update(item.serialize())
+        self._settings_items[item.settings_id] = item
 
     def serialize(self):
+        serialized_settings_items = dict()
+        for k in self._settings_items:
+            print(self._settings_items[k].serialize())
+            serialized_settings_items.update(self._settings_items[k].serialize())
+
         return json.dumps({
             "type": "object",
-            "properties": self._settings_items,
+            "properties": serialized_settings_items,
             "requires": list(self._settings_items.keys())
         })
 
     def seed_default_values(self):
-        self._settings_items.update(SettingsItem(settings_type=SettingsItemType.NUMBER, settings_id="timeout", settings_title="Timeout").serialize())
+        self.add(SettingsItem(settings_type=SettingsItemType.NUMBER, settings_id="timeout", settings_title="Timeout"))
 
 
 if __name__ == "__main__":
