@@ -288,6 +288,7 @@ class DataSources:
                 }
                 if val["ifType"] == "ethernetCsmacd":
                     iface_infos = val["ifType"].split(" ")
+                    print(iface_infos)
                     infos = {
                         "slot": iface_infos[1],  # 2
                         "port": iface_infos[3],  # 12
