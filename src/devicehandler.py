@@ -6,10 +6,12 @@ from src.utilities import Utilities
 import time
 import os
 from decouple import config
+from src.utilities import Utilities
 
 
 class ModuleHander():
     def __init__(self):
+        self._logger = Utilities.setup_logger()
         self._imported_modules = []
         self._workers = {}
         self._module_config = Config("./src/config/modules.json").get_whole_file()
@@ -58,7 +60,7 @@ class ModuleHander():
                 output["external_events"] = external_events
                 self._api.send_data(output)
                 # print("--------------\n"*4)
-                print(json.dumps(output))
+                self._logger.debug(json.dumps(output))
             time.sleep(5)
 
     def check_devices(self):
@@ -104,7 +106,7 @@ class ModuleHander():
         self._workers[device.id] = c_device
         #self._workers[device.id].setDaemon(True)
         self._workers[device.id].start()
-        print(f"Started device {device.name}")
+        self._logger.info(f"Started device {device.name}")
         return True
 
     def start_system_thread(self, key=None):
@@ -130,7 +132,7 @@ class ModuleHander():
     def stop_device(self, device_id, device_name):
         self._workers[str(device_id)].running = False
         del self._workers[str(device_id)]
-        print(f"Stopped device {device_name}")
+        self._logger.info(f"Stopped device {device_name}")
         return True
 
     def get_running_devices(self):
@@ -165,5 +167,5 @@ class ModuleHander():
                     "config_fields": settings_fields
                 })
             else:
-                print(f"{module_name} is not configured correctly!")
+                self._logger.critical(f"{module_name} is not configured correctly!")
         self._api.send_known_modules(output)
