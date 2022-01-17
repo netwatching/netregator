@@ -287,8 +287,7 @@ class DataSources:
                     "out_errors": int(val["ifOutErrors"])
                 }
                 if val["ifType"] == "ethernetCsmacd":
-                    iface_infos = val["ifType"].split(" ")
-                    print(iface_infos)
+                    iface_infos = val["ifDescr"].split(" ")
                     infos = {
                         "slot": iface_infos[1],  # 2
                         "port": iface_infos[3],  # 12
