@@ -262,30 +262,46 @@ class DataSources:
         old_name_values = self.__snmp.get_table(_keys, "IF-MIB")
         new_values = {}
         for key, val in old_name_values.items():
-            new_values[key] = {
-                "index": int(val["ifIndex"]),
-                "description": val["ifDescr"],
-                "type": val["ifType"],
-                "mtu": int(val["ifMtu"]),
-                "speed": int(val["ifSpeed"]),  # e.g. 4294967295
-                "mac_address": val["ifPhysAddress"],  # e.g. "up"
-                "admin_status": val["ifAdminStatus"],
-                "operating_status": val["ifOperStatus"],
-                "last_change": int(val["ifLastChange"])*10,  # sysuptime timestamp at which operational state changed
-                "in_bytes": int(val["ifInOctets"]),
-                "in_unicast_packets": int(val["ifInUcastPkts"]),
-                "in_non_unicast_packets": int(val["ifInNUcastPkts"]),
-                "in_discards": int(val["ifInDiscards"]),
-                "in_errors": int(val["ifInErrors"]),
-                "in_unknown_protocolls": int(val["ifInUnknownProtos"]),
-                "out_bytes": int(val["ifOutOctets"]),
-                "out_unicast_packets": int(val["ifOutUcastPkts"]),
-                "out_non-unicast_packets": int(val["ifOutNUcastPkts"]),
-                "out_discards": int(val["ifOutDiscards"]),
-                "out_errors": int(val["ifOutErrors"])
-            }
+            if val["ifType"] in ["ethernetCsmacd", "ieee8023adLag"]:
+                new_values[key] = {
+                    "index": int(val["ifIndex"]),
+                    "description": val["ifDescr"],
+                    "type": val["ifType"],
+                    "mtu": int(val["ifMtu"]),
+                    "speed": int(val["ifSpeed"]),  # e.g. 4294967295
+                    "mac_address": val["ifPhysAddress"],  # e.g. "up"
+                    "admin_status": val["ifAdminStatus"],
+                    "operating_status": val["ifOperStatus"],
+                    "last_change": int(val["ifLastChange"]) * 10,
+                    # sysuptime timestamp at which operational state changed
+                    "in_bytes": int(val["ifInOctets"]),
+                    "in_unicast_packets": int(val["ifInUcastPkts"]),
+                    "in_non_unicast_packets": int(val["ifInNUcastPkts"]),
+                    "in_discards": int(val["ifInDiscards"]),
+                    "in_errors": int(val["ifInErrors"]),
+                    "in_unknown_protocolls": int(val["ifInUnknownProtos"]),
+                    "out_bytes": int(val["ifOutOctets"]),
+                    "out_unicast_packets": int(val["ifOutUcastPkts"]),
+                    "out_non-unicast_packets": int(val["ifOutNUcastPkts"]),
+                    "out_discards": int(val["ifOutDiscards"]),
+                    "out_errors": int(val["ifOutErrors"])
+                }
+                if val["ifType"] == "ethernetCsmacd":
+                    iface_infos = val["ifType"].split(" ")
+                    infos = {
+                        "slot": iface_infos[1],  # 2
+                        "port": iface_infos[3],  # 12
+                        "definition": iface_infos[4]  # 10G
+                    }
+                    new_values[key].update(infos)
 
-        return {"interfaces": new_values}
+            """
+            ethernetCsmacd (Slot: 0 Port: 22 Gigabit - Level)
+            other ( CPU Interface for Slot: 5 Port: 1)
+            ieee8023adLag ( Link Aggregate 1)
+            """
+
+        return {"network_interfaces": new_values}
 
     def get_ip_addresses(self):
         _keys = [
