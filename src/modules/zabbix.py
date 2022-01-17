@@ -108,5 +108,5 @@ class Events(Zabbix):
     def config_template():
         settings = Settings()
         settings.add(SettingsItem(settings_id="test_test", settings_title="Test", settings_type=SettingsItemType.STRING,
-                                  settings_default_value="123"))
+                                  settings_default_value="test"))
         return settings

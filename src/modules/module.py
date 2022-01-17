@@ -1,6 +1,5 @@
 import datetime
 import threading
-import enum
 import time
 from src.module_data import ModuleData
 from src.device_data import DeviceData
@@ -12,6 +11,7 @@ class Module(threading.Thread):
         self.__data = DeviceData()
         self.timeout = timeout
         self.ip = ip
+        self.config_signature, self.default_config = self.__class__.config_template().serialize()
         self.config = config
         self.last_updated = datetime.datetime.now()
         super().__init__(*args, **kwargs)
@@ -23,7 +23,10 @@ class Module(threading.Thread):
 
     @config.setter
     def config(self, data: dict):
-        self.__config = data
+        if not data:
+            self.__config = self.default_config
+        else:
+            self.__config = data
 
     @property
     def data(self):
