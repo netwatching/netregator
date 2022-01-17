@@ -5,6 +5,7 @@ from decouple import config
 from src.module_data import ModuleData, OutputType
 import time
 from enum import Enum
+from src.settings import Settings, SettingsItem, SettingsItemType
 
 
 class ZabbixDataType(Enum):
@@ -102,3 +103,10 @@ class Events(Zabbix):
         hosts = self.get_hosts()
         events = self.get_infos(hosts, ZabbixDataType.EVENTS)
         return ModuleData({}, {}, events, OutputType.EXTERNAL_DATA_SOURCES)
+
+    @staticmethod
+    def config_template():
+        settings = Settings()
+        settings.add(SettingsItem(settings_id="test_test", settings_title="Test", settings_type=SettingsItemType.STRING,
+                                  settings_default_value="123"))
+        return settings

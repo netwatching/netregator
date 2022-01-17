@@ -157,9 +157,12 @@ class ModuleHander():
         output = []
         for module_name in self._modules.get_whole_file():
             if validate_settings is False or self.validate_module_config_module(module_name):
+                c_classname = self._modules.read_config_file(module_name)['classname']
+                exec(f"settings_signature, settings_fields = {c_classname}.config_template().serialize()", globals())
                 output.append({
                     "id": module_name,
-                    "config": {}
+                    "config_signature": settings_signature,
+                    "config_fields": settings_fields
                 })
             else:
                 print(f"{module_name} is not configured correctly!")

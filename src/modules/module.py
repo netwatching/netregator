@@ -4,6 +4,7 @@ import enum
 import time
 from src.module_data import ModuleData
 from src.device_data import DeviceData
+from src.settings import Settings, SettingsItem, SettingsItemType
 
 
 class Module(threading.Thread):
@@ -60,6 +61,11 @@ class Module(threading.Thread):
     def clear_data(self):
         self.last_updated = datetime.datetime.now()
         self.__data = DeviceData()
+
+    @staticmethod
+    def config_template():
+        settings = Settings()
+        return settings
 
     def run(self):
         while self.is_running():
