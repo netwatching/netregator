@@ -36,7 +36,8 @@ class SNMP:
             self._logger.error(error_indication)
             raise Exception(error_indication)
         elif error_status:
-            raise Exception('%s at %s' % (error_status.prettyPrint(), error_index and var_binds[int(error_index) - 1][0] or '?'))
+            raise Exception('%s at %s' % (error_status.prettyPrint(),
+                                          error_index and var_binds[int(error_index) - 1][0] or '?'))
         else:
             if var_binds:
                 return var_binds
@@ -74,11 +75,14 @@ class SNMP:
         for error_indication, error_status, error_index, var_binds in iterator:
             if error_indication:
                 self._logger.error(error_indication)
-                break
+                raise Exception(error_indication)
+                # TODO: prviously break
             elif error_status:
                 self._logger.error('%s at %s' % (error_status.prettyPrint(),
                                                  error_index and var_binds[int(error_index) - 1][0] or '?'))
-                break
+                raise Exception('%s at %s' % (error_status.prettyPrint(),
+                                              error_index and var_binds[int(error_index) - 1][0] or '?'))
+                # TODO: here too - break
             else:
                 if var_binds:
                     #interface_data = {}
@@ -315,7 +319,7 @@ class DataSources:
                     }
                     new_values[key].update(infos)
                 else:
-                    self._logger.warning(f"ifDescr {val['ifDescr']} did not match any regex")
+                    self._logger.spam(f"ifDescr {val['ifDescr']} did not match any regex")
             """
             ethernetCsmacd (Slot: 0 Port: 22 Gigabit - Level)
             other ( CPU Interface for Slot: 5 Port: 1)
