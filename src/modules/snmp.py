@@ -10,7 +10,7 @@ class SNMP(Module):
         self.ip = ip
         self.settings = {
             "community_string": "HTL-Villachhh",
-            "c_str_2": "HTL-Villachhh",  # snmp_rw
+            "c_str_2": "HTL-Villach",  # snmp_rw
             "snmp_port": 161
         }
 
