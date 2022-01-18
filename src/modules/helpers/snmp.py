@@ -1,4 +1,5 @@
 from pysnmp.hlapi import *
+import re
 
 
 class SNMP:
@@ -286,18 +287,31 @@ class DataSources:
                     "out_discards": int(val["ifOutDiscards"]),
                     "out_errors": int(val["ifOutErrors"])
                 }
-                if val["ifType"] == "ethernetCsmacd":
-                    try:
-                        iface_infos = val["ifDescr"].split(" ")
-                        infos = {
-                            "slot": iface_infos[1],  # 2
-                            "port": iface_infos[3],  # 12
-                            "definition": iface_infos[4]  # 10G
-                        }
-                        new_values[key].update(infos)
-                    except Exception:
-                        print(f"ifDescr could not be split {val['ifDescr']}")
-
+                # ^[a-zA-Z]*[0-9]*(/[0-9]*)*
+                if re.match(r"^[a-zA-Z]+[0-9]+(/[0-9]+){1,2}$", val["ifDescr"]):
+                    # cisco description e.g. TenGigabitEthernet3/23/4/23
+                    infos = {}
+                    nums = re.split(r"^[a-zA-Z]*", val["ifDescr"])[1]
+                    iface_infos = nums.split("/")
+                    if len(iface_infos) == 3:
+                        infos["blade"] = iface_infos[0]
+                        infos["slot"] = iface_infos[1]
+                        infos["port"] = iface_infos[2]
+                    elif len(iface_infos) == 2:
+                        infos["slot"] = iface_infos[0]
+                        infos["port"] = iface_infos[1]
+                    infos["definition"] = re.split(r"[0-9]", val["ifDescr"])[0]
+                elif re.match(r"^Slot: [0-9]+ Port: [0-9]+ \w+", val["ifDescr"]):
+                    # unifi sw desrc e.g. Slot: 0 Port: 51 10G - Level  /  Slot: 0 Port: 7 Gigabit - Level
+                    iface_infos = val["ifDescr"].split(" ")
+                    infos = {
+                        "slot": iface_infos[1],  # 2
+                        "port": iface_infos[3],  # 12
+                        "definition": iface_infos[4]  # 10G
+                    }
+                    new_values[key].update(infos)
+                else:
+                    print(f"ifDescr {val['ifDescr']} did not match any regex")
             """
             ethernetCsmacd (Slot: 0 Port: 22 Gigabit - Level)
             other ( CPU Interface for Slot: 5 Port: 1)
