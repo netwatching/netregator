@@ -98,6 +98,9 @@ class SNMP:
                         mib, name, index = oid.getMibSymbol()
                         value = value.prettyPrint()
                         index = index[0].prettyPrint()
+                        if value == 'No more variables left in this MIB View':
+                            self._logger.warn(f"found no variables left string in: {oid=}, {value=}, {mib=}, {name=}, "
+                                              f"{index=}")
                         # interface_data.append((mib, name, index, value))
                         # if index in interface_data:
                         #interface_data[index].update({name: value})
@@ -322,6 +325,8 @@ class DataSources:
                     new_values[key].update(infos)
                 else:
                     self._logger.spam(f"ifDescr {val['ifDescr']} did not match any regex")
+            if not val["ifType"] == "other":
+                self._logger.warning(f"unknown interface type: {val['ifType']}")
             """
             ethernetCsmacd (Slot: 0 Port: 22 Gigabit - Level)
             other ( CPU Interface for Slot: 5 Port: 1)
