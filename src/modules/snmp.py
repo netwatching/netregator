@@ -9,8 +9,8 @@ class SNMP(Module):
         super().__init__(ip, timeout, *args, **kwargs)
         self.ip = ip
         self.settings = {
-            "community_string": "HTL-Villachhh",
-            "c_str_2": "HTL-Villach",  # snmp_rw
+            "community_string": "HTL-Villach",
+            "c_str_2": "snmp_rw",  # TODO: replace by proper setting
             "snmp_port": 161
         }
 
