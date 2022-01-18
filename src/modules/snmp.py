@@ -8,7 +8,8 @@ class SNMP(Module):
     def __init__(self, ip: str = None, timeout: int = None, *args, **kwargs):
         super().__init__(ip, timeout, *args, **kwargs)
         self.settings = {
-            "community_string": "HTL-Villach",
+            "community_string": "HTL-Villachhh",
+            "c_str_2": "snmp_rw"
         }
 
         self.__ds = snmp.DataSources(snmp.SNMP(self.settings["community_string"], ip, 161))
@@ -17,12 +18,6 @@ class SNMP(Module):
         # return ModuleData(static_data={}, live_data={}, events={})
         data = {}
 
-        # data.update(self.__ds.get_hostname())
-        # data.update(self.__ds.get_object_id())
-        # data.update(self.__ds.get_uptime())
-        # data.update(self.__ds.get_description())
-        # data.update(self.__ds.get_contact())
-        # data.update(self.__ds.get_name())
         data.update(self.__ds.get_system_data())
         data.update(self.__ds.get_services())
         data.update(self.__ds.get_interfaces())
