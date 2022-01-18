@@ -4,6 +4,8 @@ import datetime
 import json
 from decouple import config
 import urllib3
+import logging
+from src.utilities import Utilities
 
 
 class Config:
@@ -39,6 +41,7 @@ class Config:
 
 class API:
     def __init__(self):
+        self._logger = Utilities.setup_logger()
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         self._session = requests.session()
         self._demo = config("DEMO", False, cast=bool)
@@ -83,7 +86,7 @@ class API:
             req = self._session.post(f"{self._url}/api/aggregator-login", timeout=5, json=payload)
             if req.status_code == requests.codes.ok:
                 output = req.json()
-                print(output)
+                self._logger.debug(output)
                 self._id = output["aggregator_id"]
                 self._token = output["token"]
                 return self._token
@@ -103,12 +106,12 @@ class API:
                 req = self._session.get(f"{self._url}/api/aggregator/{self._id}", auth=JWTAuth(self), timeout=5)
                 if req.status_code == requests.codes.ok:
                     output = req.json()
-                    print(output)
+                    self._logger.debug(output)
                     return output
                 else:
                     return []
             except Exception as ex:
-                print(ex)
+                self._logger.critical(ex)
                 return []
         else:
             data = []
@@ -117,7 +120,7 @@ class API:
             data.append(
                 {"id": "1", "name": "Ubi", "timeout": 1, "type": "Ubiquiti", "ip": "172.31.37.95", "modules": modules})
             data.append({"id": "2", "name": "Zabbi", "timeout": 10, "type": "Ubiquiti", "ip": "zabbix.htl-vil.local",
-                         "modules": [{"name": "problems", "config": {}}, {"name": "events", "config": {}}]})
+                         "modules": [{"name": "problems", "config": {}}, {"name": "events", "config": {'timeout': 5, 'test_test': '123'}}]})
             # data.append({"id": "3", "name": "Cisco", "timeout": 10, "type": "Cisco", "ip": "172.31.8.81", "modules": modules})
 
             # if(self.__conter % 5 == 0):
@@ -143,6 +146,7 @@ class API:
     def send_known_modules(self, modules):
         req = self._session.post(f"{self._url}/api/aggregator/{self._id}/version", json={"modules": modules},
                                  auth=JWTAuth(self), timeout=5)
+        self._logger.debug({"modules": modules})
         if req.status_code == requests.codes.ok:
             return True
         else:

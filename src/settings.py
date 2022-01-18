@@ -46,15 +46,14 @@ class Settings:
         serialized_settings_items = dict()
         serialized_default_values = dict()
         for k in self._settings_items:
-            print(self._settings_items[k].serialize())
             serialized_settings_items.update(self._settings_items[k].serialize())
             if self._settings_items[k].default_value:
                 serialized_default_values[self._settings_items[k].settings_id] = self._settings_items[k].default_value
-        return json.dumps({
+        return {
             "type": "object",
             "properties": serialized_settings_items,
             "required": list(self._settings_items.keys())
-        }), json.dumps(serialized_default_values)
+        }, serialized_default_values
 
     def seed_default_values(self):
         self.add(SettingsItem(settings_type=SettingsItemType.NUMBER, settings_id="timeout", settings_title="Timeout",

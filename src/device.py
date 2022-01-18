@@ -9,6 +9,7 @@ from src.device_data import DeviceData
 class Device(threading.Thread):
 
     def __init__(self, id, name: str, ip: str, device_type: str, timeout: int, modules: dict, *args, **kwargs):
+        self._logger = Utilities.setup_logger()
         self._module_config = Config("./src/config/modules.json").get_whole_file()
         self._imported_modules = []
         self._workers = {}
@@ -109,7 +110,7 @@ class Device(threading.Thread):
         exec(code, globals())
         self._workers[module["name"]] = c_worker
         c_worker.start()
-        print(f"Started module {module['name']}")
+        self._logger.info(f"Started module {module['name']}")
 
     def check_modules(self):
         # start modules
@@ -124,7 +125,7 @@ class Device(threading.Thread):
         # stop modules
         modules_to_stop = self._utilities.compare_list(self._workers.keys(), module_api_out.keys())
         for c_module in modules_to_stop:
-            print(f"Stopped module {c_module}")
+            self._logger.info(f"Stopped module {c_module}")
             self.stop_module(c_module)
 
         # update modules
@@ -138,12 +139,12 @@ class Device(threading.Thread):
         config = self._module_config[module_name]
         exec(f"from src.modules.{config['filename']} import {config['classname']}", globals())
         self._imported_modules.append(module_name)
-        print(f"Successfully imported module {module_name}")
+        self._logger.info(f"Successfully imported module {module_name}")
 
     def stop_module(self, module_name):
         self._workers[module_name].stop()
         self._workers.pop(module_name)
-        print(f"Stopped module {module_name}")
+        self._logger.info(f"Stopped module {module_name}")
 
     def get_data(self):
         for c_module in self._workers:
