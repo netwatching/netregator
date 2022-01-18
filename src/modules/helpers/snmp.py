@@ -77,7 +77,7 @@ class SNMP:
         for error_indication, error_status, error_index, var_binds in iterator:
             if error_indication:
                 self._logger.error(error_indication)
-                # raise Exception(error_indication)
+                raise Exception(error_indication)
                 # TODO: prviously break
             elif error_status:
                 self._logger.error('%s at %s' % (error_status.prettyPrint(),
