@@ -82,8 +82,8 @@ class SNMP:
             elif error_status:
                 self._logger.error('%s at %s' % (error_status.prettyPrint(),
                                                  error_index and var_binds[int(error_index) - 1][0] or '?'))
-                # raise Exception('%s at %s' % (error_status.prettyPrint(),
-                #                               error_index and var_binds[int(error_index) - 1][0] or '?'))
+                raise Exception('%s at %s' % (error_status.prettyPrint(),
+                                              error_index and var_binds[int(error_index) - 1][0] or '?'))
                 # TODO: here too - break
             else:
                 if var_binds:
@@ -276,7 +276,7 @@ class DataSources:
         old_name_values = self.__snmp.get_table(_keys, "IF-MIB")
         new_values = {}
         for key, val in old_name_values.items():
-            if val["ifType"] in ["ethernetCsmacd", "ieee8023adLag"]:
+            if val["ifType"] in ["ethernetCsmacd", "ieee8023adLag", "softwareLoopback"]:
                 new_values[key] = {
                     "index": int(val["ifIndex"]),
                     "description": val["ifDescr"],
