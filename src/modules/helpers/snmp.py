@@ -325,7 +325,7 @@ class DataSources:
                     new_values[key].update(infos)
                 else:
                     self._logger.spam(f"ifDescr {val['ifDescr']} did not match any regex")
-            if not val["ifType"] == "other":
+            elif not val["ifType"] == "other":
                 self._logger.warning(f"unknown interface type: {val['ifType']}")
             """
             ethernetCsmacd (Slot: 0 Port: 22 Gigabit - Level)
