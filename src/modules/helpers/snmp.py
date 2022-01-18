@@ -148,6 +148,7 @@ class DataSources:
         # ]
 
         system_data["name"] = self.__snmp.get_single_value_by_name_with_name("sysName")
+        system_data["hostname"] = self.__snmp.get_single_value_by_name_with_name("sysHostname")
         system_data["uptime"] = int(self.__snmp.get_single_value_by_name_with_name("sysUpTime")) * 10
         system_data["description"] = self.__snmp.get_single_value_by_name_with_name("sysDescr")
         system_data["contact"] = self.__snmp.get_single_value_by_name_with_name("sysContact")
