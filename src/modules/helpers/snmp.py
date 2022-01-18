@@ -108,33 +108,33 @@ class DataSources:
     def __init__(self, snmp: SNMP):
         self.__snmp = snmp
 
-    def get_hostname(self):
-        name = self.__snmp.get_single_value_by_name('sysName')
-        return {"hostname": name}
-
-    def get_object_id(self):  # milliseconds
-        oid = self.__snmp.get_single_value_by_name('sysObjectID')
-        return {"object_id": oid}
-
-    def get_uptime(self):  # milliseconds
-        uptime = int(self.__snmp.get_single_value_by_name('sysUpTime'))*10
-        return {"uptime": uptime}
-
-    def get_description(self):
-        description = self.__snmp.get_single_value_by_name('sysDescr')
-        return {"description": description}
-
-    def get_contact(self):
-        contact = self.__snmp.get_single_value_by_name('sysContact')
-        return {"contact": contact}
-
-    def get_name(self):
-        name = self.__snmp.get_single_value_by_name('sysName')
-        return {"name": name}
-
-    def get_location(self):
-        location = self.__snmp.get_single_value_by_name('sysLocation')
-        return {"location": location}
+    # def get_hostname(self):
+    #     name = self.__snmp.get_single_value_by_name('sysName')
+    #     return {"hostname": name}
+    #
+    # def get_object_id(self):  # milliseconds
+    #     oid = self.__snmp.get_single_value_by_name('sysObjectID')
+    #     return {"object_id": oid}
+    #
+    # def get_uptime(self):  # milliseconds
+    #     uptime = int(self.__snmp.get_single_value_by_name('sysUpTime'))*10
+    #     return {"uptime": uptime}
+    #
+    # def get_description(self):
+    #     description = self.__snmp.get_single_value_by_name('sysDescr')
+    #     return {"description": description}
+    #
+    # def get_contact(self):
+    #     contact = self.__snmp.get_single_value_by_name('sysContact')
+    #     return {"contact": contact}
+    #
+    # def get_name(self):
+    #     name = self.__snmp.get_single_value_by_name('sysName')
+    #     return {"name": name}
+    #
+    # def get_location(self):
+    #     location = self.__snmp.get_single_value_by_name('sysLocation')
+    #     return {"location": location}
 
     def get_system_data(self):
         system_data = {}
@@ -148,7 +148,6 @@ class DataSources:
         # ]
 
         system_data["name"] = self.__snmp.get_single_value_by_name_with_name("sysName")
-        system_data["hostname"] = self.__snmp.get_single_value_by_name_with_name("sysHostname")
         system_data["uptime"] = int(self.__snmp.get_single_value_by_name_with_name("sysUpTime")) * 10
         system_data["description"] = self.__snmp.get_single_value_by_name_with_name("sysDescr")
         system_data["contact"] = self.__snmp.get_single_value_by_name_with_name("sysContact")
