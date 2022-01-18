@@ -17,6 +17,7 @@ class SNMP(Module):
         self.__ds = snmp.DataSources(snmp.SNMP(self.settings["community_string"], ip, self.settings["snmp_port"]))
 
     def worker(self):
+        print(f"starting to process device with IP: {self.ip}")
         # return ModuleData(static_data={}, live_data={}, events={})
         data = {}
 
