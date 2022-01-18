@@ -287,13 +287,16 @@ class DataSources:
                     "out_errors": int(val["ifOutErrors"])
                 }
                 if val["ifType"] == "ethernetCsmacd":
-                    iface_infos = val["ifDescr"].split(" ")
-                    infos = {
-                        "slot": iface_infos[1],  # 2
-                        "port": iface_infos[3],  # 12
-                        "definition": iface_infos[4]  # 10G
-                    }
-                    new_values[key].update(infos)
+                    try:
+                        iface_infos = val["ifDescr"].split(" ")
+                        infos = {
+                            "slot": iface_infos[1],  # 2
+                            "port": iface_infos[3],  # 12
+                            "definition": iface_infos[4]  # 10G
+                        }
+                        new_values[key].update(infos)
+                    except Exception:
+                        print(f"ifDescr could not be split {val['ifDescr']}")
 
             """
             ethernetCsmacd (Slot: 0 Port: 22 Gigabit - Level)
