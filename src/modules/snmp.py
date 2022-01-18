@@ -1,12 +1,14 @@
 from src.modules.module import Module
 from src.device import Device
 from src.module_data import ModuleData
+from src.utilities import Utilities
 import src.modules.helpers.snmp as snmp
 
 
 class SNMP(Module):
     def __init__(self, ip: str = None, timeout: int = None, *args, **kwargs):
         super().__init__(ip, timeout, *args, **kwargs)
+        self._logger = Utilities.setup_logger()
         self.ip = ip
         self.settings = {
             "community_string": "HTL-Villach",
@@ -17,7 +19,7 @@ class SNMP(Module):
         self.__ds = snmp.DataSources(snmp.SNMP(self.settings["community_string"], ip, self.settings["snmp_port"]))
 
     def worker(self):
-        print(f"starting to process device with IP: {self.ip}")
+        self._logger.info(f"starting to fetch SNMP information from device with IP: {self.ip}")
         # return ModuleData(static_data={}, live_data={}, events={})
         data = {}
 
@@ -37,5 +39,5 @@ class SNMP(Module):
             data.update(self.__ds.get_ip_addresses())
             # TODO: add other DataSource functions above
 
-        # print(data)  # TODO: logging class
+        self._logger.spam(data)
         return ModuleData(static_data=data, live_data={}, events={})

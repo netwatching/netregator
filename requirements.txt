@@ -7,4 +7,4 @@ pysnmp-mibs==0.1.6
 urllib3~=1.26.7
 coloredlogs~=15.0.1
 python-decouple
-
+verboselogs

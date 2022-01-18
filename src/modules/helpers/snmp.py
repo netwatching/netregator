@@ -1,9 +1,11 @@
 from pysnmp.hlapi import *
 import re
+from src.utilities import Utilities
 
 
 class SNMP:
     def __init__(self, community_string, hostname, port=161):
+        self._logger = Utilities.setup_logger()
         self.__community_string = community_string
         self.__hostname = hostname
         self.__port = port
@@ -31,7 +33,7 @@ class SNMP:
         (error_indication, error_status, error_index, var_binds) = next(iterator)
 
         if error_indication:
-            print(error_indication)
+            self._logger.error(error_indication)
             raise Exception(error_indication)
         elif error_status:
             raise Exception('%s at %s' % (error_status.prettyPrint(), error_index and var_binds[int(error_index) - 1][0] or '?'))
@@ -71,10 +73,11 @@ class SNMP:
 
         for error_indication, error_status, error_index, var_binds in iterator:
             if error_indication:
-                print(error_indication)
+                self._logger.error(error_indication)
                 break
             elif error_status:
-                print('%s at %s' % (error_status.prettyPrint(), error_index and var_binds[int(error_index) - 1][0] or '?'))
+                self._logger.error('%s at %s' % (error_status.prettyPrint(),
+                                                 error_index and var_binds[int(error_index) - 1][0] or '?'))
                 break
             else:
                 if var_binds:
@@ -101,13 +104,14 @@ class SNMP:
                         # print(f"{value.prettyPrint()=}")
                         all_entries[index].update({name: value})
                 else:
-                    print("no value returned")
+                    self._logger.warning("no value returned")
         return all_entries
 
 
 class DataSources:
     def __init__(self, snmp: SNMP):
         self.__snmp = snmp
+        self._logger = Utilities.setup_logger()
 
     # def get_hostname(self):
     #     name = self.__snmp.get_single_value_by_name('sysName')
@@ -311,7 +315,7 @@ class DataSources:
                     }
                     new_values[key].update(infos)
                 else:
-                    print(f"ifDescr {val['ifDescr']} did not match any regex")
+                    self._logger.warning(f"ifDescr {val['ifDescr']} did not match any regex")
             """
             ethernetCsmacd (Slot: 0 Port: 22 Gigabit - Level)
             other ( CPU Interface for Slot: 5 Port: 1)
