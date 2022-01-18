@@ -14,7 +14,7 @@ class SNMP:
         iterator = getCmd(
             SnmpEngine(),
             CommunityData(self.__community_string, mpModel=0),
-            UdpTransportTarget((self.__hostname, self.__port)),
+            UdpTransportTarget((self.__hostname, self.__port), timeout=1, retries=5),
             ContextData(),
             ObjectType(ObjectIdentity(oid)), lookupMib=True, lexicographicMode=False
         )
@@ -34,10 +34,12 @@ class SNMP:
 
         if error_indication:
             self._logger.error(error_indication)
-            raise Exception(error_indication)
+            # raise Exception(error_indication)
         elif error_status:
-            raise Exception('%s at %s' % (error_status.prettyPrint(),
-                                          error_index and var_binds[int(error_index) - 1][0] or '?'))
+            self._logger.error('%s at %s' % (error_status.prettyPrint(),
+                                             error_index and var_binds[int(error_index) - 1][0] or '?'))
+            # raise Exception('%s at %s' % (error_status.prettyPrint(),
+            #                               error_index and var_binds[int(error_index) - 1][0] or '?'))
         else:
             if var_binds:
                 return var_binds
@@ -65,7 +67,7 @@ class SNMP:
         iterator = nextCmd(
             SnmpEngine(),
             CommunityData(self.__community_string),
-            UdpTransportTarget((self.__hostname, 161)),
+            UdpTransportTarget((self.__hostname, 161), timeout=1, retries=5),
             ContextData(),
             *_var_binds,
             lexicographicMode=False,
@@ -75,13 +77,13 @@ class SNMP:
         for error_indication, error_status, error_index, var_binds in iterator:
             if error_indication:
                 self._logger.error(error_indication)
-                raise Exception(error_indication)
+                # raise Exception(error_indication)
                 # TODO: prviously break
             elif error_status:
                 self._logger.error('%s at %s' % (error_status.prettyPrint(),
                                                  error_index and var_binds[int(error_index) - 1][0] or '?'))
-                raise Exception('%s at %s' % (error_status.prettyPrint(),
-                                              error_index and var_binds[int(error_index) - 1][0] or '?'))
+                # raise Exception('%s at %s' % (error_status.prettyPrint(),
+                #                               error_index and var_binds[int(error_index) - 1][0] or '?'))
                 # TODO: here too - break
             else:
                 if var_binds:
