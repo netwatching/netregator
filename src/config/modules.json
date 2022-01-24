@@ -10,5 +10,9 @@
   "events": {
     "filename": "zabbix",
     "classname": "Events"
+  },
+  "ssh": {
+    "filename": "ssh",
+    "classname": "SSH"
   }
 }
