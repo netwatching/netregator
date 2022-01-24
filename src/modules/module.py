@@ -75,7 +75,11 @@ class Module(threading.Thread):
             if (datetime.datetime.now() - self.last_updated) > datetime.timedelta(minutes=5):
                 self.stop()
             self.data = self.worker()
-            time.sleep(int(self.timeout))
+            if "timeout" in self.config:
+                c_timeout = self.config["timeout"]
+            else:
+                c_timeout = self.timeout
+            time.sleep(int(c_timeout))
 
     @staticmethod
     def check_module_configuration():
