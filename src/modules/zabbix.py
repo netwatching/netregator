@@ -71,7 +71,8 @@ class Zabbix(Module):
                         c_severity = math.ceil((int(obj["severity"]) + 1)/2)
                     else:
                         c_severity = math.ceil((int(obj["severity"]) + 5)/2)
-                    z_problem = ZabbixProblems(problem=obj["name"], severity=c_severity, timestamp=obj["clock"])
+                    c_problem = str.replace(obj["name"], '"', '')
+                    z_problem = ZabbixProblems(problem=c_problem, severity=c_severity, timestamp=obj["clock"])
                     z_device.problems.append(z_problem)
 
                     if not host["host"] in zabbix_devices:
