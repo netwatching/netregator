@@ -68,13 +68,9 @@ class Zabbix(Module):
             if data_obj:
                 for obj in data_obj:
                     if zabbix_data_type == ZabbixDataType.EVENTS:
-                        print("Event")
                         c_severity = math.ceil((int(obj["severity"]) + 1)/2)
-                        print(c_severity)
                     else:
-                        print("Problem")
                         c_severity = math.ceil((int(obj["severity"]) + 5)/2)
-                        print(c_severity)
                     z_problem = ZabbixProblems(problem=obj["name"], severity=c_severity, timestamp=obj["clock"])
                     z_device.problems.append(z_problem)
 
