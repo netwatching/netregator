@@ -1,3 +1,5 @@
+import math
+
 from src.modules.module import Module
 from src.device import Device
 from pyzabbix.api import ZabbixAPI
@@ -14,7 +16,7 @@ class ZabbixDataType(Enum):
 
 
 class ZabbixProblems:
-    def __init__(self, problem: str = None, timestamp: float = None, severity: str = None):
+    def __init__(self, problem: str = None, timestamp: float = None, severity: int = None):
         self.problem = problem
         self.timestamp = timestamp
         self.severity = severity
@@ -65,7 +67,15 @@ class Zabbix(Module):
                 data_obj = self.connection.event.get(hostids=host['hostid'], time_from=time.time() - 86400)  # 86400
             if data_obj:
                 for obj in data_obj:
-                    z_problem = ZabbixProblems(problem=obj["name"], severity=obj["severity"], timestamp=obj["clock"])
+                    if zabbix_data_type == ZabbixDataType.EVENTS:
+                        print("Event")
+                        c_severity = math.ceil((int(obj["severity"]) + 1)/2)
+                        print(c_severity)
+                    else:
+                        print("Problem")
+                        c_severity = math.ceil((int(obj["severity"]) + 5)/2)
+                        print(c_severity)
+                    z_problem = ZabbixProblems(problem=obj["name"], severity=c_severity, timestamp=obj["clock"])
                     z_device.problems.append(z_problem)
 
                     if not host["host"] in zabbix_devices:
