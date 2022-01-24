@@ -108,6 +108,7 @@ class Device(threading.Thread):
             self.import_module(module["name"])
         code = f"global c_worker;c_worker = {self._module_config[module['name']]['classname']}(ip='{self.ip}', timeout={self.timeout}, config={module['config']})"
         exec(code, globals())
+        c_worker.name = f"{self.name}:{self._module_config[module['name']]['classname']}"
         self._workers[module["name"]] = c_worker
         c_worker.start()
         self._logger.info(f"Started module {module['name']}")
