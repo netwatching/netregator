@@ -11,6 +11,7 @@ import json
 class SSH(Module):
     def __init__(self, ip: str = None, timeout: int = None, *args, **kwargs):
         super().__init__(ip, timeout, *args, **kwargs)
+        # devicetype & creds -> settingsAPI
         self.dev_type = 's350'
         self.dev_creds = {
             'hostname': '172.31.8.81',
@@ -25,7 +26,7 @@ class SSH(Module):
         self.conn = driver(**self.dev_creds)
         self.conn.open()
 
-    def get_infos(self):
+    def get_lldp_infos(self):
         output = self.conn.get_lldp_neighbors_detail()
         neighbors = {}
 
@@ -46,4 +47,4 @@ class SSH(Module):
         return {"neighbors": neighbors}
 
     def worker(self):
-        return ModuleData(self.get_infos(), {}, {}, OutputType.DEFAULT)
+        return ModuleData(self.get_lldp_infos(), {}, {}, OutputType.DEFAULT)
