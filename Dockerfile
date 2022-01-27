@@ -6,7 +6,7 @@ RUN apk add --no-cache --update gcc libc-dev linux-headers git && rm -rf /var/ca
 COPY .git .
 COPY .env.template .
 RUN [ -e "/usr/src/app/.env" ] && echo "Env already exists" || mv .env.template .env
-RUN sed -i "s/%VER%/$(git describe --always --abbrev)/" .env
+RUN sed -i "s/%VER%/$(git describe --always --abbrev | sed 's/-/./')/" .env
 RUN adduser -s /bin/bash -S netuser
 RUN apk add alpine-sdk
 USER netuser
