@@ -3,6 +3,7 @@ from src.device import Device
 from src.module_data import ModuleData
 from src.utilities import Utilities
 import src.modules.helpers.snmp as snmp
+from src.settings import Settings, SettingsItem, SettingsItemType
 
 
 class SNMP(Module):
@@ -18,8 +19,13 @@ class SNMP(Module):
 
         self.__ds = snmp.DataSources(snmp.SNMP(self.settings["community_string"], ip, self.settings["snmp_port"]))
 
+    @staticmethod
+    def config_template():
+        settings = Settings(default_timeout=30*60)
+        return settings
+
     def worker(self):
-        self._logger.info(f"starting to fetch SNMP information from device with IP: {self.ip}")
+        # self._logger.info(f"starting to fetch SNMP information from device with IP: {self.ip}")
         # return ModuleData(static_data={}, live_data={}, events={})
         data = {}
 
@@ -39,5 +45,5 @@ class SNMP(Module):
             data.update(self.__ds.get_ip_addresses())
             # TODO: add other DataSource functions above
 
-        self._logger.spam(data)
+        # self._logger.spam(data)
         return ModuleData(static_data=data, live_data={}, events={})
