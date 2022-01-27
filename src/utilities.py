@@ -6,23 +6,26 @@ import inspect
 
 
 class Utilities:
-
-    def compare_dict(self, dict1, dict2):
+    @staticmethod
+    def compare_dict(dict1, dict2):
         output = []
         for key1 in dict1:
             if key1 not in dict2:
                 output.append(key1)
         return output
 
-    def compare_list(self, list1, list2):
+    @staticmethod
+    def compare_list(list1, list2):
         return list(set(list1)-set(list2))
 
     @staticmethod
-    def setup_logger():
+    def setup_logger(additional_info: str = None):
         stack = inspect.stack()
         caller_classname = stack[1][0].f_locals["self"].__class__.__name__
         logger = verboselogs.VerboseLogger("netregator")  #logging.getLogger("netregator")
         logger.addHandler(logging.StreamHandler())
+        if additional_info:
+            caller_classname = f"{caller_classname}:{additional_info}"
         fmt = f'[%(asctime)s] [%(levelname)s] [{caller_classname}] %(message)s'
         if config("LOG_LEVEL", 2, cast=int) == 0:
             coloredlogs.install(fmt=fmt, logger=logger, level=verboselogs.SPAM)

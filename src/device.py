@@ -9,7 +9,7 @@ from src.device_data import DeviceData
 class Device(threading.Thread):
 
     def __init__(self, id, name: str, ip: str, device_type: str, timeout: int, modules: dict, *args, **kwargs):
-        self._logger = Utilities.setup_logger()
+        self._logger = Utilities.setup_logger(ip)
         self._module_config = Config("./src/config/modules.json").get_whole_file()
         self._imported_modules = []
         self._workers = {}

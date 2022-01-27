@@ -95,11 +95,12 @@ class API:
 
     def send_data(self, data):
         req = self._session.post(f"{self._url}/api/devices/data", auth=JWTAuth(self), json=data)
-        self._logger.error(req.request.body)
-        self._logger.warning(req.text)
+        self._logger.info("Data sent successfully.")
+        # self._logger.error(req.request.body)
         if req.status_code == requests.codes.ok:
             return True
         else:
+            self._logger.error(f"Status code: {req.status_code}, response: {req.text}")
             return False
 
     def get_running_threads(self):

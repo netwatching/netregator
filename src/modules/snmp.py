@@ -9,7 +9,6 @@ from src.settings import Settings, SettingsItem, SettingsItemType
 class SNMP(Module):
     def __init__(self, ip: str = None, timeout: int = None, *args, **kwargs):
         super().__init__(ip, timeout, *args, **kwargs)
-        self._logger = Utilities.setup_logger()
         self.ip = ip
         self.settings = {
             "community_string": "HTL-Villach",

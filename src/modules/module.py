@@ -4,10 +4,12 @@ import time
 from src.module_data import ModuleData
 from src.device_data import DeviceData
 from src.settings import Settings, SettingsItem, SettingsItemType
+from src.utilities import Utilities
 
 
 class Module(threading.Thread):
     def __init__(self, ip: str, timeout: int, config: dict, *args, **kwargs):
+        self._logger = Utilities.setup_logger(ip)
         self.__data = DeviceData()
         self.timeout = timeout
         self.ip = ip

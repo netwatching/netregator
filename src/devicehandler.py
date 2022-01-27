@@ -66,8 +66,8 @@ class ModuleHander():
     def check_devices(self):
         while True:
             running_devices = self.get_running_devices()
-            devices_to_start = self._utilities.compare_dict(running_devices, self._workers)
-            devices_to_stop = self._utilities.compare_dict(self._workers, running_devices)
+            devices_to_start = Utilities.compare_dict(running_devices, self._workers)
+            devices_to_stop = Utilities.compare_dict(self._workers, running_devices)
     
             # starts new Devices
             for c_id in devices_to_start:
