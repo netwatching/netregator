@@ -83,7 +83,7 @@ class API:
             payload = {
                 "token": self._secret
             }
-            req = self._session.post(f"{self._url}/api/aggregator-login", timeout=5, json=payload)
+            req = self._session.post(f"{self._url}/api/aggregator-login", json=payload)
             if req.status_code == requests.codes.ok:
                 output = req.json()
                 self._logger.debug(output)
@@ -147,7 +147,7 @@ class API:
 
     def send_known_modules(self, modules):
         req = self._session.post(f"{self._url}/api/aggregator/{self._id}/modules", json={"modules": modules},
-                                 auth=JWTAuth(self), timeout=5)
+                                 auth=JWTAuth(self))
         if req.status_code == requests.codes.ok:
             return True
         else:
