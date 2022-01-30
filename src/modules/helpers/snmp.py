@@ -33,8 +33,8 @@ class SNMP:
         (error_indication, error_status, error_index, var_binds) = next(iterator)
 
         if error_indication:
-            self._logger.error(error_indication)
-            # raise Exception(error_indication)
+            # self._logger.error(error_indication)
+            raise Exception(error_indication)
         elif error_status:
             # self._logger.error('%s at %s' % (error_status.prettyPrint(),
             #                                  error_index and var_binds[int(error_index) - 1][0] or '?'))
