@@ -36,10 +36,10 @@ class SNMP:
             self._logger.error(error_indication)
             # raise Exception(error_indication)
         elif error_status:
-            self._logger.error('%s at %s' % (error_status.prettyPrint(),
-                                             error_index and var_binds[int(error_index) - 1][0] or '?'))
-            # raise Exception('%s at %s' % (error_status.prettyPrint(),
-            #                               error_index and var_binds[int(error_index) - 1][0] or '?'))
+            # self._logger.error('%s at %s' % (error_status.prettyPrint(),
+            #                                  error_index and var_binds[int(error_index) - 1][0] or '?'))
+            raise Exception('%s at %s' % (error_status.prettyPrint(),
+                                          error_index and var_binds[int(error_index) - 1][0] or '?'))
         else:
             if var_binds:
                 return var_binds
@@ -76,14 +76,14 @@ class SNMP:
 
         for error_indication, error_status, error_index, var_binds in iterator:
             if error_indication:
-                self._logger.error(error_indication)
-                # raise Exception(error_indication)
+                # self._logger.error(error_indication)
+                raise Exception(error_indication)
                 # TODO: prviously break - how can no variables found appear on no exception???
             elif error_status:
-                self._logger.error('%s at %s' % (error_status.prettyPrint(),
-                                                 error_index and var_binds[int(error_index) - 1][0] or '?'))
-                # raise Exception('%s at %s' % (error_status.prettyPrint(),
-                #                               error_index and var_binds[int(error_index) - 1][0] or '?'))
+                # self._logger.error('%s at %s' % (error_status.prettyPrint(),
+                #                                  error_index and var_binds[int(error_index) - 1][0] or '?'))
+                raise Exception('%s at %s' % (error_status.prettyPrint(),
+                                              error_index and var_binds[int(error_index) - 1][0] or '?'))
                 # TODO: here too - break
             else:
                 if var_binds:
