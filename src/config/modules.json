@@ -14,5 +14,9 @@
   "ssh": {
     "filename": "ssh",
     "classname": "SSH"
+  },
+  "lldp": {
+    "filename": "unifi",
+    "classname": "LLDP"
   }
 }
