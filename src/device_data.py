@@ -54,11 +54,9 @@ class DeviceData:
             if type(item) == LiveData:
                 if item.name not in self.live_data:
                     self.live_data[item.name] = {}
-                print(item.timestamp)
                 self.live_data[item.name].update({item.timestamp: item.value})
             else:
                 print(type(item), item)
-        print(self.live_data)
 
     def serialize(self):
         return {"static_data": self.convert_to_key_value_list(self.static_data),
