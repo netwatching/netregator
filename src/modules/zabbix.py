@@ -49,10 +49,10 @@ class Zabbix(Module):
     def __init__(self, ip: str = None, timeout: int = None, *args, **kwargs):
         super().__init__(ip, timeout, *args, **kwargs)
         self.url = f"https://{ip}"
-        self.user = self.config["username"]
-        #self.user = config("ZABBIX_USERNAME")
-        self.password = self.config["password"]
-        #self.password = config("ZABBIX_PASSWORD")
+        #self.user = self.config["username"]
+        self.user = config("ZABBIX_USERNAME")
+        #self.password = self.config["password"]
+        self.password = config("ZABBIX_PASSWORD")
         self.connection = self.__create_connection()
 
     def __create_connection(self):
