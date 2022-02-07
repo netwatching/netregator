@@ -99,6 +99,7 @@ class SNMP:
                         value = value.prettyPrint()
                         index = index[0].prettyPrint()
                         if value == 'No more variables left in this MIB View':
+                            break
                             self._logger.debug(f"found no variables left string in: {oid=}, {value=}, {mib=}, {name=}, "
                                                f"{index=}")
                         # interface_data.append((mib, name, index, value))
