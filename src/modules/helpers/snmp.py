@@ -78,7 +78,7 @@ class SNMP:
             if error_indication:
                 # self._logger.error(error_indication)
                 raise Exception(error_indication)
-                # TODO: prviously break - how can no variables found appear on no exception???
+                # TODO: previously break - how can no variables found appear on no exception???
             elif error_status:
                 # self._logger.error('%s at %s' % (error_status.prettyPrint(),
                 #                                  error_index and var_binds[int(error_index) - 1][0] or '?'))
@@ -100,7 +100,7 @@ class SNMP:
                         index = index[0].prettyPrint()
                         if value == 'No more variables left in this MIB View':
                             self._logger.debug(f"found no variables left string in: {oid=}, {value=}, {mib=}, {name=}, "
-                                              f"{index=}")
+                                               f"{index=}")
                         # interface_data.append((mib, name, index, value))
                         # if index in interface_data:
                         #interface_data[index].update({name: value})
@@ -275,9 +275,36 @@ class DataSources:
 
         old_name_values = self.__snmp.get_table(_keys, "IF-MIB")
         new_values = {}
-        for key, val in old_name_values.items():
+        for _, val in old_name_values.items():
+            infos = {}
+            # ^[a-zA-Z]*[0-9]*(/[0-9]*)*
+            if re.match(r"^[a-zA-Z]+[0-9]+(/[0-9]+){1,2}$", val["ifDescr"]):
+                # cisco description e.g. TenGigabitEthernet3/23/4
+                nums = re.split(r"^[a-zA-Z]*", val["ifDescr"])[1]
+                iface_infos = nums.split("/")
+                if len(iface_infos) == 3:
+                    infos["blade"] = iface_infos[0]
+                    infos["slot"] = iface_infos[1]
+                    infos["port"] = iface_infos[2]
+                elif len(iface_infos) == 2:
+                    infos["slot"] = iface_infos[0]
+                    infos["port"] = iface_infos[1]
+                infos["definition"] = re.split(r"[0-9]", val["ifDescr"])[0]
+                key = val["ifDescr"]
+            elif re.match(r"^Slot: [0-9]+ Port: [0-9]+ \w+", val["ifDescr"]):
+                # unifi sw desrc e.g. Slot: 0 Port: 51 10G - Level  /  Slot: 0 Port: 7 Gigabit - Level
+                iface_infos = val["ifDescr"].split(" ")
+                infos["slot"] = iface_infos[1]  # 2
+                infos["port"] = iface_infos[3]  # 12
+                infos["definition"] = iface_infos[4]  # 10G
+                key = f"Port {infos['port']}"
+            else:
+                key = val["ifDescr"]
+                self._logger.spam(f"ifDescr {val['ifDescr']} did not match any regex")
+
             if val["ifType"] in ["ethernetCsmacd", "ieee8023adLag", "softwareLoopback"]:
                 new_values[key] = {
+                    "key": key,
                     "index": int(val["ifIndex"]),
                     "description": val["ifDescr"],
                     "type": val["ifType"],
@@ -300,33 +327,13 @@ class DataSources:
                     "out_discards": int(val["ifOutDiscards"]),
                     "out_errors": int(val["ifOutErrors"])
                 }
-                # ^[a-zA-Z]*[0-9]*(/[0-9]*)*
-                if re.match(r"^[a-zA-Z]+[0-9]+(/[0-9]+){1,2}$", val["ifDescr"]):
-                    # cisco description e.g. TenGigabitEthernet3/23/4/23
-                    infos = {}
-                    nums = re.split(r"^[a-zA-Z]*", val["ifDescr"])[1]
-                    iface_infos = nums.split("/")
-                    if len(iface_infos) == 3:
-                        infos["blade"] = iface_infos[0]
-                        infos["slot"] = iface_infos[1]
-                        infos["port"] = iface_infos[2]
-                    elif len(iface_infos) == 2:
-                        infos["slot"] = iface_infos[0]
-                        infos["port"] = iface_infos[1]
-                    infos["definition"] = re.split(r"[0-9]", val["ifDescr"])[0]
-                elif re.match(r"^Slot: [0-9]+ Port: [0-9]+ \w+", val["ifDescr"]):
-                    # unifi sw desrc e.g. Slot: 0 Port: 51 10G - Level  /  Slot: 0 Port: 7 Gigabit - Level
-                    iface_infos = val["ifDescr"].split(" ")
-                    infos = {
-                        "slot": iface_infos[1],  # 2
-                        "port": iface_infos[3],  # 12
-                        "definition": iface_infos[4]  # 10G
-                    }
-                    new_values[key].update(infos)
-                else:
-                    self._logger.spam(f"ifDescr {val['ifDescr']} did not match any regex")
-            elif not val["ifType"] == "other":
+
+            elif not val["ifType"] in ["other"]:
                 self._logger.warning(f"unknown interface type: {val['ifType']}, description: {val['ifDescr']}")
+
+            if infos:
+                new_values[key].update(infos)
+
             """
             ethernetCsmacd (Slot: 0 Port: 22 Gigabit - Level)
             other ( CPU Interface for Slot: 5 Port: 1)
@@ -347,11 +354,12 @@ class DataSources:
         old_name_values = self.__snmp.get_table(_keys, "IP-MIB")
         new_values = {}
         for key, val in old_name_values.items():
-            new_values[key] = {
-                "address": val["ipAdEntAddr"],
-                "interface_index": int(val["ipAdEntIfIndex"]),
-                "netmask": val["ipAdEntNetMask"],
-                "broadcast_address": val["ipAdEntBcastAddr"],
-            }
+            if not val["ipAdEntAddr"] == "127.0.0.1":
+                new_values[key] = {
+                    "address": val["ipAdEntAddr"],
+                    "interface_index": int(val["ipAdEntIfIndex"]),
+                    "netmask": val["ipAdEntNetMask"],
+                    "broadcast_address": val["ipAdEntBcastAddr"],
+                }
 
         return {"ipAddresses": new_values}

@@ -29,23 +29,20 @@ class SNMP(Module):
         data = {}
 
         try:
-            try:
-                data.update(self.__ds.get_system_data())
-                data.update(self.__ds.get_services())
-                data.update(self.__ds.get_interfaces())
-                # data.update(self.__ds.get_ip_data())
-                data.update(self.__ds.get_ip_addresses())
-                # TODO: add other DataSource functions above
-            except Exception:
-                self.__ds = snmp.DataSources(snmp.SNMP(self.settings["c_str_2"], self.ip, self.settings["snmp_port"]))
-                data.update(self.__ds.get_system_data())
-                data.update(self.__ds.get_services())
-                data.update(self.__ds.get_interfaces())
-                # data.update(self.__ds.get_ip_data())
-                data.update(self.__ds.get_ip_addresses())
-                # TODO: add other DataSource functions above
+            data.update(self.__ds.get_system_data())
+            data.update(self.__ds.get_services())
+            data.update(self.__ds.get_interfaces())
+            # data.update(self.__ds.get_ip_data())
+            data.update(self.__ds.get_ip_addresses())
+            # TODO: add other DataSource functions above
         except Exception:
-            self._logger.warning(f"SNMP get failed on device with IP: {self.ip}")
+            self.__ds = snmp.DataSources(snmp.SNMP(self.settings["c_str_2"], self.ip, self.settings["snmp_port"]))
+            data.update(self.__ds.get_system_data())
+            data.update(self.__ds.get_services())
+            data.update(self.__ds.get_interfaces())
+            # data.update(self.__ds.get_ip_data())
+            data.update(self.__ds.get_ip_addresses())
+            # TODO: add other DataSource functions above
 
         # self._logger.spam(data)
         return ModuleData(static_data=data, live_data={}, events={})
