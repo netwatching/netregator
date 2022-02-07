@@ -4,7 +4,7 @@ from src.modules.module import Module
 from src.device import Device
 from pyzabbix.api import ZabbixAPI
 from decouple import config
-from src.module_data import ModuleData, OutputType
+from src.module_data import ModuleData, OutputType, LiveData
 import time
 from enum import Enum
 from src.settings import Settings, SettingsItem, SettingsItemType
@@ -49,8 +49,10 @@ class Zabbix(Module):
     def __init__(self, ip: str = None, timeout: int = None, *args, **kwargs):
         super().__init__(ip, timeout, *args, **kwargs)
         self.url = f"https://{ip}"
-        self.user = config("ZABBIX_USERNAME")
-        self.password = config("ZABBIX_PASSWORD")
+        self.user = self.config["username"]
+        #self.user = config("ZABBIX_USERNAME")
+        self.password = self.config["password"]
+        #self.password = config("ZABBIX_PASSWORD")
         self.connection = self.__create_connection()
 
     def __create_connection(self):
@@ -86,10 +88,11 @@ class Zabbix(Module):
 
     @staticmethod
     def check_module_configuration():
-        if config("ZABBIX_USERNAME") and config("ZABBIX_PASSWORD"):
-            return True
-        else:
-            return False
+        # if config("ZABBIX_USERNAME") and config("ZABBIX_PASSWORD"):
+        #     return True
+        # else:
+        #     return False
+        return True
 
 
 class Problems(Zabbix):
@@ -99,7 +102,7 @@ class Problems(Zabbix):
     def worker(self):
         hosts = self.get_hosts()
         problems = self.get_infos(hosts, ZabbixDataType.PROBLEMS)
-        return ModuleData({}, {}, problems, OutputType.EXTERNAL_DATA_SOURCES)
+        return ModuleData({}, [], problems, OutputType.EXTERNAL_DATA_SOURCES)
 
 
 class Events(Zabbix):
@@ -107,13 +110,19 @@ class Events(Zabbix):
         super().__init__(ip, timeout, *args, **kwargs)
 
     def worker(self):
+        testlivedata = LiveData(name="cpu", value=20, timestamp=500)
         hosts = self.get_hosts()
         events = self.get_infos(hosts, ZabbixDataType.EVENTS)
-        return ModuleData({}, {}, events, OutputType.EXTERNAL_DATA_SOURCES)
+        return ModuleData({}, [testlivedata, LiveData(name="cpu", value=21)], events,
+                          OutputType.EXTERNAL_DATA_SOURCES)
 
     @staticmethod
     def config_template():
-        settings = Settings()
-        settings.add(SettingsItem(settings_id="test_test", settings_title="Test", settings_type=SettingsItemType.STRING,
-                                  settings_default_value="test"))
+        settings = Settings(default_timeout=60)
+        settings.add(SettingsItem(settings_id="username", settings_title="Zabbix Username",
+                                  settings_type=SettingsItemType.STRING,
+                                  settings_default_value="user"))
+        settings.add(SettingsItem(settings_id="password", settings_title="Zabbix Password",
+                                  settings_type=SettingsItemType.STRING,
+                                  settings_default_value="password"))
         return settings

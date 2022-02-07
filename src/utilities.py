@@ -3,6 +3,7 @@ import coloredlogs
 import verboselogs
 from decouple import config
 import inspect
+import collections.abc
 
 
 class Utilities:
@@ -17,6 +18,15 @@ class Utilities:
     @staticmethod
     def compare_list(list1, list2):
         return list(set(list1)-set(list2))
+
+    @staticmethod
+    def update_multidimensional_dict(orig_dict, new_dict):
+        for k, v in new_dict.items():
+            if isinstance(v, collections.abc.Mapping):
+                orig_dict[k] = Utilities.update_multidimensional_dict(orig_dict.get(k, {}), v)
+            else:
+                orig_dict[k] = v
+        return orig_dict
 
     @staticmethod
     def setup_logger(additional_info: str = None):

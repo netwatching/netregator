@@ -8,8 +8,16 @@ class OutputType(Enum):
     EXTERNAL_DATA_SOURCES = 1
 
 
+class LiveData:
+    def __init__(self, name: str, value: float, timestamp: time = time.time()):
+        self.name = name
+        self.value = value
+        self.timestamp = timestamp
+
+
 class ModuleData:
-    def __init__(self, static_data: dict, live_data: dict, events: dict, output_type: OutputType = OutputType.DEFAULT):
+    def __init__(self, static_data: dict, live_data: list[LiveData], events: dict,
+                 output_type: OutputType = OutputType.DEFAULT):
         self.static_data = static_data
         self.live_data = live_data
         self.events = events

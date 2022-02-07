@@ -6,7 +6,7 @@ pysnmp==4.4.12
 pysnmp-mibs==0.1.6
 urllib3~=1.26.7
 coloredlogs~=15.0.1
-python-decouple
 verboselogs~=1.7
 napalm-s350~=0.3.1
 napalm~=3.3.1
+unificontrol==0.2.9

@@ -47,4 +47,4 @@ class SSH(Module):
         return {"neighbors": neighbors}
 
     def worker(self):
-        return ModuleData(self.get_lldp_infos(), {}, {}, OutputType.DEFAULT)
+        return ModuleData(self.get_lldp_infos(), [], {}, OutputType.DEFAULT)
