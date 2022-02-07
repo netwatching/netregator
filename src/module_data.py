@@ -1,6 +1,7 @@
 import time
 import json
 from enum import Enum
+from typing import List
 
 
 class OutputType(Enum):
@@ -16,7 +17,7 @@ class LiveData:
 
 
 class ModuleData:
-    def __init__(self, static_data: dict, live_data: list[LiveData], events: dict,
+    def __init__(self, static_data: dict, live_data: List[LiveData], events: dict,
                  output_type: OutputType = OutputType.DEFAULT):
         self.static_data = static_data
         self.live_data = live_data
