@@ -4,7 +4,7 @@ from src.modules.module import Module
 from src.device import Device
 from pyzabbix.api import ZabbixAPI
 from decouple import config
-from src.module_data import ModuleData, OutputType
+from src.module_data import ModuleData, OutputType, LiveData
 import time
 from enum import Enum
 from src.settings import Settings, SettingsItem, SettingsItemType
@@ -99,7 +99,7 @@ class Problems(Zabbix):
     def worker(self):
         hosts = self.get_hosts()
         problems = self.get_infos(hosts, ZabbixDataType.PROBLEMS)
-        return ModuleData({}, {}, problems, OutputType.EXTERNAL_DATA_SOURCES)
+        return ModuleData({}, [], problems, OutputType.EXTERNAL_DATA_SOURCES)
 
 
 class Events(Zabbix):
@@ -107,13 +107,16 @@ class Events(Zabbix):
         super().__init__(ip, timeout, *args, **kwargs)
 
     def worker(self):
+        testlivedata = LiveData(name="cpu", value=20, timestamp=500)
         hosts = self.get_hosts()
         events = self.get_infos(hosts, ZabbixDataType.EVENTS)
-        return ModuleData({}, {}, events, OutputType.EXTERNAL_DATA_SOURCES)
+        return ModuleData({}, [testlivedata, LiveData(name="cpu", value=21)], events,
+                          OutputType.EXTERNAL_DATA_SOURCES)
 
     @staticmethod
     def config_template():
         settings = Settings()
-        settings.add(SettingsItem(settings_id="test_test", settings_title="Test", settings_type=SettingsItemType.STRING,
+        settings.add(SettingsItem(settings_id="demo_item", settings_title="Demo",
+                                  settings_type=SettingsItemType.STRING,
                                   settings_default_value="test"))
         return settings
