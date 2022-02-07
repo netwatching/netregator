@@ -45,4 +45,4 @@ class SNMP(Module):
             # TODO: add other DataSource functions above
 
         # self._logger.spam(data)
-        return ModuleData(static_data=data, live_data={}, events={})
+        return ModuleData(static_data=data, live_data=[], events={})
