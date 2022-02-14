@@ -127,8 +127,6 @@ class SNMP:
                         print(f"{name=}")
                         print(f"{index=}")
                         print(f"{value=}")
-                        print(f"{index.prettyPrint()=}")
-                        print(f"{value.prettyPrint()=}")
 
                         # print(f"{value.prettyPrint()=}")
                         all_entries[index].update({name: value})
