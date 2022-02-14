@@ -87,6 +87,8 @@ class SNMP:
                                               error_index and var_binds[int(error_index) - 1][0] or '?'))
                 # TODO: here too - break
             else:
+                if error_index:
+                    self._logger.warning(str(error_index))
                 if var_binds:
                     #interface_data = {}
                     oid, _ = var_binds[0]
