@@ -1,5 +1,8 @@
 from pysnmp.hlapi import *
 import re
+
+from pysnmp.smi import view, builder
+
 from src.utilities import Utilities
 
 
@@ -62,8 +65,21 @@ class SNMP:
         all_entries = {}
         _var_binds = []
 
+        # for key in arguments_list:
+        #     _var_binds.append(ObjectType(ObjectIdentity(mib_name, key)))
+
+        # iterator = nextCmd(
+        #     SnmpEngine(),
+        #     CommunityData(self.__community_string),
+        #     UdpTransportTarget((self.__hostname, 161), timeout=1, retries=5),
+        #     ContextData(),
+        #     *_var_binds,
+        #     lexicographicMode=False,
+        #     lookupMib=True
+        # )
+
         for key in arguments_list:
-            _var_binds.append(ObjectType(ObjectIdentity(mib_name, key)))
+            _var_binds.append(ObjectType(ObjectIdentity(mib_name, key)).resolveWithMib(view.MibViewController(builder.MibBuilder())))
 
         iterator = nextCmd(
             SnmpEngine(),
@@ -71,8 +87,7 @@ class SNMP:
             UdpTransportTarget((self.__hostname, 161), timeout=1, retries=5),
             ContextData(),
             *_var_binds,
-            lexicographicMode=False,
-            lookupMib=True
+            lexicographicMode=False
         )
 
         for error_indication, error_status, error_index, var_binds in iterator:
