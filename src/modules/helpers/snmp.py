@@ -87,8 +87,6 @@ class SNMP:
                                               error_index and var_binds[int(error_index) - 1][0] or '?'))
                 # TODO: here too - break
             else:
-                if error_index:
-                    self._logger.warning(str(error_index))
                 if var_binds:
                     #interface_data = {}
                     oid, _ = var_binds[0]
@@ -103,7 +101,7 @@ class SNMP:
                         index = index[0].prettyPrint()
                         if value == 'No more variables left in this MIB View':
                             self._logger.info(f"found no variables left string in: {oid=}, {value=}, {mib=}, {name=}, "
-                                               f"{index=}")
+                                               f"{index=}, {var_binds=}")
                         # interface_data.append((mib, name, index, value))
                         # if index in interface_data:
                         #interface_data[index].update({name: value})
