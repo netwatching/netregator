@@ -23,6 +23,7 @@ class SNMP:
         return value.prettyPrint()
 
     def __get_var_binds_by_name(self, name, mib_name):
+        self._logger.info(f"name: {name} mib-name: {mib_name}")
         iterator = getCmd(
             SnmpEngine(),
             CommunityData(self.__community_string, mpModel=0),
