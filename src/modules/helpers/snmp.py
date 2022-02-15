@@ -84,7 +84,7 @@ class SNMP:
         iterator = nextCmd(
             SnmpEngine(),
             CommunityData(self.__community_string),
-            UdpTransportTarget((self.__hostname, 161), timeout=1, retries=5),
+            UdpTransportTarget((self.__hostname, 161), timeout=2, retries=5),
             ContextData(),
             *_var_binds,
             lexicographicMode=False
@@ -123,10 +123,10 @@ class SNMP:
                         # else:
                         #     interface_data[index] = {name: value}
 
-                        print(f"{mib=}")
-                        print(f"{name=}")
-                        print(f"{index=}")
-                        print(f"{value=}")
+                        # print(f"{mib=}")
+                        # print(f"{name=}")
+                        # print(f"{index=}")
+                        # print(f"{value=}")
 
                         # print(f"{value.prettyPrint()=}")
                         all_entries[m_index].update({name: value})
