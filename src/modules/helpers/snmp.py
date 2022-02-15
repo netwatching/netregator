@@ -106,9 +106,9 @@ class SNMP:
                     #interface_data = {}
                     oid, _ = var_binds[0]
                     _, _, index = oid.getMibSymbol()
-                    index = index[0].prettyPrint()
+                    m_index = index[0].prettyPrint()
                     #interface_data[index] = {}
-                    all_entries[index] = {}
+                    all_entries[m_index] = {}
                     for var_bind in var_binds:
                         oid, value = var_bind
                         mib, name, index = oid.getMibSymbol()
@@ -129,7 +129,7 @@ class SNMP:
                         print(f"{value=}")
 
                         # print(f"{value.prettyPrint()=}")
-                        all_entries[index].update({name: value})
+                        all_entries[m_index].update({name: value})
                 else:
                     self._logger.warning("no value returned")
         return all_entries
