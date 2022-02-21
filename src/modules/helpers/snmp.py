@@ -265,6 +265,29 @@ class DataSources:
             'ifOutErrors'
         ]
 
+        canonical_names = {
+            'ifIndex': 'index',
+            'ifDescr': 'description',
+            'ifType': 'type',
+            'ifMtu': 'mtu',
+            'ifSpeed': 'speed',
+            'ifPhysAddress': 'mac_address',
+            'ifAdminStatus': 'admin_status',
+            'ifOperStatus': 'operating_status',
+            'ifLastChange': 'last_change',
+            'ifInOctets': 'in_bytes',
+            'ifInUcastPkts': 'in_unicast_packets',
+            'ifInNUcastPkts': 'in_non_unicast_packets',
+            'ifInDiscards': 'in_discards',
+            'ifInErrors': 'in_errors',
+            'ifInUnknownProtos': 'in_unknown_protocolls',
+            'ifOutOctets': 'out_bytes',
+            'ifOutUcastPkts': 'out_unicast_packets',
+            'ifOutNUcastPkts': 'out_non_unicast_packets',
+            'ifOutDiscards': 'out_discards',
+            'ifOutErrors': 'out_errors'
+        }
+
         old_name_values = self.__snmp.get_table(_keys, "IF-MIB")
         new_values = {}
         for val in old_name_values:
@@ -295,30 +318,38 @@ class DataSources:
                 self._logger.spam(f"ifDescr {val['ifDescr']} did not match any regex")
 
             if val["ifType"] in ["ethernetCsmacd", "ieee8023adLag", "softwareLoopback"]:
-                new_values[key] = {
-                    "key": key,
-                    "index": int(val["ifIndex"]),
-                    "description": val["ifDescr"],
-                    "type": val["ifType"],
-                    "mtu": int(val["ifMtu"]),
-                    "speed": int(val["ifSpeed"]),  # e.g. 4294967295
-                    "mac_address": val["ifPhysAddress"],  # e.g. "up"
-                    "admin_status": val["ifAdminStatus"],
-                    "operating_status": val["ifOperStatus"],
-                    "last_change": int(val["ifLastChange"]) * 10,
-                    # sysuptime timestamp at which operational state changed
-                    "in_bytes": int(val["ifInOctets"]),
-                    "in_unicast_packets": int(val["ifInUcastPkts"]),
-                    "in_non_unicast_packets": int(val["ifInNUcastPkts"]),
-                    "in_discards": int(val["ifInDiscards"]),
-                    "in_errors": int(val["ifInErrors"]),
-                    "in_unknown_protocolls": int(val["ifInUnknownProtos"]),
-                    "out_bytes": int(val["ifOutOctets"]),
-                    "out_unicast_packets": int(val["ifOutUcastPkts"]),
-                    "out_non-unicast_packets": int(val["ifOutNUcastPkts"]),
-                    "out_discards": int(val["ifOutDiscards"]),
-                    "out_errors": int(val["ifOutErrors"])
-                }
+
+
+                new_values[key] = {}
+                for _key in _keys:
+                    if _key in val:
+                        new_values[key].update({canonical_names[_key]: val[_key]})
+
+
+                # new_values[key] = {
+                #     "key": key,
+                #     "index": int(val["ifIndex"]),
+                #     "description": val["ifDescr"],
+                #     "type": val["ifType"],
+                #     "mtu": int(val["ifMtu"]),
+                #     "speed": int(val["ifSpeed"]),  # e.g. 4294967295
+                #     "mac_address": val["ifPhysAddress"],  # e.g. "up"
+                #     "admin_status": val["ifAdminStatus"],
+                #     "operating_status": val["ifOperStatus"],
+                #     "last_change": int(val["ifLastChange"]) * 10,
+                #     # sysuptime timestamp at which operational state changed
+                #     "in_bytes": int(val["ifInOctets"]),
+                #     "in_unicast_packets": int(val["ifInUcastPkts"]),
+                #     "in_non_unicast_packets": int(val["ifInNUcastPkts"]),
+                #     "in_discards": int(val["ifInDiscards"]),
+                #     "in_errors": int(val["ifInErrors"]),
+                #     "in_unknown_protocolls": int(val["ifInUnknownProtos"]),
+                #     "out_bytes": int(val["ifOutOctets"]),
+                #     "out_unicast_packets": int(val["ifOutUcastPkts"]),
+                #     "out_non-unicast_packets": int(val["ifOutNUcastPkts"]),
+                #     "out_discards": int(val["ifOutDiscards"]),
+                #     "out_errors": int(val["ifOutErrors"])
+                # }
 
             elif not val["ifType"] in ["other"]:
                 self._logger.warning(f"unknown interface type: {val['ifType']}, description: {val['ifDescr']}")
