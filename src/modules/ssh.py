@@ -1,6 +1,6 @@
 from src.modules.module import Module
 from decouple import config
-from src.module_data import ModuleData, OutputType
+from src.module_data import ModuleData, OutputType, Event, EventSeverity
 import sys
 import time
 import napalm
@@ -47,4 +47,5 @@ class SSH(Module):
         return {"neighbors": neighbors}
 
     def worker(self):
+        #return ModuleData({}, [], [Event("successfully sent", EventSeverity.DEBUG)], OutputType.DEFAULT)
         return ModuleData(self.get_lldp_infos(), [], {}, OutputType.DEFAULT)

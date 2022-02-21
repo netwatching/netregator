@@ -2,7 +2,14 @@ from __future__ import annotations
 import time
 import json
 from enum import Enum
+import typing
 
+class EventSeverity(Enum):
+    DEBUG = 1
+    INFORMATION = 2
+    WARNING = 3
+    ERROR = 4
+    DISASTER = 5
 
 class OutputType(Enum):
     DEFAULT = 0
@@ -15,9 +22,22 @@ class LiveData:
         self.value = value
         self.timestamp = timestamp
 
+class Event:
+    def __init__(self, information: str, severity: EventSeverity, timestamp: time = time.time()):
+        self.information = information
+        self.severity = severity.value
+        self.timestamp = timestamp
+
+    def serialize(self):
+        return {
+            "information": self.information,
+            "severity": self.severity,
+            "timestamp": self.timestamp
+        }
+
 
 class ModuleData:
-    def __init__(self, static_data: dict, live_data: list[LiveData], events: dict,
+    def __init__(self, static_data: dict, live_data: list[LiveData], events: typing.Union[list, dict],
                  output_type: OutputType = OutputType.DEFAULT):
         self.static_data = static_data
         self.live_data = live_data
