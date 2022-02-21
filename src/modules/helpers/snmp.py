@@ -65,53 +65,43 @@ class SNMP:
         all_entries = {}
         _var_binds = []
 
-        # for key in arguments_list:
-        #     _var_binds.append(ObjectType(ObjectIdentity(mib_name, key)))
-
-        # iterator = nextCmd(
-        #     SnmpEngine(),
-        #     CommunityData(self.__community_string),
-        #     UdpTransportTarget((self.__hostname, 161), timeout=1, retries=5),
-        #     ContextData(),
-        #     *_var_binds,
-        #     lexicographicMode=False,
-        #     lookupMib=True
-        # )
-
         for key in arguments_list:
             _var_binds.append(ObjectType(ObjectIdentity(mib_name, key)))
 
         iterator = nextCmd(
             SnmpEngine(),
             CommunityData(self.__community_string),
-            UdpTransportTarget((self.__hostname, 161), timeout=2, retries=5),
+            UdpTransportTarget((self.__hostname, 161), timeout=1, retries=5),
             ContextData(),
             *_var_binds,
             lexicographicMode=False,
             lookupMib=True
         )
 
+        all_data = []
         for error_indication, error_status, error_index, var_binds in iterator:
             if error_indication:
                 # self._logger.error(error_indication)
-                break
+                # break
                 raise Exception(error_indication)
                 # TODO: previously break - how can no variables found appear on no exception???
             elif error_status:
                 # self._logger.error('%s at %s' % (error_status.prettyPrint(),
                 #                                  error_index and var_binds[int(error_index) - 1][0] or '?'))
-                break
+                # break
                 raise Exception('%s at %s' % (error_status.prettyPrint(),
                                               error_index and var_binds[int(error_index) - 1][0] or '?'))
                 # TODO: here too - break
             else:
                 if var_binds:
+                    self._logger.debug(str(var_binds))
                     #interface_data = {}
-                    oid, _ = var_binds[0]
-                    _, _, index = oid.getMibSymbol()
-                    m_index = index[0].prettyPrint()
-                    #interface_data[index] = {}
-                    all_entries[m_index] = {}
+                    # oid, _ = var_binds[0]
+                    # _, _, index = oid.getMibSymbol()
+                    # m_index = index[0].prettyPrint()
+                    # #interface_data[index] = {}
+                    # all_entries[m_index] = {}
+                    one_data_type = []
                     for var_bind in var_binds:
                         oid, value = var_bind
                         mib, name, index = oid.getMibSymbol()
@@ -131,10 +121,14 @@ class SNMP:
                         # print(f"{index=}")
                         # print(f"{value=}")
 
+                        one_data_type.append({name: value})
+
                         # print(f"{value.prettyPrint()=}")
-                        all_entries[m_index].update({name: value})
+                        # all_entries[m_index].update({name: value})
+                    all_data.append(one_data_type)
                 else:
                     self._logger.warning("no value returned")
+        self._logger.warning(all_data)
         return all_entries
 
 
