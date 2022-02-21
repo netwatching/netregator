@@ -110,6 +110,7 @@ class SNMP:
                         if value == 'No more variables left in this MIB View':
                             self._logger.info(f"found no variables left string in: {oid=}, {value=}, {mib=}, {name=}, "
                                                f"{index=}, {var_binds=}")
+                            break
                         # interface_data.append((mib, name, index, value))
                         # if index in interface_data:
                         #interface_data[index].update({name: value})
