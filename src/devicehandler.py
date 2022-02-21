@@ -9,7 +9,7 @@ from decouple import config
 from src.utilities import Utilities
 
 
-class ModuleHander():
+class DeviceHander():
     def __init__(self):
         self._logger = Utilities.setup_logger()
         self._imported_modules = []
