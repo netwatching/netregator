@@ -1,6 +1,6 @@
 from src.modules.module import Module
 from src.device import Device
-from src.module_data import ModuleData
+from src.module_data import ModuleData, OutputType, Event, EventSeverity
 from src.utilities import Utilities
 import src.modules.helpers.snmp as snmp
 from src.settings import Settings, SettingsItem, SettingsItemType
@@ -26,6 +26,8 @@ class SNMP(Module):
     def worker(self):
         # self._logger.info(f"starting to fetch SNMP information from device with IP: {self.ip}")
         # return ModuleData(static_data={}, live_data={}, events={})
+
+        #return ModuleData({}, [], [Event("successfully sent", EventSeverity.DEBUG)], OutputType.DEFAULT)
         data = {}
 
         try:
