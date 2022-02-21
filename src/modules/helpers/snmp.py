@@ -79,7 +79,7 @@ class SNMP:
         # )
 
         for key in arguments_list:
-            _var_binds.append(ObjectType(ObjectIdentity(mib_name, key)).resolveWithMib(view.MibViewController(builder.MibBuilder())))
+            _var_binds.append(ObjectType(ObjectIdentity(mib_name, key)))
 
         iterator = nextCmd(
             SnmpEngine(),
@@ -87,7 +87,8 @@ class SNMP:
             UdpTransportTarget((self.__hostname, 161), timeout=2, retries=5),
             ContextData(),
             *_var_binds,
-            lexicographicMode=False
+            lexicographicMode=False,
+            lookupMib=True
         )
 
         for error_indication, error_status, error_index, var_binds in iterator:
