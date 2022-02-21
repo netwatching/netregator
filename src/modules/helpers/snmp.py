@@ -12,6 +12,7 @@ class SNMP:
         self.__community_string = community_string
         self.__hostname = hostname
         self.__port = port
+        self.__mib_builder = builder.MibBuilder()
 
     def get_single_value_by_oid(self, oid):
         iterator = getCmd(
@@ -97,11 +98,17 @@ class SNMP:
                     for var_bind in var_binds:
                         oid, value = var_bind
                         mib, name, index = oid.getMibSymbol()
+
+                        mib_node, = self.__mib_builder.importSymbols(mib, name)
                         value = value.prettyPrint()
-                        index = index[0].prettyPrint()
+                        # index = index[0].prettyPrint()
                         if value == 'No more variables left in this MIB View':
                             continue
-                        entity_data[name] = value
+                        self._logger.error(mib_node.syntax.__class__)
+                        if mib_node.syntax.__class__ == 'pysnmp.proto.rfc1902.TimeTicks':
+                            entity_data[name] = "asdfghjkl"
+                        else:
+                            entity_data[name] = value
                     all_data.append(entity_data)
                 else:
                     self._logger.warning("no value returned")
@@ -318,7 +325,6 @@ class DataSources:
                 self._logger.spam(f"ifDescr {val['ifDescr']} did not match any regex")
 
             if val["ifType"] in ["ethernetCsmacd", "ieee8023adLag", "softwareLoopback"]:
-
 
                 new_values[key] = {}
                 for _key in _keys:
