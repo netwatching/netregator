@@ -105,7 +105,7 @@ class SNMP:
                     all_data.append(entity_data)
                 else:
                     self._logger.warning("no value returned")
-        self._logger.warning(all_data)
+        self._logger.debug(all_data)
         return all_data
 
 
