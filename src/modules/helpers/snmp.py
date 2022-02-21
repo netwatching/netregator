@@ -1,5 +1,8 @@
 from pysnmp.hlapi import *
 import re
+import pysnmp
+import pysnmp.proto
+import pysnmp.proto.rfc1902
 
 from pysnmp.smi import view, builder
 
@@ -105,7 +108,7 @@ class SNMP:
                         if value == 'No more variables left in this MIB View':
                             continue
                         self._logger.error(mib_node.syntax.__class__)
-                        if mib_node.syntax.__class__ == 'pysnmp.proto.rfc1902.TimeTicks':
+                        if mib_node.syntax.__class__ is pysnmp.proto.rfc1902.TimeTicks:
                             entity_data[name] = "asdfghjkl"
                         else:
                             entity_data[name] = value
