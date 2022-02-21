@@ -62,7 +62,6 @@ class SNMP:
         return value
 
     def get_table(self, arguments_list: list, mib_name):
-        all_entries = {}
         _var_binds = []
 
         for key in arguments_list:
@@ -94,13 +93,6 @@ class SNMP:
                 # TODO: here too - break
             else:
                 if var_binds:
-                    self._logger.debug(str(var_binds))
-                    #interface_data = {}
-                    # oid, _ = var_binds[0]
-                    # _, _, index = oid.getMibSymbol()
-                    # m_index = index[0].prettyPrint()
-                    # #interface_data[index] = {}
-                    # all_entries[m_index] = {}
                     entity_data = {}
                     for var_bind in var_binds:
                         oid, value = var_bind
@@ -108,29 +100,13 @@ class SNMP:
                         value = value.prettyPrint()
                         index = index[0].prettyPrint()
                         if value == 'No more variables left in this MIB View':
-                            # self._logger.info(f"found no variables left string in: {oid=}, {value=}, {mib=}, {name=}, "
-                            #                   f"{index=}, {var_binds=}")
                             continue
-                        # interface_data.append((mib, name, index, value))
-                        # if index in interface_data:
-                        #interface_data[index].update({name: value})
-                        # else:
-                        #     interface_data[index] = {name: value}
-
-                        # print(f"{mib=}")
-                        # print(f"{name=}")
-                        # print(f"{index=}")
-                        # print(f"{value=}")
-
                         entity_data[name] = value
-
-                        # print(f"{value.prettyPrint()=}")
-                        # all_entries[m_index].update({name: value})
                     all_data.append(entity_data)
                 else:
                     self._logger.warning("no value returned")
         self._logger.warning(all_data)
-        return all_entries
+        return all_data
 
 
 class DataSources:
@@ -291,7 +267,7 @@ class DataSources:
 
         old_name_values = self.__snmp.get_table(_keys, "IF-MIB")
         new_values = {}
-        for _, val in old_name_values.items():
+        for val in old_name_values:
             infos = {}
             # ^[a-zA-Z]*[0-9]*(/[0-9]*)*
             if re.match(r"^[a-zA-Z]+[0-9]+(/[0-9]+){1,2}$", val["ifDescr"]):
@@ -356,6 +332,8 @@ class DataSources:
             ieee8023adLag ( Link Aggregate 1)
             """
 
+        self._logger.warning(str({"network_interfaces": new_values}))
+
         return {"network_interfaces": new_values}
 
     def get_ip_addresses(self):
@@ -369,13 +347,15 @@ class DataSources:
 
         old_name_values = self.__snmp.get_table(_keys, "IP-MIB")
         new_values = {}
-        for key, val in old_name_values.items():
+        for val in old_name_values:
             if not val["ipAdEntAddr"] == "127.0.0.1":
-                new_values[key] = {
+                new_values[val["ipAdEntAddr"]] = {
                     "address": val["ipAdEntAddr"],
                     "interface_index": int(val["ipAdEntIfIndex"]),
                     "netmask": val["ipAdEntNetMask"],
                     "broadcast_address": val["ipAdEntBcastAddr"],
                 }
+
+        self._logger.warning(str({"ipAddresses": new_values}))
 
         return {"ipAddresses": new_values}
