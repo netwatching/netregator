@@ -16,15 +16,12 @@ class DeviceData:
         if type(module_data) is ModuleData:
             self.add_live_data_or_event_list(module_data.live_data)
             if module_data.output_type == OutputType.DEFAULT:
-                #self.add_live_data_or_event_list(module_data.events)
                 self.events.extend(module_data.events)
-                #self.events.update(module_data.events)
             elif module_data.output_type == OutputType.EXTERNAL_DATA_SOURCES:
                 self.external_events.update(module_data.events)
         elif type(module_data) is DeviceData:
             self.live_data = Utilities.update_multidimensional_dict(self.live_data, module_data.live_data)
             self.events.extend(module_data.events)
-            #self.add_live_data_or_event_list(module_data.events)
             self.external_events.update(module_data.external_events)
 
     def convert_to_key_value_list(self, input_dict: dict):
