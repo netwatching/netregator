@@ -9,7 +9,7 @@ from decouple import config
 from src.utilities import Utilities
 
 
-class ModuleHander():
+class DeviceHandler:
     def __init__(self):
         self._logger = Utilities.setup_logger()
         self._imported_modules = []
@@ -34,7 +34,6 @@ class ModuleHander():
                 time.sleep(5)
         except KeyboardInterrupt:
             os._exit(1)
-        #self.stop_system_thread()
 
     def get_data_from_devices(self):
         while True:
@@ -44,7 +43,6 @@ class ModuleHander():
             for deviceid in self._workers:
                 c_data, c_external_events = self._workers[deviceid].data
                 self._workers[deviceid].clear_data()
-                # print(c_data)
                 if c_data != {'static_data': [], 'live_data': [], 'events': {}}:
                     current_metadata = {"id": deviceid,
                                     "name": self._workers[deviceid].name}
@@ -101,21 +99,21 @@ class ModuleHander():
             time.sleep(5)
 
     def start_device(self, device: Device):
-        #code = f"global cmodule;cmodule = {device.type}(deviceid={device.id},devicetype='{device.type}',devicename='{device.name}',deviceip='{device.ip}', devicetimeout={device.timeout}, devicemodules={device.modules})"
         code = f"global c_device;c_device = Device(id={device.id}, name='{device.name}', ip='{device.ip}', device_type='{device.device_type}', timeout={device.timeout}, modules={device.modules})"
         exec(code, globals())
         self._workers[device.id] = c_device
-        #self._workers[device.id].setDaemon(True)
         self._workers[device.id].start()
         self._logger.info(f"Started device {device.name}")
         return True
 
     def start_system_thread(self, key=None):
         if key == "sendData" or key is None:
-            self._system_threads["sendData"] = threading.Thread(target=self.get_data_from_devices, name="sendData", args=())
+            self._system_threads["sendData"] = threading.Thread(target=self.get_data_from_devices, name="sendData",
+                                                                args=())
             self._system_threads["sendData"].start()
         if key == "checkDevices" or key is None:
-            self._system_threads["checkDevices"] = threading.Thread(target=self.check_devices, name="checkDevices", args=())
+            self._system_threads["checkDevices"] = threading.Thread(target=self.check_devices, name="checkDevices",
+                                                                    args=())
             self._system_threads["checkDevices"].start()
 
     def stop_system_thread(self, key=None):
@@ -143,7 +141,6 @@ class ModuleHander():
             device_id = c_device["id"]
             del c_device["id"]
             output[device_id] = c_device
-        #print(output)
         return output
 
     def set_version(self):
