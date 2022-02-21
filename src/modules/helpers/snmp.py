@@ -314,7 +314,7 @@ class DataSources:
                 infos["definition"] = iface_infos[4]  # 10G
                 key = f"Port {infos['port']}"
             else:
-                key = val["ifDescr"]
+                key = val["ifDescr"].strip()
                 self._logger.spam(f"ifDescr {val['ifDescr']} did not match any regex")
 
             if val["ifType"] in ["ethernetCsmacd", "ieee8023adLag", "softwareLoopback"]:
