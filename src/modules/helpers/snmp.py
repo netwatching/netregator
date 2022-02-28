@@ -98,7 +98,7 @@ class SNMP:
                 # TODO: here too - break
             else:
                 if var_binds:
-                    parse_exceptions = {"up": 1, "down": 0}
+                    parse_exceptions = ["up", "down"]
                     entity_data = {}
                     for var_bind in var_binds:
                         oid, value = var_bind
@@ -113,12 +113,12 @@ class SNMP:
                         if isinstance(mib_node.syntax, typing.Union[pysnmp.proto.rfc1902.TimeTicks, pysnmp.proto.rfc1902.Integer32, pysnmp.proto.rfc1902.Counter32, pysnmp.proto.rfc1902.Gauge32].__args__):
                             try:
                                 if value in parse_exceptions:
-                                    entity_data[name] = parse_exceptions[value]
+                                    entity_data[name] = value
                                 else:
                                     if isinstance(mib_node.syntax, pysnmp.proto.rfc1902.TimeTicks):
-                                        entity_data[name] = int(value)*10  # TODO: timeticks x10 - not working
+                                        entity_data[name] = int(value)*10
                                     else:
-                                        entity_data[name] = int(value)  # TODO: timeticks x10 - not working
+                                        entity_data[name] = int(value)
                             except Exception:
                                 self._logger.error(f"{mib_node.syntax.__class__=}, {value=}")
                         else:
