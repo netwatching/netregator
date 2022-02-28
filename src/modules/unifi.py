@@ -85,30 +85,28 @@ class UnifiAPI(Module):
         hostname = ""
 
         device = UnifiDevice(ip=self.ip)
-        alldevices = self.connection.list_devices()
-        for obj in alldevices:
+        all_devices = self.connection.list_devices()
+        for obj in all_devices:
             if obj["ip"] == self.ip:
                 mac = obj["mac"]
 
-        allclients = self.connection.list_clients()
-        lldpdevice = self.connection.list_devices(device_mac=mac)
-        #print(allclients)
-        for obj in lldpdevice:
-            for client in allclients:
-                if client["mac"] == obj["lldp_table"][0]["chassis_id"]:
-                    hostname = client["hostname"]
+        all_clients = self.connection.list_clients()
+        device = self.connection.list_devices(device_mac=mac)
+        for device_data in device:
+            lldp_device = device_data["lldp_table"]
+            for i in range(len(lldp_device)):
+                for clients in all_clients:
+                    if clients["mac"] == lldp_device[i]["chassis_id"]:
+                        if clients["hostname"] != "":
+                            hostname = clients["hostname"]
 
-                    lldp = UnifiLLDP(chassis_id=obj["lldp_table"][0]["chassis_id"], remote_host=hostname,
-                                 is_wired=obj["lldp_table"][0]["is_wired"],
-                                 local_port_idx=obj["lldp_table"][0]["local_port_idx"],
-                                 local_port_name=obj["lldp_table"][0]["is_wired"],
-                                 port_id=obj["lldp_table"][0]["port_id"])
+                    lldp = UnifiLLDP(chassis_id=lldp_device["chassis_id"], remote_host=hostname,
+                                 is_wired=lldp_device["is_wired"],
+                                 local_port_idx=lldp_device["local_port_idx"],
+                                 local_port_name=lldp_device["is_wired"],
+                                 port_id=lldp_device["port_id"])
 
-                    print(hostname)
-                else:
-                    print(obj["lldp_table"][0]["chassis_id"])
-
-            #lldp_dict = lldp.serialize()
+            lldp_dict = lldp.serialize()
 
             #lldp_list = [lldp_dict]
             #print(lldp_list)
