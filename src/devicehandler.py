@@ -7,6 +7,7 @@ import time
 import os
 from decouple import config
 from src.utilities import Utilities
+import importlib
 
 
 class DeviceHandler:
@@ -100,8 +101,12 @@ class DeviceHandler:
             time.sleep(5)
 
     def start_device(self, device: Device):
-        code = f"global c_device;c_device = Device(id={device.id}, name='{device.name}', ip='{device.ip}', device_type='{device.device_type}', timeout={device.timeout}, modules={device.modules})"
-        exec(code, globals())
+        device_type = getattr(importlib.import_module("src.device"), "Device")
+        print(device_type)
+        c_device = Device(id=device.id, name=device.name, ip=device.ip, device_type=device.device_type,
+                               timeout=device.timeout, modules=device.modules)
+        #code = f"global c_device;c_device = Device(id={device.id}, name='{device.name}', ip='{device.ip}', device_type='{device.device_type}', timeout={device.timeout}, modules={device.modules})"
+        #exec(code, globals())
         self._workers[device.id] = c_device
         self._workers[device.id].start()
         self._logger.info(f"Started device {device.name}")

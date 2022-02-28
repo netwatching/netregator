@@ -4,6 +4,7 @@ from src.io import Config
 import json
 from src.utilities import Utilities
 from src.device_data import DeviceData
+import importlib
 
 
 class Device(threading.Thread):
@@ -104,10 +105,11 @@ class Device(threading.Thread):
             self.stop_module(c_worker)
 
     def start_module(self, module):
-        if module["name"] not in self._imported_modules:
-            self.import_module(module["name"])
-        code = f"global c_worker;c_worker = {self._module_config[module['name']]['classname']}(ip='{self.ip}', timeout={self.timeout}, config={module['config']})"
-        exec(code, globals())
+        c_module_import = self.import_module(module["name"])
+        c_worker = c_module_import(ip=self.ip, timeout=self.timeout, config=module['config'])
+        #if module["name"] not in self._imported_modules:
+        #code = f"global c_worker;c_worker = {self._module_config[module['name']]['classname']}(ip='{self.ip}', timeout={self.timeout}, config={module['config']})"
+        #exec(code, globals())
         c_worker.name = f"{self.name}:{self._module_config[module['name']]['classname']}"
         self._workers[module["name"]] = c_worker
         c_worker.start()
@@ -138,9 +140,11 @@ class Device(threading.Thread):
 
     def import_module(self, module_name):
         config = self._module_config[module_name]
-        exec(f"from src.modules.{config['filename']} import {config['classname']}", globals())
+        c_module_import = getattr(importlib.import_module(f"src.modules.{config['filename']}"), config['classname'])
+        #exec(f"from src.modules.{config['filename']} import {config['classname']}", globals())
         self._imported_modules.append(module_name)
         self._logger.info(f"Successfully imported module {module_name}")
+        return c_module_import
 
     def stop_module(self, module_name):
         self._workers[module_name].stop()
