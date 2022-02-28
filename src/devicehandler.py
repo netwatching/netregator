@@ -45,7 +45,8 @@ class DeviceHandler:
                 self._workers[deviceid].clear_data()
                 if c_data != {'static_data': [], 'live_data': [], 'events': {}}:
                     current_metadata = {"id": deviceid,
-                                    "name": self._workers[deviceid].name}
+                                        "name": self._workers[deviceid].name,
+                                        "ip": self._workers[deviceid].ip}
                     current_metadata.update(c_data)
                     devices.append(current_metadata)
                 self._workers[deviceid].clear_data()
