@@ -108,7 +108,7 @@ class SNMP:
                         # index = index[0].prettyPrint()
                         if value == 'No more variables left in this MIB View':
                             continue
-                        #self._logger.error(mib_node.syntax.__class__)
+                        self._logger.error(type(mib_node.syntax.__class__))
                         if type(mib_node.syntax) == typing.Union[pysnmp.proto.rfc1902.TimeTicks, pysnmp.proto.rfc1902.Integer32, pysnmp.proto.rfc1902.Counter32, pysnmp.proto.rfc1902.Gauge32]:
                             try:
                                 entity_data[name] = int(value)  # TODO: timeticks x10 - not working
