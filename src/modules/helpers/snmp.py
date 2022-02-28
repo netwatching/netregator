@@ -98,7 +98,7 @@ class SNMP:
                 # TODO: here too - break
             else:
                 if var_binds:
-                    parse_exceptions = ["up", "down"]
+                    parse_exceptions = ["up", "down", "notPresent"]
                     entity_data = {}
                     for var_bind in var_binds:
                         oid, value = var_bind
@@ -110,19 +110,28 @@ class SNMP:
                         if value == 'No more variables left in this MIB View':
                             continue
                         #self._logger.error(type(mib_node.syntax))
-                        if isinstance(mib_node.syntax, typing.Union[pysnmp.proto.rfc1902.TimeTicks, pysnmp.proto.rfc1902.Integer32, pysnmp.proto.rfc1902.Counter32, pysnmp.proto.rfc1902.Gauge32].__args__):
-                            try:
-                                if value in parse_exceptions:
-                                    entity_data[name] = value
-                                else:
-                                    if isinstance(mib_node.syntax, pysnmp.proto.rfc1902.TimeTicks):
-                                        entity_data[name] = int(value)*10
-                                    else:
-                                        entity_data[name] = int(value)
-                            except Exception:
-                                self._logger.error(f"{mib_node.syntax.__class__=}, {value=}")
+                        #if isinstance(mib_node.syntax, typing.Union[pysnmp.proto.rfc1902.TimeTicks, pysnmp.proto.rfc1902.Integer32, pysnmp.proto.rfc1902.Counter32, pysnmp.proto.rfc1902.Gauge32].__args__):
+                        if mib_node.syntax.__class__ == pysnmp.proto.rfc1902.TimeTicks:
+                            entity_data[name] = int(value) * 10
+                        for c in [pysnmp.proto.rfc1902.Integer32, pysnmp.proto.rfc1902.Counter32, pysnmp.proto.rfc1902.Gauge32]:
+                            if mib_node.syntax.__class__ == c:
+                                entity_data[name] = int(value)
+                                break
                         else:
                             entity_data[name] = value
+
+                            # try:
+                            #     if value in parse_exceptions:
+                            #         entity_data[name] = value
+                            #     else:
+                            #         if isinstance(mib_node.syntax, pysnmp.proto.rfc1902.TimeTicks):
+                            #             entity_data[name] = int(value)*10
+                            #         else:
+                            #             entity_data[name] = int(value)
+                            # except Exception:
+                            #     self._logger.error(f"{mib_node.syntax.__class__=}, {value=}")
+                        # else:
+                        #     entity_data[name] = value
                     all_data.append(entity_data)
                 else:
                     self._logger.warning("no value returned")
