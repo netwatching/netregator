@@ -47,7 +47,8 @@ class API:
         self._demo = config("DEMO", False, cast=bool)
         self._id = None
         self._secret = config("SECRET", "admin", cast=str)
-        self._token = None
+        self._access_token = None
+        self._refresh_token = None
         self._url = config("IP")
         self.__conter = 0
         self._session.verify = config("SSL_VERIFY", True, cast=bool)
@@ -66,13 +67,13 @@ class API:
             'verify_aud': False
         }
         # first run of code
-        if self._token is None:
+        if self._access_token is None:
             reauth = True
         # if not first Run
         if reauth is False:
             try:
                 time = datetime.datetime.utcfromtimestamp(
-                    jwt.decode(self._token, algorithms=["HS512", "HS256"], options=jwt_options)["exp"])
+                    jwt.decode(self._access_token, algorithms=["HS512", "HS256"], options=jwt_options)["exp"])
                 # check if code already expired
                 if datetime.datetime.utcnow() > (time - datetime.timedelta(seconds=60)):
                     reauth = True
@@ -80,24 +81,43 @@ class API:
                 reauth = True
         # generate new Code
         if reauth:
-            payload = {
-                "token": self._secret
-            }
-            req = self._session.post(f"{self._url}/api/aggregator-login", json=payload)
-            if req.status_code == requests.codes.ok:
-                output = req.json()
-                self._logger.debug(output)
-                self._id = output["aggregator_id"]
-                self._token = output["token"]
-                return self._token
+            use_refresh = True
+            if self._refresh_token is not None:
+                time = datetime.datetime.utcfromtimestamp(
+                    jwt.decode(self._access_token, algorithms=["HS512", "HS256"], options=jwt_options)["exp"])
+                if datetime.datetime.utcnow() > (time - datetime.timedelta(seconds=60)):
+                    use_refresh = False
+            else:
+                use_refresh = False
+            if use_refresh:
+                req = self._session.post(f"{self._url}/api/aggregator-refresh",
+                                         auth=JWTAuthRefreshToken(self._refresh_token))
+                if req.status_code == requests.codes.ok:
+                    output = req.json()
+                    self._logger.debug(output)
+                    self._access_token = output["access_token"]
+                    self._refresh_token = output["refresh_token"]
+                    return self._access_token
+            else:
+                payload = {
+                    "token": self._secret
+                }
+                req = self._session.post(f"{self._url}/api/aggregator-login", json=payload)
+                if req.status_code == requests.codes.ok:
+                    output = req.json()
+                    self._logger.debug(output)
+                    self._id = output["aggregator_id"]
+                    self._access_token = output["access_token"]
+                    self._refresh_token = output["refresh_token"]
+                    return self._access_token
         else:
-            return self._token
+            return self._access_token
 
     def send_data(self, data):
         req = self._session.post(f"{self._url}/api/devices/data", auth=JWTAuth(self), json=data)
-        self._logger.info("Data sent successfully.")
         # self._logger.error(req.request.body)
         if req.status_code == requests.codes.ok:
+            self._logger.info("Data sent successfully.")
             return True
         else:
             self._logger.error(f"Status code: {req.status_code}, response: {req.text}")
@@ -159,6 +179,16 @@ class API:
 class JWTAuth(requests.auth.AuthBase):
     def __init__(self, api: API):
         self.token = api.login()
+
+    def __call__(self, r):
+        # print(self.token)
+        r.headers["Authorization"] = "Bearer " + self.token
+        #print(self.token)
+        return r
+
+class JWTAuthRefreshToken(requests.auth.AuthBase):
+    def __init__(self, token: str):
+        self.token = token
 
     def __call__(self, r):
         # print(self.token)
