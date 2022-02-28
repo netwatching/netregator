@@ -110,6 +110,7 @@ class SNMP:
                             continue
                         self._logger.error(type(mib_node.syntax))
                         if type(mib_node.syntax) == typing.Union[pysnmp.proto.rfc1902.TimeTicks, pysnmp.proto.rfc1902.Integer32, pysnmp.proto.rfc1902.Counter32, pysnmp.proto.rfc1902.Gauge32]:
+                            self._logger.success("################################## SUCCESS ##########################################")
                             try:
                                 entity_data[name] = int(value)  # TODO: timeticks x10 - not working
                             except Exception:
