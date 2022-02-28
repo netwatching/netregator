@@ -62,7 +62,8 @@ class DeviceData:
                 self._logger.error("Tried to add invalid Data Type. Data can either be ListData or Event.")
 
     def serialize(self):
-        return {"static_data": self.convert_to_key_value_list(self.static_data),
+        return {#"static_data": self.convert_to_key_value_list(self.static_data),
+                "static_data": self.static_data,
                 "live_data": self.live_data,
                 "events": [item.serialize() for item in self.events],
                 }
