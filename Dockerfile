@@ -2,7 +2,7 @@
 FROM python:3-alpine as netregator-config
 WORKDIR /usr/src/app
 
-RUN apk add --no-cache --update gcc libc-dev linux-headers git && rm -rf /var/cache/apk/*
+RUN apk add --no-cache --update gcc libffi-dev libc-dev linux-headers git && rm -rf /var/cache/apk/*
 COPY .git .
 COPY .env.template .
 RUN [ -e "/usr/src/app/.env" ] && echo "Env already exists" || mv .env.template .env
