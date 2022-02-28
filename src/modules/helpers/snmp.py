@@ -109,7 +109,10 @@ class SNMP:
                             continue
                         self._logger.error(mib_node.syntax.__class__)
                         if mib_node.syntax.__class__ in [pysnmp.proto.rfc1902.TimeTicks, pysnmp.proto.rfc1902.Integer32, pysnmp.proto.rfc1902.Counter32, pysnmp.proto.rfc1902.Gauge32]:
-                            entity_data[name] = int(value)  # TODO: timeticks x10
+                            try:
+                                entity_data[name] = int(value)  # TODO: timeticks x10 - not working
+                            except Exception:
+                                self._logger.error(f"{mib_node.syntax.__class__=}, {value=}")
                         else:
                             entity_data[name] = value
                     all_data.append(entity_data)
