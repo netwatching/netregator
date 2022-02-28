@@ -69,7 +69,7 @@ class DeviceHandler:
             running_devices = self.get_running_devices()
             devices_to_start = Utilities.compare_dict(running_devices, self._workers)
             devices_to_stop = Utilities.compare_dict(self._workers, running_devices)
-    
+
             # starts new Devices
             for c_id in devices_to_start:
                 device_type = running_devices[c_id]["type"]
@@ -77,16 +77,17 @@ class DeviceHandler:
                 name = running_devices[c_id]["name"]
                 timeout = running_devices[c_id]["timeout"]
                 modules = running_devices[c_id]["modules"]
-                self.start_device(Device(id=c_id, name=name, device_type=device_type, ip=ip, timeout=timeout, modules=modules))
-                #print(running_devices[c_id])
-    
+                self.start_device(
+                    Device(id=c_id, name=name, device_type=device_type, ip=ip, timeout=timeout, modules=modules))
+                # print(running_devices[c_id])
+
             # stop devices
             for c_id in devices_to_stop:
                 self.stop_device(self._workers[c_id].id, self._workers[c_id].name)
-    
+
             # update timeout, modules and check for dead devices/threads and restart them
             for c_id in running_devices:
-                #check if device is still running. if not, restart it.
+                # check if device is still running. if not, restart it.
                 if not self._workers[c_id].is_alive() or not self._workers[c_id].running:
                     c_id = self._workers[c_id].id
                     name = self._workers[c_id].name
@@ -94,19 +95,16 @@ class DeviceHandler:
                     ip = self._workers[c_id].ip
                     timeout = self._workers[c_id].timeout
                     modules = self._workers[c_id].modules
-                    self.start_device(Device(id=c_id, name=name, device_type=device_type, ip=ip, timeout=timeout, modules=modules))
+                    self.start_device(
+                        Device(id=c_id, name=name, device_type=device_type, ip=ip, timeout=timeout, modules=modules))
                 # update timeout
                 self._workers[c_id].timeout = running_devices[c_id]["timeout"]
                 self._workers[c_id].modules = running_devices[c_id]["modules"]
             time.sleep(5)
 
     def start_device(self, device: Device):
-        device_type = getattr(importlib.import_module("src.device"), "Device")
-        print(device_type)
         c_device = Device(id=device.id, name=device.name, ip=device.ip, device_type=device.device_type,
-                               timeout=device.timeout, modules=device.modules)
-        #code = f"global c_device;c_device = Device(id={device.id}, name='{device.name}', ip='{device.ip}', device_type='{device.device_type}', timeout={device.timeout}, modules={device.modules})"
-        #exec(code, globals())
+                          timeout=device.timeout, modules=device.modules)
         self._workers[device.id] = c_device
         self._workers[device.id].start()
         self._logger.info(f"Started device {device.name}")

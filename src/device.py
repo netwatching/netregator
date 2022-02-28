@@ -12,7 +12,6 @@ class Device(threading.Thread):
     def __init__(self, id, name: str, ip: str, device_type: str, timeout: int, modules: dict, *args, **kwargs):
         self._logger = Utilities.setup_logger(ip)
         self._module_config = Config("./src/config/modules.json").get_whole_file()
-        self._imported_modules = []
         self._workers = {}
         self.__data = DeviceData()
         self.name = name
@@ -107,9 +106,6 @@ class Device(threading.Thread):
     def start_module(self, module):
         c_module_import = self.import_module(module["name"])
         c_worker = c_module_import(ip=self.ip, timeout=self.timeout, config=module['config'])
-        #if module["name"] not in self._imported_modules:
-        #code = f"global c_worker;c_worker = {self._module_config[module['name']]['classname']}(ip='{self.ip}', timeout={self.timeout}, config={module['config']})"
-        #exec(code, globals())
         c_worker.name = f"{self.name}:{self._module_config[module['name']]['classname']}"
         self._workers[module["name"]] = c_worker
         c_worker.start()
@@ -141,9 +137,6 @@ class Device(threading.Thread):
     def import_module(self, module_name):
         config = self._module_config[module_name]
         c_module_import = getattr(importlib.import_module(f"src.modules.{config['filename']}"), config['classname'])
-        #exec(f"from src.modules.{config['filename']} import {config['classname']}", globals())
-        self._imported_modules.append(module_name)
-        self._logger.info(f"Successfully imported module {module_name}")
         return c_module_import
 
     def stop_module(self, module_name):
