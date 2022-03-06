@@ -7,17 +7,15 @@ from decouple import config
 
 class UnifiLLDP:
     def __init__(self, chassis_id: str = None, remote_host: str = None, is_wired: str = None,
-                 local_port_idx: int = None,
-                 local_port_name: str = None, port_id: str = None):
+                 local_port_idx: int = None, port_id: str = None):
         self.chassis_id = chassis_id
         self.remote_host = remote_host
         self.is_wired = is_wired
         self.local_port_idx = local_port_idx
-        self.local_port_name = local_port_name
         self.port_id = port_id
 
     def serialize(self):
-        return {"local_port": self.local_port_name, "remote_host": self.remote_host,
+        return {"local_port": self.local_port_idx, "remote_host": self.remote_host,
                 "remote_chassis_id": self.chassis_id,
                 "remote_port": self.port_id, "remote_system_description": "", "remote_system_capability": "",
                 "is_wired": self.is_wired}
@@ -47,12 +45,6 @@ class UnifiDevice:
     @ip.setter
     def ip(self, ipaddr):
         self.__ip = ipaddr
-    #
-    # def serialize_ip(self):
-    #     out = []
-    #     for data in self.data:
-    #         out.append(data.serialize())
-    #     return {self.ip: out}
 
 
 class UnifiAPI(Module):
@@ -83,41 +75,41 @@ class UnifiAPI(Module):
         lldp_data = {}
         mac = ""
         hostname = ""
+        portname = ""
 
         device = UnifiDevice(ip=self.ip)
         all_devices = self.connection.list_devices()
-        for obj in all_devices:
-            if obj["ip"] == self.ip:
-                mac = obj["mac"]
+        for obj_ in all_devices:
+            if obj_["ip"] == self.ip:
+                mac = obj_["mac"]
 
         all_clients = self.connection.list_clients()
-        device = self.connection.list_devices(device_mac=mac)
-        for device_data in device:
+        devices = self.connection.list_devices(device_mac=mac)
+        for device_data in devices:
             lldp_device = device_data["lldp_table"]
+            lldp_list = []
             for i in range(len(lldp_device)):
                 for clients in all_clients:
                     if clients["mac"] == lldp_device[i]["chassis_id"]:
-                        if clients["hostname"] != "":
+                        if "hostname" in clients:
                             hostname = clients["hostname"]
 
-                    lldp = UnifiLLDP(chassis_id=lldp_device["chassis_id"], remote_host=hostname,
-                                 is_wired=lldp_device["is_wired"],
-                                 local_port_idx=lldp_device["local_port_idx"],
-                                 local_port_name=lldp_device["is_wired"],
-                                 port_id=lldp_device["port_id"])
+                        portname = lldp_device[i]["local_port_idx"]
 
-            lldp_dict = lldp.serialize()
+                        lldp = UnifiLLDP(chassis_id=lldp_device[i]["chassis_id"], remote_host=hostname,
+                                         is_wired=lldp_device[i]["is_wired"],
+                                         local_port_idx=lldp_device[i]["local_port_idx"],
+                                         port_id=lldp_device[i]["port_id"])
+                        xyz = {"test": lldp}
+                        print(xyz)
+                        lldp_list.append(lldp.serialize())
 
-            #lldp_list = [lldp_dict]
-            #print(lldp_list)
-            #port_dict = {"lldp": lldp_list}
-            #print(port_dict)
-            #obj["lldp_table"][0]["port_id"] = port_dict
+            print(lldp_list)
 
             #lldp_data = device.data
+            #todo: Add Port to LLDP Data
 
-        print(lldp_data)
-        return lldp_data
+            return lldp_list
 
     def get_vlan_data(self):
         vlan_data_devices = {}
