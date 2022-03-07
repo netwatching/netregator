@@ -1,10 +1,10 @@
-requests~=2.26.0
+requests==2.27.1
 PyJWT~=2.3.0
 py-zabbix~=1.1.7
-python-decouple~=3.5
+python-decouple==3.6
 pysnmp==4.4.12
 pysnmp-mibs==0.1.6
-urllib3~=1.26.7
+urllib3==1.26.8
 coloredlogs~=15.0.1
 verboselogs~=1.7
 napalm-s350~=0.3.1
