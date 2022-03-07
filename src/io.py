@@ -134,16 +134,16 @@ class API:
                 else:
                     return []
             except Exception as ex:
-                self._logger.critical(ex)
+                self._logger.critical(f"get_running_threads: {ex}")
                 return []
         else:
             data = []
             modules = []
-            modules.append({"name": "snmp", "config": {}})
+            modules.append({"name": "unifi_lldp", "config": {}})
             #data.append(
             #    {"id": "1", "name": "Ubi", "timeout": 1, "type": "Ubiquiti", "ip": "172.31.37.95", "modules": modules})
-            data.append({"id": "2", "name": "Zabbi", "timeout": 10, "type": "Ubiquiti", "ip": "zabbix.htl-vil.local",
-                         "modules": [{"name": "problems", "config": {}}, {"name": "events", "config": {'timeout': 30}}]})
+            data.append({"id": "2", "name": "Zabbi", "timeout": 10, "type": "Ubiquiti", "ip": "172.31.37.77",
+                         "modules": modules})
             # data.append({"id": "3", "name": "Cisco", "timeout": 10, "type": "Cisco", "ip": "172.31.8.81", "modules": modules})
 
             # if(self.__conter % 5 == 0):
@@ -163,7 +163,7 @@ class API:
         if req.status_code == requests.codes.ok:
             return True
         else:
-            self._logger.critical(req.text)
+            self._logger.critical(f"send_version_string: {req.text}")
             return False
 
     def send_known_modules(self, modules):
@@ -172,7 +172,7 @@ class API:
         if req.status_code == requests.codes.ok:
             return True
         else:
-            self._logger.critical(req.text)
+            self._logger.critical(f"send_known_modules: {req.text}")
             return False
 
 

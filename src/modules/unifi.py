@@ -94,22 +94,20 @@ class UnifiAPI(Module):
                         if "hostname" in clients:
                             hostname = clients["hostname"]
 
-                        portname = lldp_device[i]["local_port_idx"]
 
                         lldp = UnifiLLDP(chassis_id=lldp_device[i]["chassis_id"], remote_host=hostname,
                                          is_wired=lldp_device[i]["is_wired"],
                                          local_port_idx=lldp_device[i]["local_port_idx"],
                                          port_id=lldp_device[i]["port_id"])
-                        xyz = {"test": lldp}
-                        print(xyz)
                         lldp_list.append(lldp.serialize())
 
-            print(lldp_list)
+            output_data = {}
+            for c_vlan_data in lldp_list:
+                if c_vlan_data["local_port"] not in output_data:
+                    output_data[c_vlan_data["local_port"]] = []
+                output_data[c_vlan_data["local_port"]].append(c_vlan_data)
 
-            #lldp_data = device.data
-            #todo: Add Port to LLDP Data
-
-            return lldp_list
+            return output_data
 
     def get_vlan_data(self):
         vlan_data_devices = {}
@@ -150,7 +148,6 @@ class UnifiAPI(Module):
                 device.data[port_idx] = port_dict
 
             vlan_data_devices = device.data
-        print(vlan_data_devices)
         return vlan_data_devices
 
 
@@ -160,7 +157,7 @@ class LLDP(UnifiAPI):
 
     def worker(self):
         lldp = self.get_lldp_data()
-        return ModuleData(lldp, [], {}, OutputType.DEFAULT)
+        return ModuleData({"lldp": lldp}, [], {}, OutputType.DEFAULT)
 
 
 class VLAN(UnifiAPI):
