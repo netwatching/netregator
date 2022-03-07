@@ -115,7 +115,10 @@ class SNMP:
                             entity_data[name] = int(value) * 10
                         for c in [pysnmp.proto.rfc1902.Integer32, pysnmp.proto.rfc1902.Counter32, pysnmp.proto.rfc1902.Gauge32]:
                             if mib_node.syntax.__class__ == c:
-                                entity_data[name] = int(value)
+                                if value in parse_exceptions:
+                                    entity_data[name] = value
+                                else:
+                                    entity_data[name] = int(value)
                                 break
                         else:
                             entity_data[name] = value
