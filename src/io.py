@@ -144,7 +144,8 @@ class API:
             #    {"id": "1", "name": "Ubi", "timeout": 1, "type": "Ubiquiti", "ip": "172.31.37.95", "modules": modules})
             data.append({"id": "2", "name": "Zabbi", "timeout": 10, "type": "Ubiquiti", "ip": "172.31.37.77",
                          "modules": modules})
-            # data.append({"id": "3", "name": "Cisco", "timeout": 10, "type": "Cisco", "ip": "172.31.8.81", "modules": modules})
+            data.append({"id": "798787", "name": "Zabbix", "timeout": 10, "type": "Zabbix", "ip": "zabbix.htl-vil.local",
+                         "modules": [{"name": "events", "config": {}}]})
 
             # if(self.__conter % 5 == 0):
             #     data.append({"id": "3", "name": "Cisco", "timeout": 10, "type": "Cisco", "ip": "172.31.8.81",

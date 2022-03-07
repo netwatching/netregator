@@ -22,7 +22,7 @@ class ZabbixProblems:
         self.severity = severity
 
     def serialize(self):
-        return {"timestamp": self.timestamp, "severity": self.severity, "data": self.problem}
+        return {"timestamp": self.timestamp, "severity": self.severity, "information": self.problem}
 
 
 class ZabbixDevice:

@@ -94,7 +94,6 @@ class UnifiAPI(Module):
                         if "hostname" in clients:
                             hostname = clients["hostname"]
 
-
                         lldp = UnifiLLDP(chassis_id=lldp_device[i]["chassis_id"], remote_host=hostname,
                                          is_wired=lldp_device[i]["is_wired"],
                                          local_port_idx=lldp_device[i]["local_port_idx"],
