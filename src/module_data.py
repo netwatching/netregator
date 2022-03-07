@@ -4,12 +4,14 @@ import json
 from enum import Enum
 import typing
 
+
 class EventSeverity(Enum):
     DEBUG = 1
     INFORMATION = 2
     WARNING = 3
     ERROR = 4
     DISASTER = 5
+
 
 class OutputType(Enum):
     DEFAULT = 0
@@ -21,6 +23,7 @@ class LiveData:
         self.name = name
         self.value = value
         self.timestamp = timestamp
+
 
 class Event:
     def __init__(self, information: str, severity: EventSeverity, timestamp: time = time.time()):
@@ -86,8 +89,8 @@ class ModuleData:
         self.__timestamp = timestamp
 
     def __str__(self):
-        return json.dumps({"static_data":self.static_data,
-                "live_data":self.live_data,
-                "events":self.events,
-                "timestamp": self.timestamp,
-                "output_type": self.output_type})
+        return json.dumps({"static_data": self.static_data,
+                           "live_data": self.live_data,
+                           "events": self.events,
+                           "timestamp": self.timestamp,
+                           "output_type": self.output_type})

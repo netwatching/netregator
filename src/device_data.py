@@ -3,6 +3,7 @@ from src.utilities import Utilities
 import json
 import typing
 
+
 class DeviceData:
     def __init__(self):
         self._logger = Utilities.setup_logger()
@@ -24,7 +25,8 @@ class DeviceData:
             self.events.extend(module_data.events)
             self.external_events.update(module_data.external_events)
 
-    def convert_to_key_value_list(self, input_dict: dict):
+    @staticmethod
+    def convert_to_key_value_list(input_dict: dict):
         key_val = []
         system_data = {}
         for key, val in input_dict.items():
@@ -62,11 +64,11 @@ class DeviceData:
                 self._logger.error("Tried to add invalid Data Type. Data can either be ListData or Event.")
 
     def serialize(self):
-        return {#"static_data": self.convert_to_key_value_list(self.static_data),
-                "static_data": self.static_data,
-                "live_data": self.live_data,
-                "events": [item.serialize() for item in self.events],
-                }
+        return {  # "static_data": self.convert_to_key_value_list(self.static_data),
+            "static_data": self.static_data,
+            "live_data": self.live_data,
+            "events": [item.serialize() for item in self.events],
+        }
 
     def __str__(self):
         return json.dumps({"static_data": self.static_data,

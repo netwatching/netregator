@@ -50,7 +50,7 @@ class API:
         self._access_token = None
         self._refresh_token = None
         self._url = config("IP")
-        self.__conter = 0
+        self.__counter = 0
         self._session.verify = config("SSL_VERIFY", True, cast=bool)
         self._session.trust_env = config("SSL_VERIFY", True, cast=bool)
         self._session.auth = JWTAuth(self)
@@ -58,7 +58,7 @@ class API:
 
     def login(self):
         # generate new token or use old one
-        reauth = False
+        redo_auth = False
         jwt_options = {
             'verify_signature': False,
             'verify_exp': False,
@@ -68,19 +68,19 @@ class API:
         }
         # first run of code
         if self._access_token is None:
-            reauth = True
+            redo_auth = True
         # if not first Run
-        if reauth is False:
+        if redo_auth is False:
             try:
                 time = datetime.datetime.utcfromtimestamp(
                     jwt.decode(self._access_token, algorithms=["HS512", "HS256"], options=jwt_options)["exp"])
                 # check if code already expired
                 if datetime.datetime.utcnow() > (time - datetime.timedelta(seconds=60)):
-                    reauth = True
+                    redo_auth = True
             except jwt.exceptions.DecodeError:
-                reauth = True
+                redo_auth = True
         # generate new Code
-        if reauth:
+        if redo_auth:
             use_refresh = True
             if self._refresh_token is not None:
                 time = datetime.datetime.utcfromtimestamp(
@@ -138,9 +138,8 @@ class API:
                 return []
         else:
             data = []
-            modules = []
-            modules.append({"name": "unifi_lldp", "config": {}})
-            #data.append(
+            modules = [{"name": "unifi_lldp", "config": {}}]
+            # data.append(
             #    {"id": "1", "name": "Ubi", "timeout": 1, "type": "Ubiquiti", "ip": "172.31.37.95", "modules": modules})
             data.append({"id": "2", "name": "Zabbi", "timeout": 10, "type": "Ubiquiti", "ip": "172.31.37.77",
                          "modules": modules})
@@ -153,7 +152,7 @@ class API:
             # else:
             # data.append({"id": "3", "name": "Cisco", "timeout": 10, "type": "Cisco", "ip": "172.31.8.81",
             # "modules": modules})
-            self.__conter += 1
+            self.__counter += 1
             # print(data)
             return data
 

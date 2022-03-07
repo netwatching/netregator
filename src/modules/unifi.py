@@ -66,8 +66,8 @@ class UnifiAPI(Module):
             if network_obj["_id"] == key:
                 return network_obj
 
-    def _get_portconfig_obj(self, portconfig, key):
-        for portconfig_obj in portconfig:
+    def _get_portconfig_obj(self, port_config, key):
+        for portconfig_obj in port_config:
             if portconfig_obj["_id"] == key:
                 return portconfig_obj
 
@@ -118,28 +118,29 @@ class UnifiAPI(Module):
                 mac = obj["mac"]
                 break
 
-        portconf = self.connection.list_portconf()
+        port_conf = self.connection.list_portconf()
         networks = self.connection.list_networkconf()
 
-        vlandevice = self.connection.list_devices(mac)
-        for devices in vlandevice:
+        vlan_device = self.connection.list_devices(mac)
+        for devices in vlan_device:
             port_table = devices["port_table"]
             for port in port_table:
                 port_idx = port["port_idx"]
                 port_status = port["name"]
 
-                portconf_obj = self._get_portconfig_obj(portconf, port["portconf_id"])
+                port_conf_obj = self._get_portconfig_obj(port_conf, port["portconf_id"])
                 admin_status = "down" if port_status == "Disabled" else "up"
 
-                if "native_networkconf_id" in portconf_obj:
-                    network_obj = self._get_network_obj(networks, portconf_obj["native_networkconf_id"])
-                    if network_obj["_id"] == portconf_obj["native_networkconf_id"]:
+                if "native_networkconf_id" in port_conf_obj:
+                    network_obj = self._get_network_obj(networks, port_conf_obj["native_networkconf_id"])
+                    if network_obj["_id"] == port_conf_obj["native_networkconf_id"]:
                         vlan = UnifiVLAN(local_port_name=port_idx, vlan_name=network_obj["name"],
                                          vlan_id=network_obj["vlan"], admin_status=admin_status)
+                    else:
+                        vlan = None
                 else:
                     vlan = UnifiVLAN(local_port_name=port_idx, vlan_name="Default",
                                      vlan_id=-1, admin_status=admin_status)
-
                 vlan_dict = vlan.serialize()
 
                 vlan_list = [vlan_dict]

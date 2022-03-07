@@ -32,7 +32,7 @@ class Utilities:
     def setup_logger(additional_info: str = None):
         stack = inspect.stack()
         caller_classname = stack[1][0].f_locals["self"].__class__.__name__
-        logger = verboselogs.VerboseLogger("netregator")  #logging.getLogger("netregator")
+        logger = verboselogs.VerboseLogger("netregator")  # logging.getLogger("netregator")
         logger.addHandler(logging.StreamHandler())
         if additional_info:
             caller_classname = f"{caller_classname}:{additional_info}"

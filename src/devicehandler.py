@@ -41,16 +41,16 @@ class DeviceHandler:
             output = {}
             devices = []
             external_events = {}
-            for deviceid in self._workers:
-                c_data, c_external_events = self._workers[deviceid].data
-                self._workers[deviceid].clear_data()
+            for device_id in self._workers:
+                c_data, c_external_events = self._workers[device_id].data
+                self._workers[device_id].clear_data()
                 if c_data != {'static_data': [], 'live_data': [], 'events': {}}:
-                    current_metadata = {"id": deviceid,
-                                        "name": self._workers[deviceid].name,
-                                        "ip": self._workers[deviceid].ip}
+                    current_metadata = {"id": device_id,
+                                        "name": self._workers[device_id].name,
+                                        "ip": self._workers[device_id].ip}
                     current_metadata.update(c_data)
                     devices.append(current_metadata)
-                self._workers[deviceid].clear_data()
+                self._workers[device_id].clear_data()
                 for c_hostname in c_external_events:
                     if not c_hostname in external_events:
                         external_events[c_hostname] = []
@@ -78,7 +78,7 @@ class DeviceHandler:
                 timeout = running_devices[c_id]["timeout"]
                 modules = running_devices[c_id]["modules"]
                 self.start_device(
-                    Device(id=c_id, name=name, device_type=device_type, ip=ip, timeout=timeout, modules=modules))
+                    Device(id_=c_id, name=name, device_type=device_type, ip=ip, timeout=timeout, modules=modules))
                 # print(running_devices[c_id])
 
             # stop devices
@@ -96,14 +96,14 @@ class DeviceHandler:
                     timeout = self._workers[c_id].timeout
                     modules = self._workers[c_id].modules
                     self.start_device(
-                        Device(id=c_id, name=name, device_type=device_type, ip=ip, timeout=timeout, modules=modules))
+                        Device(id_=c_id, name=name, device_type=device_type, ip=ip, timeout=timeout, modules=modules))
                 # update timeout
                 self._workers[c_id].timeout = running_devices[c_id]["timeout"]
                 self._workers[c_id].modules = running_devices[c_id]["modules"]
             time.sleep(5)
 
     def start_device(self, device: Device):
-        c_device = Device(id=device.id, name=device.name, ip=device.ip, device_type=device.device_type,
+        c_device = Device(id_=device.id, name=device.name, ip=device.ip, device_type=device.device_type,
                           timeout=device.timeout, modules=device.modules)
         self._workers[device.id] = c_device
         self._workers[device.id].start()

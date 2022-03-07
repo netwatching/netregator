@@ -9,13 +9,13 @@ import importlib
 
 class Device(threading.Thread):
 
-    def __init__(self, id, name: str, ip: str, device_type: str, timeout: int, modules: dict, *args, **kwargs):
+    def __init__(self, id_, name: str, ip: str, device_type: str, timeout: int, modules: dict, *args, **kwargs):
         self._logger = Utilities.setup_logger(ip)
         self._module_config = Config("./src/config/modules.json").get_whole_file()
         self._workers = {}
         self.__data = DeviceData()
         self.name = name
-        self.id = id
+        self.id = id_
         self.ip = ip
         self.device_type = device_type
         self.timeout = timeout
@@ -88,8 +88,8 @@ class Device(threading.Thread):
     def data(self, module_name):
         module_data = self._workers[module_name].data
         self.__data.add_module_data(module_data)
-        #(module_data)
-        #if module_data:
+        # (module_data)
+        # if module_data:
         #    self.__data["static_data"].update(module_data.static_data)
         #    self.__data["live_data"].update(module_data.live_data)
         #    self.__data["events"].update(self.__data["events"])
@@ -132,7 +132,6 @@ class Device(threading.Thread):
             c_module_worker.timeout = self.timeout
             c_module_worker.config = module_api_out[c_module_name]["config"]
             # TODO: Config timeout nutzen statt Device
-
 
     def import_module(self, module_name):
         config = self._module_config[module_name]
