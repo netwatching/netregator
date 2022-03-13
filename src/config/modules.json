@@ -18,5 +18,9 @@
   "unifi_lldp": {
     "filename": "unifi",
     "classname": "LLDP"
+  },
+  "unifi_vlan": {
+    "filename": "unifi",
+    "classname": "VLAN"
   }
 }

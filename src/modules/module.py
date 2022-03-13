@@ -87,5 +87,5 @@ class Module(threading.Thread):
     def check_module_configuration():
         return True
 
-    def worker(self):
-        return ModuleData({"Error": f"Worker class of Type {self.ip} not yet implemented!"}, {}, {})
+    def worker(self) -> ModuleData:
+        return ModuleData({"Error": f"Worker class of Type {self.ip} not yet implemented!"}, [], {})

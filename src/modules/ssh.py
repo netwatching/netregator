@@ -27,25 +27,26 @@ class SSH(Module):
         self.conn.open()
 
     def get_lldp_infos(self):
-        output = self.conn.get_lldp_neighbors_detail()
+        interface_output = self.conn.get_interfaces()
+        lldp_output = self.conn.get_lldp_neighbors_detail()
         neighbors = {}
 
-        for portname, data in output.items():
+        for portname, data in lldp_output.items():
             neighbor = {
-                portname:
-                    {
-                        "local_port": portname,
-                        "remote_host": output[portname][0]["remote_system_name"],
-                        "remote_chassis_id": output[portname][0]["remote_chassis_id"],
-                        "remote_port": output[portname][0]["remote_port"],
-                        "remote_system_description": output[portname][0]["remote_system_description"],
-                        "remote_system_capability": output[portname][0]["remote_system_capab"][-1]
-                    }
+                portname: [{
+                    "local_mac": interface_output[portname]["mac_address"],
+                    "local_port": portname,
+                    "remote_host": lldp_output[portname][0]["remote_system_name"],
+                    "remote_chassis_id": lldp_output[portname][0]["remote_chassis_id"],
+                    "remote_port": lldp_output[portname][0]["remote_port"],
+                    "remote_system_description": lldp_output[portname][0]["remote_system_description"],
+                    "remote_system_capability": lldp_output[portname][0]["remote_system_capab"][-1]
+                }]
             }
             neighbors.update(neighbor)
 
         return {"neighbors": neighbors}
 
     def worker(self):
-        #return ModuleData({}, [], [Event("successfully sent", EventSeverity.DEBUG)], OutputType.DEFAULT)
+        # return ModuleData({}, [], [Event("successfully sent", EventSeverity.DEBUG)], OutputType.DEFAULT)
         return ModuleData(self.get_lldp_infos(), [], {}, OutputType.DEFAULT)

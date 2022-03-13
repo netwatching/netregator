@@ -6,19 +6,18 @@ from decouple import config
 
 
 class UnifiLLDP:
-    def __init__(self, chassis_id: str = None, remote_host: str = None, is_wired: str = None,
+    def __init__(self, local_mac: str = None, chassis_id: str = None, remote_host: str = None,
                  local_port_idx: int = None, port_id: str = None):
+        self.local_mac = local_mac
         self.chassis_id = chassis_id
         self.remote_host = remote_host
-        self.is_wired = is_wired
         self.local_port_idx = local_port_idx
         self.port_id = port_id
 
     def serialize(self):
-        return {"local_port": self.local_port_idx, "remote_host": self.remote_host,
+        return {"local_mac": self.local_mac, "local_port": self.local_port_idx, "remote_host": self.remote_host,
                 "remote_chassis_id": self.chassis_id,
-                "remote_port": self.port_id, "remote_system_description": "", "remote_system_capability": "",
-                "is_wired": self.is_wired}
+                "remote_port": self.port_id}
 
 
 class UnifiVLAN:
@@ -94,8 +93,7 @@ class UnifiAPI(Module):
                         if "hostname" in clients:
                             hostname = clients["hostname"]
 
-                        lldp = UnifiLLDP(chassis_id=lldp_device[i]["chassis_id"], remote_host=hostname,
-                                         is_wired=lldp_device[i]["is_wired"],
+                        lldp = UnifiLLDP(local_mac=mac, chassis_id=lldp_device[i]["chassis_id"], remote_host=hostname,
                                          local_port_idx=lldp_device[i]["local_port_idx"],
                                          port_id=lldp_device[i]["port_id"])
                         lldp_list.append(lldp.serialize())
@@ -157,7 +155,7 @@ class LLDP(UnifiAPI):
 
     def worker(self):
         lldp = self.get_lldp_data()
-        return ModuleData({"lldp": lldp}, [], {}, OutputType.DEFAULT)
+        return ModuleData({"neighbors": lldp}, [], {}, OutputType.DEFAULT)
 
 
 class VLAN(UnifiAPI):
