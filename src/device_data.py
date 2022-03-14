@@ -26,6 +26,16 @@ class DeviceData:
             self.external_events.update(module_data.external_events)
 
     @staticmethod
+    def livedata_multidimensional_parser(live_data: LiveData, mapping: tuple):
+        output = {}
+        c_output_layer = output
+        for c_mapping in mapping:
+            c_output_layer[c_mapping] = {}
+            c_output_layer = c_output_layer[c_mapping]
+        c_output_layer[live_data.name] = {live_data.timestamp: live_data.value}
+        return output
+
+    @staticmethod
     def convert_to_key_value_list(input_dict: dict):
         key_val = []
         system_data = {}
