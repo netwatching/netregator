@@ -136,6 +136,7 @@ class API:
                     self._logger.debug(output)
                     return output
                 else:
+                    self._logger.debug(req.json())
                     return []
             except Exception as ex:
                 self._logger.critical(f"get_running_threads: {ex}")
