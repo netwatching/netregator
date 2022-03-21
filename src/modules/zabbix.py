@@ -110,10 +110,9 @@ class Events(Zabbix):
         super().__init__(ip, timeout, *args, **kwargs)
 
     def worker(self):
-        testlivedata = LiveData(name="cpu", value=20, timestamp=500)
         hosts = self.get_hosts()
         events = self.get_infos(hosts, ZabbixDataType.EVENTS)
-        return ModuleData({}, [testlivedata, LiveData(name="cpu", value=21)], events,
+        return ModuleData({}, [], events,
                           OutputType.EXTERNAL_DATA_SOURCES)
 
     @staticmethod
