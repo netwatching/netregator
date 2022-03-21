@@ -113,7 +113,7 @@ class API:
                     return self._access_token
                 elif req.status_code == requests.codes.unauthorized:
                     self._logger.critical("Invalid client secret!")
-                    os._exit(1)
+                    os._exit(22)
         else:
             return self._access_token
 
