@@ -107,7 +107,8 @@ class UnifiAPI(Module):
             return output_data
 
     def get_vlan_data(self):
-        vlan_data_devices = {}
+        is_trunk = False
+        vlandata = []
 
         device = UnifiDevice(ip=self.ip)
         alldevices = self.connection.list_devices()
@@ -132,21 +133,22 @@ class UnifiAPI(Module):
                 if "native_networkconf_id" in port_conf_obj:
                     network_obj = self._get_network_obj(networks, port_conf_obj["native_networkconf_id"])
                     if network_obj["_id"] == port_conf_obj["native_networkconf_id"]:
+                        is_trunk = False
                         vlan = UnifiVLAN(local_port_name=port_idx, vlan_name=network_obj["name"],
                                          vlan_id=network_obj["vlan"], admin_status=admin_status)
                     else:
                         vlan = None
                 else:
+                    is_trunk = True
                     vlan = UnifiVLAN(local_port_name=port_idx, vlan_name="Default",
                                      vlan_id=-1, admin_status=admin_status)
                 vlan_dict = vlan.serialize()
-
                 vlan_list = [vlan_dict]
-                port_dict = {"vlans": vlan_list, "admin_status": admin_status}
-                device.data[port_idx] = port_dict
 
-            vlan_data_devices = device.data
-        return vlan_data_devices
+                port_dict = {"port": port_idx, "vlans": vlan_list, "is_trunk": is_trunk} #"admin_status": admin_status
+                vlandata.append(port_dict)
+
+        return vlandata
 
 
 class LLDP(UnifiAPI):
@@ -164,4 +166,4 @@ class VLAN(UnifiAPI):
 
     def worker(self):
         vlan = self.get_vlan_data()
-        return ModuleData(vlan, [], {}, OutputType.DEFAULT)
+        return ModuleData({"vlan": vlan}, [], {}, OutputType.DEFAULT)
