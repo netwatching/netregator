@@ -1,8 +1,9 @@
 from src.modules.module import Module
 from src.device import Device
-from src.module_data import ModuleData, OutputType
+from src.module_data import ModuleData, OutputType, LiveData
 from unificontrol import UnifiClient
 from decouple import config
+import time
 
 
 class UnifiLLDP:
@@ -157,7 +158,11 @@ class LLDP(UnifiAPI):
 
     def worker(self):
         lldp = self.get_lldp_data()
-        return ModuleData({"neighbors": lldp}, [], {}, OutputType.DEFAULT)
+        livedata_list = []
+        livedata_list.append(LiveData(name="cpu", value=70, mapping=("my_data",)))
+        time.sleep(5)
+        livedata_list.append(LiveData(name="cpu", value=71, mapping=("my_data",)))
+        return ModuleData({"neighbors": lldp}, livedata_list, {}, OutputType.DEFAULT)
 
 
 class VLAN(UnifiAPI):

@@ -1,6 +1,6 @@
 from src.modules.module import Module
 from src.device import Device
-from src.module_data import ModuleData, OutputType, Event, EventSeverity
+from src.module_data import ModuleData, OutputType, Event, EventSeverity, LiveData
 from src.utilities import Utilities
 import src.modules.helpers.snmp as snmp
 from src.settings import Settings, SettingsItem, SettingsItemType
@@ -28,23 +28,28 @@ class SNMP(Module):
         # return ModuleData(static_data={}, live_data={}, events={})
 
         #return ModuleData({}, [], [Event("successfully sent", EventSeverity.DEBUG)], OutputType.DEFAULT)
-        data = {}
+        static_data = {}
+        live_data = []
 
         try:
-            data.update(self.__ds.get_system_data())
-            data.update(self.__ds.get_services())
-            data.update(self.__ds.get_interfaces())
+            static_data.update(self.__ds.get_system_data())
+            static_data.update(self.__ds.get_services())
+            interfaces_static, interfaces_live = self.__ds.get_interfaces()["static"]
+            static_data.update({"network_interfaces": interfaces_static})
+            for key, val in interfaces_live.items():
+                for i_key, i_val in val.items():
+                    live_data.append(LiveData(key+i_key, float(i_val)))
             # data.update(self.__ds.get_ip_data())
-            data.update(self.__ds.get_ip_addresses())
+            static_data.update(self.__ds.get_ip_addresses())
             # TODO: add other DataSource functions above
         except Exception:
             self.__ds = snmp.DataSources(snmp.SNMP(self.settings["c_str_2"], self.ip, self.settings["snmp_port"]))
-            data.update(self.__ds.get_system_data())
-            data.update(self.__ds.get_services())
-            data.update(self.__ds.get_interfaces())
+            static_data.update(self.__ds.get_system_data())
+            static_data.update(self.__ds.get_services())
+            static_data.update(self.__ds.get_interfaces())
             # data.update(self.__ds.get_ip_data())
-            data.update(self.__ds.get_ip_addresses())
+            static_data.update(self.__ds.get_ip_addresses())
             # TODO: add other DataSource functions above
 
         # self._logger.spam(data)
-        return ModuleData(static_data=data, live_data=[], events={})
+        return ModuleData(static_data=static_data, live_data=live_data, events={})

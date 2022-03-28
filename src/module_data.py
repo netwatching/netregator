@@ -19,17 +19,24 @@ class OutputType(Enum):
 
 
 class LiveData:
-    def __init__(self, name: str, value: float, timestamp: time = time.time()):
+    def __init__(self, name: str, value: float, mapping: tuple, timestamp: time = None):
+        if not timestamp:
+            self.timestamp = time.time()
+        else:
+            self.timestamp = timestamp
+        self.mapping = mapping
         self.name = name
         self.value = value
-        self.timestamp = timestamp
 
 
 class Event:
     def __init__(self, information: str, severity: EventSeverity, timestamp: time = time.time()):
+        if not timestamp:
+            self.timestamp = time.time()
+        else:
+            self.timestamp = timestamp
         self.information = information
         self.severity = severity.value
-        self.timestamp = timestamp
 
     def serialize(self):
         return {

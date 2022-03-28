@@ -147,33 +147,6 @@ class DataSources:
         self.__snmp = snmp
         self._logger = Utilities.setup_logger()
 
-    # def get_hostname(self):
-    #     name = self.__snmp.get_single_value_by_name('sysName')
-    #     return {"hostname": name}
-    #
-    # def get_object_id(self):  # milliseconds
-    #     oid = self.__snmp.get_single_value_by_name('sysObjectID')
-    #     return {"object_id": oid}
-    #
-    # def get_uptime(self):  # milliseconds
-    #     uptime = int(self.__snmp.get_single_value_by_name('sysUpTime'))*10
-    #     return {"uptime": uptime}
-    #
-    # def get_description(self):
-    #     description = self.__snmp.get_single_value_by_name('sysDescr')
-    #     return {"description": description}
-    #
-    # def get_contact(self):
-    #     contact = self.__snmp.get_single_value_by_name('sysContact')
-    #     return {"contact": contact}
-    #
-    # def get_name(self):
-    #     name = self.__snmp.get_single_value_by_name('sysName')
-    #     return {"name": name}
-    #
-    # def get_location(self):
-    #     location = self.__snmp.get_single_value_by_name('sysLocation')
-    #     return {"location": location}
 
     def get_system_data(self):
         system_data = {}
@@ -298,6 +271,20 @@ class DataSources:
             'ifOutErrors'
         ]
 
+        _live_keys = [
+            'ifInOctets',
+            'ifInUcastPkts',
+            'ifInNUcastPkts',
+            'ifInDiscards',
+            'ifInErrors',
+            'ifInUnknownProtos',
+            'ifOutOctets',
+            'ifOutUcastPkts',
+            'ifOutNUcastPkts',
+            'ifOutDiscards',
+            'ifOutErrors'
+        ]
+
         canonical_names = {
             'ifIndex': 'index',
             'ifDescr': 'description',
@@ -322,7 +309,8 @@ class DataSources:
         }
 
         old_name_values = self.__snmp.get_table(_keys, "IF-MIB")
-        new_values = {}
+        static_values = {}
+        live_values = {}
         for val in old_name_values:
             infos = {}
             # ^[a-zA-Z]*[0-9]*(/[0-9]*)*
@@ -352,10 +340,15 @@ class DataSources:
 
             if val["ifType"] in ["ethernetCsmacd", "ieee8023adLag", "softwareLoopback"]:
 
-                new_values[key] = {}
+                static_values[key] = {}
+                live_values[key] = {}
                 for _key in _keys:
                     if _key in val:
-                        new_values[key].update({canonical_names[_key]: val[_key]})
+                        if _key in _live_keys:
+                            live_values[key].update({canonical_names[_key]: val[_key]})
+                            static_values[key].update({canonical_names[_key]: val[_key]})  # TODO: remove
+                        else:
+                            static_values[key].update({canonical_names[_key]: val[_key]})
 
 
                 # new_values[key] = {
@@ -387,7 +380,7 @@ class DataSources:
                 self._logger.warning(f"unknown interface type: {val['ifType']}, description: {val['ifDescr']}")
 
             if infos:
-                new_values[key].update(infos)
+                static_values[key].update(infos)
 
             """
             ethernetCsmacd (Slot: 0 Port: 22 Gigabit - Level)
@@ -395,9 +388,9 @@ class DataSources:
             ieee8023adLag ( Link Aggregate 1)
             """
 
-        self._logger.warning(str({"network_interfaces": new_values}))
+        self._logger.warning(str({"network_interfaces": static_values}))
 
-        return {"network_interfaces": new_values}
+        return static_values, live_values
 
     def get_ip_addresses(self):
         _keys = [

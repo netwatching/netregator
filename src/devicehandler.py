@@ -67,6 +67,7 @@ class DeviceHandler:
     def check_devices(self):
         while True:
             running_devices = self.get_running_devices()
+            print(running_devices)
             devices_to_start = Utilities.compare_dict(running_devices, self._workers)
             devices_to_stop = Utilities.compare_dict(self._workers, running_devices)
 
@@ -74,7 +75,7 @@ class DeviceHandler:
             for c_id in devices_to_start:
                 device_type = running_devices[c_id]["type"]
                 ip = running_devices[c_id]["ip"]
-                name = running_devices[c_id]["name"]
+                name = running_devices[c_id]["hostname"]
                 timeout = running_devices[c_id]["timeout"]
                 modules = running_devices[c_id]["modules"]
                 self.start_device(
@@ -141,10 +142,11 @@ class DeviceHandler:
     def get_running_devices(self):
         running_devices = self._api.get_running_threads()
         output = {}
-        for c_device in running_devices:
-            device_id = c_device["id"]
-            del c_device["id"]
-            output[device_id] = c_device
+        if running_devices:
+            for c_device in running_devices["devices"]:
+                device_id = c_device["id"]
+                del c_device["id"]
+                output[device_id] = c_device
         return output
 
     def set_version(self):

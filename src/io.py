@@ -5,6 +5,7 @@ import json
 from decouple import config
 import urllib3
 import logging
+import os
 from src.utilities import Utilities
 
 
@@ -110,6 +111,9 @@ class API:
                     self._access_token = output["access_token"]
                     self._refresh_token = output["refresh_token"]
                     return self._access_token
+                elif req.status_code == requests.codes.unauthorized:
+                    self._logger.critical("Invalid client secret!")
+                    os._exit(22)
         else:
             return self._access_token
 
@@ -132,6 +136,7 @@ class API:
                     self._logger.debug(output)
                     return output
                 else:
+                    self._logger.debug(req.json())
                     return []
             except Exception as ex:
                 self._logger.critical(f"get_running_threads: {ex}")

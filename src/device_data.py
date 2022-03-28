@@ -1,6 +1,7 @@
 from src.module_data import ModuleData, OutputType, LiveData, Event
 from src.utilities import Utilities
 import json
+import time
 import typing
 
 
@@ -15,7 +16,9 @@ class DeviceData:
     def add_module_data(self, module_data: ModuleData):
         self.static_data.update(module_data.static_data)
         if type(module_data) is ModuleData:
-            self.add_live_data_or_event_list(module_data.live_data)
+            #self.add_live_data_or_event_list(module_data.live_data)
+            Utilities.update_multidimensional_dict(self.live_data,
+                                                   DeviceData.livedata_multidimensional_parser(module_data.live_data))
             if module_data.output_type == OutputType.DEFAULT:
                 self.events.extend(module_data.events)
             elif module_data.output_type == OutputType.EXTERNAL_DATA_SOURCES:
@@ -24,6 +27,19 @@ class DeviceData:
             self.live_data = Utilities.update_multidimensional_dict(self.live_data, module_data.live_data)
             self.events.extend(module_data.events)
             self.external_events.update(module_data.external_events)
+
+    @staticmethod
+    def livedata_multidimensional_parser(live_data_list: list[LiveData]):
+        output = {}
+        for live_data in live_data_list:
+            current_layer = {}
+            c_output_layer = current_layer
+            for c_mapping in live_data.mapping:
+                c_output_layer[c_mapping] = {}
+                c_output_layer = c_output_layer[c_mapping]
+            c_output_layer[live_data.name] = {live_data.timestamp: live_data.value}
+            Utilities.update_multidimensional_dict(output, current_layer)
+        return output
 
     @staticmethod
     def convert_to_key_value_list(input_dict: dict):
@@ -74,3 +90,10 @@ class DeviceData:
         return json.dumps({"static_data": self.static_data,
                            "live_data": self.live_data,
                            "events": self.events})
+
+if __name__ == "__main__":
+    livedata_list = []
+    livedata_list.append(LiveData(name="cpu", value=70, mapping=("my_data",)))
+    time.sleep(5)
+    livedata_list.append(LiveData(name="cpu", value=71, mapping=("my_data",)))
+    print(DeviceData.livedata_multidimensional_parser(livedata_list))
