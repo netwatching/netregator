@@ -43,22 +43,51 @@ class Vlan:
 
     @staticmethod
     def reformat_vlan_data_to_port_centric_format(vlan_data):
-        ports = {}
-        for _, vlan in vlan_data.items():
-            for tagged_port in vlan["tagged_ports"]:
-                if tagged_port in ports:
-                    ports[tagged_port]["vlans"].append({"id": vlan["id"], "name": vlan["name"]})
-                else:
-                    ports[tagged_port] = {"vlans": [{"id": vlan["id"], "name": vlan["name"]}]}
-                    ports[tagged_port]["isTrunk"] = True
+        # ports = {}
+        # for _, vlan in vlan_data.items():
+        #     for tagged_port in vlan["tagged_ports"]:
+        #         if tagged_port in ports:
+        #             ports[tagged_port]["vlans"].append({"id": vlan["id"], "name": vlan["name"]})
+        #         else:
+        #             ports[tagged_port] = {"vlans": [{"id": vlan["id"], "name": vlan["name"]}]}
+        #             ports[tagged_port]["isTrunk"] = True
+        #
+        #     for untagged_port in vlan["untagged_ports"]:
+        #         if untagged_port in ports:
+        #             ports[untagged_port]["vlans"].append({"id": vlan["id"], "name": vlan["name"]})
+        #         else:
+        #             ports[untagged_port] = {"vlans": [{"id": vlan["id"], "name": vlan["name"]}]}
+        #             ports[untagged_port]["isTrunk"] = False
+        # return ports
 
-            for untagged_port in vlan["untagged_ports"]:
-                if untagged_port in ports:
-                    ports[untagged_port]["vlans"].append({"id": vlan["id"], "name": vlan["name"]})
+        vlans = []
+        for vlan in vlan_data:
+            for tagged_port in vlan["tagged_ports"]:
+
+                port_names = [port["port"] for port in vlans]
+                if tagged_port in port_names:
+                    print("#########")
+                    port_index = port_names.index(tagged_port)
+                    vlans[port_index]["vlans"].append({"id": vlan["id"], "name": vlan["name"]})
                 else:
-                    ports[untagged_port] = {"vlans": [{"id": vlan["id"], "name": vlan["name"]}]}
-                    ports[untagged_port]["isTrunk"] = False
-        return ports
+                    vlans.append({
+                        "port": tagged_port,
+                        "vlans": [{"id": vlan["id"], "name": vlan["name"]}],
+                        "is_trunk": True
+                    })
+            for untagged_port in vlan["untagged_ports"]:
+                port_names = [port["port"] for port in vlans]
+                if untagged_port in port_names:
+                    print("#########")
+                    port_index = port_names.index(untagged_port)
+                    vlans[port_index]["vlans"].append({"id": vlan["id"], "name": vlan["name"]})
+                else:
+                    vlans.append({
+                        "port": untagged_port,
+                        "vlans": [{"id": vlan["id"], "name": vlan["name"]}],
+                        "is_trunk": False
+                    })
+        return vlans
 
 
 class VlanS350(napalm_s350.S350Driver, ABC):  # napalm.base.NetworkDriver
@@ -108,14 +137,63 @@ class VlanS350(napalm_s350.S350Driver, ABC):  # napalm.base.NetworkDriver
             return long_format_ports
         return [canonical_interface_name(port, VlanS350.s350_base_interfaces)]
 
+    # def get_vlan_data(self, expand_ports=True):
+    #     """get_vlan_data implementation for s350"""
+    #     vlans = {}
+    #
+    #     output = self._send_command("show vlan")
+    #
+    #     header = True  # cycle trough header
+    #     vlan_id = 0
+    #     for line in output.splitlines():
+    #         if header:
+    #             # last line of header
+    #             match = re.match(r"^---- -+ .*$", line)
+    #             if match:
+    #                 header = False
+    #                 fields_end = VlanS350._get_vlan_fields_end(line)  # [4, 22, 41, 60, 77, 78]
+    #                 print(f"{fields_end=}")
+    #             continue
+    #
+    #         line_elems = VlanS350._get_vlan_line_to_fields(line, fields_end)  # {0: '1312', 1: 'Students-3Jg', 2: 'gi1/0/1-12,', 3: '', 4: 'S', 5: ''}
+    #         print(f"{line_elems=}")
+    #
+    #         if line_elems[0] and line_elems[1] and line_elems[4]:
+    #             vlan_id = line_elems[0]
+    #             vlan_name = line_elems[1]
+    #             vlans[vlan_id] = {
+    #                 "id": int(vlan_id),
+    #                 "name": vlan_name,
+    #                 "tagged_ports": [],
+    #                 "untagged_ports": [],
+    #                 "created_by": list(line_elems[4])
+    #             }
+    #
+    #         if line_elems[2]:
+    #             ports = filter(None, line_elems[2].split(","))
+    #             if expand_ports:
+    #                 for port in ports:
+    #                     vlans[vlan_id]["tagged_ports"].extend(VlanS350._expand_ports(port))
+    #             else:
+    #                 vlans[vlan_id]["tagged_ports"].extend(ports)
+    #         if line_elems[3]:
+    #             ports = filter(None, line_elems[3].split(","))
+    #             if expand_ports:
+    #                 for port in ports:
+    #                     vlans[vlan_id]["untagged_ports"].extend(VlanS350._expand_ports(port))
+    #             else:
+    #                 vlans[vlan_id]["untagged_ports"].extend(ports)
+    #     return vlans
+
     def get_vlan_data(self, expand_ports=True):
         """get_vlan_data implementation for s350"""
-        vlans = {}
+        vlans = []
 
         output = self._send_command("show vlan")
 
-        header = True  # cycle trought header
+        header = True  # cycle trough header
         vlan_id = 0
+        currend_vlan_index = 0
         for line in output.splitlines():
             if header:
                 # last line of header
@@ -132,26 +210,27 @@ class VlanS350(napalm_s350.S350Driver, ABC):  # napalm.base.NetworkDriver
             if line_elems[0] and line_elems[1] and line_elems[4]:
                 vlan_id = line_elems[0]
                 vlan_name = line_elems[1]
-                vlans[vlan_id] = {
+                vlans.append({
                     "id": int(vlan_id),
                     "name": vlan_name,
                     "tagged_ports": [],
                     "untagged_ports": [],
                     "created_by": list(line_elems[4])
-                }
+                })
+                currend_vlan_index = len(vlans)-1
 
             if line_elems[2]:
                 ports = filter(None, line_elems[2].split(","))
                 if expand_ports:
                     for port in ports:
-                        vlans[vlan_id]["tagged_ports"].extend(VlanS350._expand_ports(port))
+                        vlans[currend_vlan_index]["tagged_ports"].extend(VlanS350._expand_ports(port))
                 else:
-                    vlans[vlan_id]["tagged_ports"].extend(ports)
+                    vlans[currend_vlan_index]["tagged_ports"].extend(ports)
             if line_elems[3]:
                 ports = filter(None, line_elems[3].split(","))
                 if expand_ports:
                     for port in ports:
-                        vlans[vlan_id]["untagged_ports"].extend(VlanS350._expand_ports(port))
+                        vlans[currend_vlan_index]["untagged_ports"].extend(VlanS350._expand_ports(port))
                 else:
-                    vlans[vlan_id]["untagged_ports"].extend(ports)
+                    vlans[currend_vlan_index]["untagged_ports"].extend(ports)
         return vlans
