@@ -14,10 +14,10 @@ class SSH(Module):
     def __init__(self, ip: str = None, timeout: int = None, *args, **kwargs):
         super().__init__(ip, timeout, *args, **kwargs)
 
-        self.username = self.config["SSH_PASSWORD"]
-        self.password = self.config["SSH_PASSWORD"]
-        self.secret = self.config["SSH_ENABLE_SECRET"]
-        self.dev_type = self.config["SSH_DEVICE_TYPE"]
+        self.username = self.get_config_value("SSH_USERNAME")
+        self.password = self.get_config_value("SSH_PASSWORD")
+        self.secret = self.get_config_value("SSH_ENABLE_SECRET")
+        self.dev_type = self.get_config_value("SSH_DEVICE_TYPE")
         self.dev_creds = {
             'hostname': ip,
             'username': self.username,
@@ -60,11 +60,11 @@ class SSH(Module):
     @staticmethod
     def config_template():
         settings = Settings(default_timeout=30*60)
-        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_USERNAME", "SSH_USERNAME", "NetWatch"))
-        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_PASSWORD", "SSH_PASSWORD", "!NetWatch2021?"))
-        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_ENABLE_SECRET", "SSH_ENABLE_SECRET", "",
+        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_USERNAME", "username", "NetWatch"))
+        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_PASSWORD", "password", "!NetWatch2021?"))
+        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_ENABLE_SECRET", "enable secret", "",
                                   settings_required=False))  # HTL-Villach
-        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_DEVICE_TYPE", "SSH_DEVICE_TYPE", "s350"))
+        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_DEVICE_TYPE", "device type (s350, nxos, ...)", "s350"))
         return settings
 
     def worker(self):
