@@ -34,6 +34,7 @@ class SSH(Module):
         self.conn.open()
 
     def get_lldp_infos(self):
+        self.__create_connection()
         interface_output = self.conn.get_interfaces()
         lldp_output = self.conn.get_lldp_neighbors_detail()
         neighbors = {}
@@ -51,11 +52,15 @@ class SSH(Module):
                 }]
             }
             neighbors.update(neighbor)
-
+        self.conn.close()
         return {"neighbors": neighbors}
 
     def get_vlan_infos(self):
-        return {"vlan": Vlan(self.conn).get_vlan_data()}
+        self.__create_connection()
+        vlan_data = Vlan(self.dev_creds).get_vlan_data()
+        self.conn.close()
+        return {"vlan": vlan_data}
+
 
     @staticmethod
     def config_template():
@@ -70,9 +75,9 @@ class SSH(Module):
     def worker(self):
         # return ModuleData({}, [], [Event("successfully sent", EventSeverity.DEBUG)], OutputType.DEFAULT)
         data = {}
-        self.__create_connection()
+
         data.update(self.get_lldp_infos())
         data.update(self.get_vlan_infos())
-        self.conn.close()
+
         return ModuleData(self.get_lldp_infos(), [], {}, OutputType.DEFAULT)
 
