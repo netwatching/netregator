@@ -60,10 +60,10 @@ class SSH(Module):
     @staticmethod
     def config_template():
         settings = Settings(default_timeout=30*60)
-        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_USERNAME", "SSH_USERNAME", "NetWatch",
-                                  settings_required=False))
+        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_USERNAME", "SSH_USERNAME", "NetWatch"))
         settings.add(SettingsItem(SettingsItemType.STRING, "SSH_PASSWORD", "SSH_PASSWORD", "!NetWatch2021?"))
-        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_ENABLE_SECRET", "SSH_ENABLE_SECRET", ""))  # HTL-Villach
+        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_ENABLE_SECRET", "SSH_ENABLE_SECRET", "",
+                                  settings_required=False))  # HTL-Villach
         settings.add(SettingsItem(SettingsItemType.STRING, "SSH_DEVICE_TYPE", "SSH_DEVICE_TYPE", "s350"))
         return settings
 
