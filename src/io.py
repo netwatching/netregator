@@ -175,6 +175,7 @@ class API:
         req = self._session.post(f"{self._url}/api/aggregator/{self._id}/modules", json={"modules": modules},
                                  auth=JWTAuth(self))
         if req.status_code == requests.codes.ok:
+            self._logger.info(f"send_known_modules: {req.text}")
             return True
         else:
             self._logger.critical(f"send_known_modules: {req.text}")
