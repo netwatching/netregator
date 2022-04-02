@@ -10,17 +10,19 @@ class SNMP(Module):
     def __init__(self, ip: str = None, timeout: int = None, *args, **kwargs):
         super().__init__(ip, timeout, *args, **kwargs)
         self.ip = ip
-        self.settings = {
-            "community_string": "HTL-Villach",
-            "c_str_2": "snmp_rw",  # TODO: replace by proper setting
-            "snmp_port": 161
-        }
+        self.__update_config()
         self._logger = Utilities.setup_logger()
-        self.__ds = snmp.DataSources(snmp.SNMP(self.settings["community_string"], ip, self.settings["snmp_port"]))
+        self.__ds = snmp.DataSources(snmp.SNMP(self.community_string, ip, self.port))
+
+    def __update_config(self):
+        self.community_string = self.get_config_value("SNMP_COMMUNITY")
+        self.port = self.get_config_value("SNMP_PORT")
 
     @staticmethod
     def config_template():
         settings = Settings(default_timeout=30*60)
+        settings.add(SettingsItem(SettingsItemType.STRING, "SNMP_COMMUNITY", "community string", "HTL-Villach"))
+        settings.add(SettingsItem(SettingsItemType.NUMBER, "SNMP_PORT", "port", 161))
         return settings
 
     def worker(self):
@@ -31,25 +33,16 @@ class SNMP(Module):
         static_data = {}
         live_data = []
 
-        try:
-            static_data.update(self.__ds.get_system_data())
-            static_data.update(self.__ds.get_services())
-            interfaces_static, interfaces_live = self.__ds.get_interfaces()["static"]
-            static_data.update({"network_interfaces": interfaces_static})
-            for key, val in interfaces_live.items():
-                for i_key, i_val in val.items():
-                    live_data.append(LiveData(key+i_key, float(i_val)))
-            # data.update(self.__ds.get_ip_data())
-            static_data.update(self.__ds.get_ip_addresses())
-            # TODO: add other DataSource functions above
-        except Exception:
-            self.__ds = snmp.DataSources(snmp.SNMP(self.settings["c_str_2"], self.ip, self.settings["snmp_port"]))
-            static_data.update(self.__ds.get_system_data())
-            static_data.update(self.__ds.get_services())
-            static_data.update(self.__ds.get_interfaces())
-            # data.update(self.__ds.get_ip_data())
-            static_data.update(self.__ds.get_ip_addresses())
-            # TODO: add other DataSource functions above
+        static_data.update(self.__ds.get_system_data())
+        static_data.update(self.__ds.get_services())
+        interfaces_static, interfaces_live = self.__ds.get_interfaces()["static"]
+        static_data.update({"network_interfaces": interfaces_static})
+        for key, val in interfaces_live.items():
+            for i_key, i_val in val.items():
+                live_data.append(LiveData(key+i_key, float(i_val)))
+        # data.update(self.__ds.get_ip_data())
+        static_data.update(self.__ds.get_ip_addresses())
+        # TODO: add other DataSource functions above
 
         # self._logger.spam(data)
         return ModuleData(static_data=static_data, live_data=live_data, events={})

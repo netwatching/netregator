@@ -58,11 +58,13 @@ class SSH(Module):
             }
             neighbors.update(neighbor)
         self.conn.close()
+        self._logger.spam(neighbors)
         return {"neighbors": neighbors}
 
     def get_vlan_infos(self):
         self.__update_config()
         vlan_data = Vlan(self.dev_creds).get_vlan_data()
+        self._logger.spam(vlan_data)
         return {"vlan": vlan_data}
 
     @staticmethod

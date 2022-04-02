@@ -34,7 +34,6 @@ class Vlan:
 
                 port_names = [port["port"] for port in vlans]
                 if tagged_port in port_names:
-                    print("#########")
                     port_index = port_names.index(tagged_port)
                     vlans[port_index]["vlans"].append({"id": vlan["id"], "name": vlan["name"]})
                 else:
@@ -46,7 +45,6 @@ class Vlan:
             for untagged_port in vlan["untagged_ports"]:
                 port_names = [port["port"] for port in vlans]
                 if untagged_port in port_names:
-                    print("#########")
                     port_index = port_names.index(untagged_port)
                     vlans[port_index]["vlans"].append({"id": vlan["id"], "name": vlan["name"]})
                 else:
@@ -121,11 +119,11 @@ class VlanS350(napalm_s350.S350Driver, ABC):  # napalm.base.NetworkDriver
                 if match:
                     header = False
                     fields_end = VlanS350._get_vlan_fields_end(line)  # [4, 22, 41, 60, 77, 78]
-                    print(f"{fields_end=}")
+                    # print(f"{fields_end=}")
                 continue
 
             line_elems = VlanS350._get_vlan_line_to_fields(line, fields_end)  # {0: '1312', 1: 'Students-3Jg', 2: 'gi1/0/1-12,', 3: '', 4: 'S', 5: ''}
-            print(f"{line_elems=}")
+            # print(f"{line_elems=}")
 
             if line_elems[0] and line_elems[1] and line_elems[4]:
                 vlan_id = line_elems[0]
