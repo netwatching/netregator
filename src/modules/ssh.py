@@ -55,7 +55,3 @@ class SSH(Module):
         data.update({"vlans": Vlan(self.conn).get_vlan_data()})
         self.conn.close()
         return ModuleData(self.get_lldp_infos(), [], {}, OutputType.DEFAULT)
-
-
-if __name__ == "__main__":
-    print(SSH().worker())
