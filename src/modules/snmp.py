@@ -35,7 +35,7 @@ class SNMP(Module):
 
         static_data.update(self.__ds.get_system_data())
         static_data.update(self.__ds.get_services())
-        interfaces_static, interfaces_live = self.__ds.get_interfaces()["static"]
+        interfaces_static, interfaces_live = self.__ds.get_interfaces()
         static_data.update({"network_interfaces": interfaces_static})
         for key, val in interfaces_live.items():
             for i_key, i_val in val.items():
