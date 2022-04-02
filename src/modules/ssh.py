@@ -1,5 +1,5 @@
 from src.modules.module import Module
-#from decouple import config
+from decouple import config
 from src.module_data import ModuleData, OutputType, Event, EventSeverity
 from src.modules.helpers.s350_ssh_vlan import Vlan
 import sys
@@ -10,17 +10,22 @@ import json
 
 
 class SSH(Module):
-    def __init__(self, ip: str = '172.31.8.81', timeout: int = None, *args, **kwargs):
+    def __init__(self, ip: str = None, timeout: int = None, *args, **kwargs):
         super().__init__(ip, timeout, *args, **kwargs)
-        # devicetype & creds -> settingsAPI
-        self.dev_type = 's350'
+
+        self.username = config("SSH_USERNAME")
+        self.password = config("SSH_PASSWORD")
+        self.secret = config("SSH_ENABLE_SECRET")
+        self.dev_type = config("SSH_DEVICE_TYPE")
         self.dev_creds = {
             'hostname': ip,
-            'username': 'NetWatch',
-            'password': '!NetWatch2021?',
-            'optional_args': {'secret': 'HTL-Villach'}
+            'username': self.username,
+            'password': self.password,
         }
-        self.__create_connection()
+        if self.secret:
+            self.dev_creds['optional_args']['secret'] = 'HTL-Villach'
+        else:
+            self.dev_creds['optional_args']['force_no_enable'] = True
 
     def __create_connection(self):
         driver = napalm.get_network_driver(self.dev_type)
@@ -48,10 +53,15 @@ class SSH(Module):
 
         return {"neighbors": neighbors}
 
+    def get_vlan_infos(self):
+        return {"vlans": Vlan(self.conn).get_vlan_data()}
+
     def worker(self):
         # return ModuleData({}, [], [Event("successfully sent", EventSeverity.DEBUG)], OutputType.DEFAULT)
         data = {}
+        self.__create_connection()
         data.update(self.get_lldp_infos())
-        data.update({"vlans": Vlan(self.conn).get_vlan_data()})
+        data.update(self.get_vlan_infos())
         self.conn.close()
         return ModuleData(self.get_lldp_infos(), [], {}, OutputType.DEFAULT)
+
