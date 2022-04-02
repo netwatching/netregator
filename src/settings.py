@@ -12,12 +12,13 @@ class SettingsItemType(Enum):
 # noinspection PyTypeChecker
 class SettingsItem:
     def __init__(self, settings_type: SettingsItemType, settings_id: str, settings_title: str,
-                 settings_default_value, settings_enum_items: list = None):
+                 settings_default_value, settings_enum_items: list = None, settings_required: bool = True):
         self.settings_type = settings_type
         self.settings_id = settings_id
         self.settings_title = settings_title
         self.settings_enum_items = settings_enum_items
-        self.default_value = settings_default_value
+        self.settings_default_value = settings_default_value
+        self.settings_required = settings_required
 
     def serialize(self):
         return_schema = {}
@@ -45,14 +46,19 @@ class Settings:
     def serialize(self):
         serialized_settings_items = dict()
         serialized_default_values = dict()
+        required_settings = []
         for k in self._settings_items:
             serialized_settings_items.update(self._settings_items[k].serialize())
-            if self._settings_items[k].default_value:
-                serialized_default_values[self._settings_items[k].settings_id] = self._settings_items[k].default_value
+            if self._settings_items[k].settings_default_value:
+                serialized_default_values[self._settings_items[k].settings_id] = self._settings_items[k].settings_default_value
+            # required settings
+            if self._settings_items[k].settings_required:
+                required_settings.append(self._settings_items[k].settings_id)
+
         return {
             "type": "object",
             "properties": serialized_settings_items,
-            "required": list(self._settings_items.keys())
+            "required": required_settings
         }, serialized_default_values
 
     def seed_default_values(self):
@@ -68,7 +74,7 @@ if __name__ == "__main__":
                               settings_title="Community Number", settings_default_value=1))
     settings.add(SettingsItem(settings_type=SettingsItemType.ENUM, settings_id="community_enum",
                               settings_title="Community Enum", settings_default_value="test1",
-                              settings_enum_items=["test1", "test2"]))
+                              settings_enum_items=["test1", "test2"], settings_required=False))
     test_schema, test_data = settings.serialize()
     print(test_schema)
     print(test_data)
