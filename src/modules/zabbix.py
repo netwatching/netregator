@@ -50,9 +50,9 @@ class Zabbix(Module):
         super().__init__(ip, timeout, *args, **kwargs)
         self.url = f"https://{ip}"
         # self.user = self.config["username"]
-        self.user = config("ZABBIX_USERNAME")
+        self.user = self.get_config_value("ZABBIX_USERNAME")
         # self.password = self.config["password"]
-        self.password = config("ZABBIX_PASSWORD")
+        self.password = self.get_config_value("ZABBIX_PASSWORD")
         self.connection = self.__create_connection()
 
     def __create_connection(self):
