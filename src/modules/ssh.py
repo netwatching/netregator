@@ -13,13 +13,16 @@ import json
 class SSH(Module):
     def __init__(self, ip: str = None, timeout: int = None, *args, **kwargs):
         super().__init__(ip, timeout, *args, **kwargs)
+        self.ip = ip
+        self.__update_config()
 
+    def __update_config(self):
         self.username = self.get_config_value("SSH_USERNAME")
         self.password = self.get_config_value("SSH_PASSWORD")
         self.secret = self.get_config_value("SSH_ENABLE_SECRET")
         self.dev_type = self.get_config_value("SSH_DEVICE_TYPE")
         self.dev_creds = {
-            'hostname': ip,
+            'hostname': self.ip,
             'username': self.username,
             'password': self.password,
         }
@@ -29,6 +32,8 @@ class SSH(Module):
             self.dev_creds['optional_args'] = {'force_no_enable': True}
 
     def __create_connection(self):
+        self.__update_config()
+        print(self.dev_type)
         driver = napalm.get_network_driver(self.dev_type)
         self.conn = driver(**self.dev_creds)
         self.conn.open()
@@ -56,11 +61,9 @@ class SSH(Module):
         return {"neighbors": neighbors}
 
     def get_vlan_infos(self):
-        self.__create_connection()
+        self.__update_config()
         vlan_data = Vlan(self.dev_creds).get_vlan_data()
-        self.conn.close()
         return {"vlan": vlan_data}
-
 
     @staticmethod
     def config_template():
@@ -69,15 +72,13 @@ class SSH(Module):
         settings.add(SettingsItem(SettingsItemType.STRING, "SSH_PASSWORD", "password", "!NetWatch2021?"))
         settings.add(SettingsItem(SettingsItemType.STRING, "SSH_ENABLE_SECRET", "enable secret", "",
                                   settings_required=False))  # HTL-Villach
-        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_DEVICE_TYPE", "device type (s350, nxos, ...)", "s350"))
+        settings.add(SettingsItem(SettingsItemType.ENUM, "SSH_DEVICE_TYPE", "device type", "s350", ["s350", "nxos"]))
         return settings
 
     def worker(self):
         # return ModuleData({}, [], [Event("successfully sent", EventSeverity.DEBUG)], OutputType.DEFAULT)
         data = {}
-
         data.update(self.get_lldp_infos())
         data.update(self.get_vlan_infos())
-
         return ModuleData(self.get_lldp_infos(), [], {}, OutputType.DEFAULT)
 
