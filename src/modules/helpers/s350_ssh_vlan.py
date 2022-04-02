@@ -34,7 +34,6 @@ class Vlan:
 
                 port_names = [port["port"] for port in vlans]
                 if tagged_port in port_names:
-                    print("#########")
                     port_index = port_names.index(tagged_port)
                     vlans[port_index]["vlans"].append({"id": vlan["id"], "name": vlan["name"]})
                 else:
@@ -46,7 +45,6 @@ class Vlan:
             for untagged_port in vlan["untagged_ports"]:
                 port_names = [port["port"] for port in vlans]
                 if untagged_port in port_names:
-                    print("#########")
                     port_index = port_names.index(untagged_port)
                     vlans[port_index]["vlans"].append({"id": vlan["id"], "name": vlan["name"]})
                 else:
