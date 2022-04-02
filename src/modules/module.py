@@ -85,9 +85,12 @@ class Module(threading.Thread):
             time.sleep(int(c_timeout))
 
     def get_config_value(self, identifier):
-        current_config = dict(self.config)  # creating new object because multiple processes are using same object
+        current_config = self.config
+        if type(current_config) == str:
+            if current_config == "[]":
+                current_config = {}
         if identifier in current_config:
-            return current_config[identifier]
+            return self.config[identifier]
         else:
             return None
 
