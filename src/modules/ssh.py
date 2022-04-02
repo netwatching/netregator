@@ -55,7 +55,7 @@ class SSH(Module):
         return {"neighbors": neighbors}
 
     def get_vlan_infos(self):
-        return {"vlans": Vlan(self.conn).get_vlan_data()}
+        return {"vlan": Vlan(self.conn).get_vlan_data()}
 
     @staticmethod
     def config_template():
