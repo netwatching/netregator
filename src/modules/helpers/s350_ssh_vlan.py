@@ -13,32 +13,32 @@ import napalm.base.canonical_map
 
 
 class Vlan:
-    def __init__(self, host_ip, ssh_username, ssh_password='!NetWatch2021?', device_type: str = "s350",
-                 enable_password: str = 'HTL-Villach'):
+    def __init__(self, connection):  # host_ip, ssh_username, ssh_password='!NetWatch2021?', device_type: str = "s350", enable_password: str = 'HTL-Villach'):
         self._logger = Utilities.setup_logger()
-        self.dev_type = device_type
-        self.dev_creds = {
-            'hostname': host_ip,
-            'username': ssh_username,
-            'password': ssh_password,
-            # 'optional_args': {
-            #     "verbose": True
-            # }
-        }
-        if not enable_password:
-            self.dev_creds["optional_args"]['secret'] = enable_password
-        else:
-            self.dev_creds["optional_args"]['force_no_enable'] = True
+        # self.dev_type = device_type
+        # self.dev_creds = {
+        #     'hostname': host_ip,
+        #     'username': ssh_username,
+        #     'password': ssh_password,
+        #     # 'optional_args': {
+        #     #     "verbose": True
+        #     # }
+        # }
+        # if not enable_password:
+        #     self.dev_creds["optional_args"]['secret'] = enable_password
+        # else:
+        #     self.dev_creds["optional_args"]['force_no_enable'] = True
+        self.conn = connection
 
     def get_vlan_data(self):
         # driver = napalm.get_network_driver(self.dev_type)
         # conn = driver(**self.dev_creds)
-        conn = VlanS350(**self.dev_creds)
-        conn.open()
+        # conn = VlanS350(**self.dev_creds)
+        # conn.open()
         # output = conn.get_config()
-        vlan_data = conn.get_vlan_data(expand_ports=True)
+        vlan_data = self.conn.get_vlan_data(expand_ports=True)
         r = Vlan.reformat_vlan_data_to_port_centric_format(vlan_data)
-        conn.close()
+        # conn.close()
         return r
 
     @staticmethod

@@ -1,6 +1,7 @@
 from src.modules.module import Module
-from decouple import config
+#from decouple import config
 from src.module_data import ModuleData, OutputType, Event, EventSeverity
+from src.modules.helpers.s350_ssh_vlan import Vlan
 import sys
 import time
 import napalm
@@ -9,12 +10,12 @@ import json
 
 
 class SSH(Module):
-    def __init__(self, ip: str = None, timeout: int = None, *args, **kwargs):
+    def __init__(self, ip: str = '172.31.8.81', timeout: int = None, *args, **kwargs):
         super().__init__(ip, timeout, *args, **kwargs)
         # devicetype & creds -> settingsAPI
         self.dev_type = 's350'
         self.dev_creds = {
-            'hostname': '172.31.8.81',
+            'hostname': ip,
             'username': 'NetWatch',
             'password': '!NetWatch2021?',
             'optional_args': {'secret': 'HTL-Villach'}
@@ -49,4 +50,12 @@ class SSH(Module):
 
     def worker(self):
         # return ModuleData({}, [], [Event("successfully sent", EventSeverity.DEBUG)], OutputType.DEFAULT)
+        data = {}
+        data.update(self.get_lldp_infos())
+        data.update({"vlans": Vlan(self.conn).get_vlan_data()})
+        self.conn.close()
         return ModuleData(self.get_lldp_infos(), [], {}, OutputType.DEFAULT)
+
+
+if __name__ == "__main__":
+    print(SSH().worker())
