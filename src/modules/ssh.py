@@ -2,6 +2,7 @@ from src.modules.module import Module
 from decouple import config
 from src.module_data import ModuleData, OutputType, Event, EventSeverity
 from src.modules.helpers.s350_ssh_vlan import Vlan
+from src.settings import Settings, SettingsItem, SettingsItemType
 import sys
 import time
 import napalm
@@ -22,8 +23,8 @@ class SSH(Module):
             'username': self.username,
             'password': self.password,
         }
-        if self.secret:
-            self.dev_creds['optional_args']['secret'] = 'HTL-Villach'
+        if False:  # self.secret:  # TODO: change when secret bcomes optional
+            self.dev_creds['optional_args']['secret'] = self.secret
         else:
             self.dev_creds['optional_args']['force_no_enable'] = True
 
@@ -55,6 +56,15 @@ class SSH(Module):
 
     def get_vlan_infos(self):
         return {"vlans": Vlan(self.conn).get_vlan_data()}
+
+    @staticmethod
+    def config_template():
+        settings = Settings(default_timeout=30*60)
+        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_USERNAME", "SSH_USERNAME", "NetWatch"))
+        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_PASSWORD", "SSH_PASSWORD", "NetWatch"))
+        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_ENABLE_SECRET", "SSH_ENABLE_SECRET", "HTL-Villach"))
+        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_DEVICE_TYPE", "SSH_DEVICE_TYPE", "s350"))
+        return settings
 
     def worker(self):
         # return ModuleData({}, [], [Event("successfully sent", EventSeverity.DEBUG)], OutputType.DEFAULT)
