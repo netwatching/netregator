@@ -14,6 +14,7 @@ class Module(threading.Thread):
         self.timeout = timeout
         self.ip = ip
         self.config_signature, self.default_config = self.__class__.config_template().serialize()
+        print(self.default_config)
         self.config = config
         self.last_updated = datetime.datetime.now()
         super().__init__(*args, **kwargs)
@@ -82,6 +83,12 @@ class Module(threading.Thread):
             else:
                 c_timeout = self.timeout
             time.sleep(int(c_timeout))
+
+    def get_config_value(self, identifier):
+        if identifier in self.config:
+            return self.config[identifier]
+        else:
+            return None
 
     @staticmethod
     def check_module_configuration():
