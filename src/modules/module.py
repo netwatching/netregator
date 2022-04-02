@@ -1,4 +1,5 @@
 import datetime
+import json
 import threading
 import time
 from src.module_data import ModuleData
@@ -89,8 +90,10 @@ class Module(threading.Thread):
         if type(current_config) == str:
             if current_config == "[]":
                 current_config = {}
+            else:
+                current_config = json.loads(str.replace(current_config, "'", '"'))
         if identifier in current_config:
-            return self.config[identifier]
+            return current_config[identifier]
         else:
             return None
 
