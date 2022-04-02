@@ -14,7 +14,7 @@ class Module(threading.Thread):
         self.timeout = timeout
         self.ip = ip
         self.config_signature, self.default_config = self.__class__.config_template().serialize()
-        print(self.default_config)
+        # print(self.default_config)
         self.config = config
         self.last_updated = datetime.datetime.now()
         super().__init__(*args, **kwargs)
