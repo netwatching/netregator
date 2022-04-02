@@ -24,9 +24,9 @@ class SSH(Module):
             'password': self.password,
         }
         if self.secret:
-            self.dev_creds['optional_args']['secret'] = self.secret
+            self.dev_creds['optional_args'] = {'secret': self.secret}
         else:
-            self.dev_creds['optional_args']['force_no_enable'] = True
+            self.dev_creds['optional_args'] = {'force_no_enable': True}
 
     def __create_connection(self):
         driver = napalm.get_network_driver(self.dev_type)
