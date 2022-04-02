@@ -75,6 +75,7 @@ if __name__ == "__main__":
     settings.add(SettingsItem(settings_type=SettingsItemType.ENUM, settings_id="community_enum",
                               settings_title="Community Enum", settings_default_value="test1",
                               settings_enum_items=["test1", "test2"], settings_required=False))
+    settings.add(SettingsItem(SettingsItemType.ENUM, "SSH_DEVICE_TYPE", "device type", "s350", ["s350", "nxos"]))
     test_schema, test_data = settings.serialize()
     print(test_schema)
     print(test_data)

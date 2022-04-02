@@ -121,14 +121,3 @@ class Events(Zabbix):
         events = self.get_infos(hosts, ZabbixDataType.EVENTS)
         return ModuleData({}, [], events,
                           OutputType.EXTERNAL_DATA_SOURCES)
-
-    @staticmethod
-    def config_template():
-        settings = Settings(default_timeout=60)
-        settings.add(SettingsItem(settings_id="username", settings_title="Zabbix Username",
-                                  settings_type=SettingsItemType.STRING,
-                                  settings_default_value="user"))
-        settings.add(SettingsItem(settings_id="password", settings_title="Zabbix Password",
-                                  settings_type=SettingsItemType.STRING,
-                                  settings_default_value="password"))
-        return settings
