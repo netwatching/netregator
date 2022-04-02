@@ -90,7 +90,7 @@ class Module(threading.Thread):
             if current_config == "[]":
                 current_config = {}
         if identifier in current_config:
-            return self.config[identifier]
+            return current_config[identifier]
         else:
             return None
 
