@@ -87,6 +87,13 @@ class Zabbix(Module):
         return hosts
 
     @staticmethod
+    def config_template():
+        settings = Settings(default_timeout=30*60)
+        settings.add(SettingsItem(SettingsItemType.STRING, "ZABBIX_USERNAME", "username", ""))
+        settings.add(SettingsItem(SettingsItemType.STRING, "ZABBIX_PASSWORD", "password", ""))
+        return settings
+
+    @staticmethod
     def check_module_configuration():
         # if config("ZABBIX_USERNAME") and config("ZABBIX_PASSWORD"):
         #     return True
