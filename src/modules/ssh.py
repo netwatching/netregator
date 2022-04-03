@@ -25,11 +25,12 @@ class SSH(Module):
             'hostname': self.ip,
             'username': self.username,
             'password': self.password,
+            'optional_args': {'transport': self.get_config_value("SSH_TRANSPORT_PROTOCOL")}
         }
         if self.secret:
-            self.dev_creds['optional_args'] = {'secret': self.secret}
+            self.dev_creds['optional_args']["secret"] = self.secret
         else:
-            self.dev_creds['optional_args'] = {'force_no_enable': True}
+            self.dev_creds['optional_args']['force_no_enable'] = True
 
     def __create_connection(self):
         self.__update_config()
@@ -61,9 +62,34 @@ class SSH(Module):
         self._logger.spam(neighbors)
         return {"neighbors": neighbors}
 
+    @staticmethod
+    def reformat_vlan_data(vlans):
+        vlan_results = []
+        ports = []
+        for vlan_id, vlan_data in vlans.items():
+            vlan_name = vlan_data["name"]
+            interfaces = vlan_data["interfaces"]
+            for interface in interfaces:
+                if interface in ports:
+                    port_index = ports.index(interface)
+                    vlan_results[port_index]["vlans"].append({"id": vlan_id, "name": vlan_name})
+                else:
+                    vlan_results.append({
+                        "port": interface,
+                        "vlans": [{"id": vlan_id, "name": vlan_name}]
+                    })
+                    ports.append(interface)
+        return vlan_results
+
     def get_vlan_infos(self):
         self.__update_config()
-        vlan_data = Vlan(self.dev_creds).get_vlan_data()
+        if self.dev_type == "s350":
+            vlan_data = Vlan(self.dev_creds).get_vlan_data()
+        else:
+            self.__create_connection()
+            vlans = self.conn.get_vlans()
+            self.conn.close()
+            vlan_data = SSH.reformat_vlan_data(vlans)
         self._logger.spam(vlan_data)
         return {"vlan": vlan_data}
 
@@ -75,6 +101,7 @@ class SSH(Module):
         settings.add(SettingsItem(SettingsItemType.STRING, "SSH_ENABLE_SECRET", "enable secret", "",
                                   settings_required=False))  # HTL-Villach
         settings.add(SettingsItem(SettingsItemType.ENUM, "SSH_DEVICE_TYPE", "device type", "s350", ["s350", "nxos"]))
+        settings.add(SettingsItem(SettingsItemType.ENUM, "SSH_TRANSPORT_PROTOCOL", "transport protocol", "http", ["http", "https"]))
         return settings
 
     def worker(self):
