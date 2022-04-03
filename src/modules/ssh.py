@@ -33,7 +33,7 @@ class SSH(Module):
             self.dev_creds['optional_args']['force_no_enable'] = True
 
     def __create_connection(self):
-        self.__update_config()
+        self.__update_config()  # the config needs to be updated in case the user changes the config while the program runs
         print(self.dev_type)
         driver = napalm.get_network_driver(self.dev_type)
         self.conn = driver(**self.dev_creds)
@@ -65,15 +65,15 @@ class SSH(Module):
     @staticmethod
     def reformat_vlan_data(vlans):
         vlan_results = []
-        ports = []
+        ports = []  # memorize all ports already in the output variable
         for vlan_id, vlan_data in vlans.items():
             vlan_name = vlan_data["name"]
             interfaces = vlan_data["interfaces"]
             for interface in interfaces:
-                if interface in ports:
+                if interface in ports:  # update an existing port in the out var
                     port_index = ports.index(interface)
                     vlan_results[port_index]["vlans"].append({"id": vlan_id, "name": vlan_name})
-                else:
+                else:  # add a new port to the output var
                     vlan_results.append({
                         "port": interface,
                         "vlans": [{"id": vlan_id, "name": vlan_name}]
@@ -83,13 +83,13 @@ class SSH(Module):
 
     def get_vlan_infos(self):
         self.__update_config()
-        if self.dev_type == "s350":
+        if self.dev_type == "s350":  # s350 device need special treatment since there is no native napalm integration for those products
             vlan_data = Vlan(self.dev_creds).get_vlan_data()
         else:
             self.__create_connection()
             vlans = self.conn.get_vlans()
             self.conn.close()
-            vlan_data = SSH.reformat_vlan_data(vlans)
+            vlan_data = SSH.reformat_vlan_data(vlans)  # reformats the data to an interface centric design
         self._logger.spam(vlan_data)
         return {"vlan": vlan_data}
 
@@ -100,14 +100,15 @@ class SSH(Module):
         settings.add(SettingsItem(SettingsItemType.STRING, "SSH_PASSWORD", "password", "!NetWatch2021?"))
         settings.add(SettingsItem(SettingsItemType.STRING, "SSH_ENABLE_SECRET", "enable secret", "",
                                   settings_required=False))  # HTL-Villach
+        # the enable secret is not needed at this time for anything - therefore it is optional
         settings.add(SettingsItem(SettingsItemType.ENUM, "SSH_DEVICE_TYPE", "device type", "s350", ["s350", "nxos"]))
         settings.add(SettingsItem(SettingsItemType.ENUM, "SSH_TRANSPORT_PROTOCOL", "transport protocol (only relevant for Nexus devices)", "http", ["http", "https"]))
+        # the transport protocol is the protocol used for the nexus API requests - nexus does not use SSH
         return settings
 
     def worker(self):
-        # return ModuleData({}, [], [Event("successfully sent", EventSeverity.DEBUG)], OutputType.DEFAULT)
         data = {}
         data.update(self.get_lldp_infos())
         data.update(self.get_vlan_infos())
-        return ModuleData(self.get_lldp_infos(), [], {}, OutputType.DEFAULT)
+        return ModuleData(data, [], {}, OutputType.DEFAULT)
 
