@@ -101,7 +101,7 @@ class SSH(Module):
         settings.add(SettingsItem(SettingsItemType.STRING, "SSH_ENABLE_SECRET", "enable secret", "",
                                   settings_required=False))  # HTL-Villach
         settings.add(SettingsItem(SettingsItemType.ENUM, "SSH_DEVICE_TYPE", "device type", "s350", ["s350", "nxos"]))
-        settings.add(SettingsItem(SettingsItemType.ENUM, "SSH_TRANSPORT_PROTOCOL", "transport protocol", "http", ["http", "https"]))
+        settings.add(SettingsItem(SettingsItemType.ENUM, "SSH_TRANSPORT_PROTOCOL", "transport protocol (only relevant for Nexus devices)", "http", ["http", "https"]))
         return settings
 
     def worker(self):
