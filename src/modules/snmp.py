@@ -21,7 +21,7 @@ class SNMP(Module):
     @staticmethod
     def config_template():
         settings = Settings(default_timeout=30*60)
-        settings.add(SettingsItem(SettingsItemType.STRING, "SNMP_COMMUNITY", "community string", "HTL-Villach"))
+        settings.add(SettingsItem(SettingsItemType.STRING, "SNMP_COMMUNITY", "community string", "snmp_rw"))
         settings.add(SettingsItem(SettingsItemType.NUMBER, "SNMP_PORT", "port", 161))
         return settings
 
@@ -35,11 +35,11 @@ class SNMP(Module):
 
         static_data.update(self.__ds.get_system_data())
         static_data.update(self.__ds.get_services())
-        interfaces_static, interfaces_live = self.__ds.get_interfaces()["static"]
+        interfaces_static, interfaces_live = self.__ds.get_interfaces()
         static_data.update({"network_interfaces": interfaces_static})
         for key, val in interfaces_live.items():
             for i_key, i_val in val.items():
-                live_data.append(LiveData(key+i_key, float(i_val)))
+                live_data.append(LiveData(key+i_key, float(i_val), ()))  # TODO: mapping tuple?
         # data.update(self.__ds.get_ip_data())
         static_data.update(self.__ds.get_ip_addresses())
         # TODO: add other DataSource functions above
