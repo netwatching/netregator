@@ -2,7 +2,7 @@ from src.modules.module import Module
 from src.device import Device
 from src.module_data import ModuleData, OutputType, LiveData
 from unificontrol import UnifiClient
-from decouple import config
+from src.settings import Settings, SettingsItem, SettingsItemType
 import time
 
 
@@ -51,11 +51,9 @@ class UnifiAPI(Module):
     def __init__(self, ip: str = None, timeout: int = None, *args, **kwargs):
         super().__init__(ip, timeout, *args, **kwargs)
 
-        self.host = config("UNIFI_HOSTNAME")
-        # self.user = self.config["username"]
-        self.user = config("UNIFI_USERNAME")
-        # self.password = self.config["password"]
-        self.password = config("UNIFI_PASSWORD")
+        self.host = self.get_config_value("UNIFI_HOSTNAME")
+        self.user = self.get_config_value("UNIFI_USERNAME")
+        self.password = self.get_config_value("UNIFI_PASSWORD")
         self.connection = self.__create_connection()
 
     def __create_connection(self):
@@ -72,12 +70,9 @@ class UnifiAPI(Module):
                 return portconfig_obj
 
     def get_lldp_data(self):
-        lldp_data = {}
         mac = ""
         hostname = ""
-        portname = ""
 
-        device = UnifiDevice(ip=self.ip)
         all_devices = self.connection.list_devices()
         for obj_ in all_devices:
             if obj_["ip"] == self.ip:
@@ -100,10 +95,10 @@ class UnifiAPI(Module):
                         lldp_list.append(lldp.serialize())
 
             output_data = {}
-            for c_vlan_data in lldp_list:
-                if c_vlan_data["local_port"] not in output_data:
-                    output_data[c_vlan_data["local_port"]] = []
-                output_data[c_vlan_data["local_port"]].append(c_vlan_data)
+            for c_lldp_data in lldp_list:
+                if c_lldp_data["local_port"] not in output_data:
+                    output_data[c_lldp_data["local_port"]] = []
+                output_data[c_lldp_data["local_port"]].append(c_lldp_data)
 
             return output_data
 
@@ -111,7 +106,6 @@ class UnifiAPI(Module):
         is_trunk = False
         vlandata = []
 
-        device = UnifiDevice(ip=self.ip)
         alldevices = self.connection.list_devices()
         for obj in alldevices:
             if obj["ip"] == self.ip:
@@ -146,7 +140,7 @@ class UnifiAPI(Module):
                 vlan_dict = vlan.serialize()
                 vlan_list = [vlan_dict]
 
-                port_dict = {"port": port_idx, "vlans": vlan_list, "is_trunk": is_trunk} #"admin_status": admin_status
+                port_dict = {"port": port_idx, "vlans": vlan_list, "is_trunk": is_trunk}
                 vlandata.append(port_dict)
 
         return vlandata
@@ -158,8 +152,7 @@ class LLDP(UnifiAPI):
 
     def worker(self):
         lldp = self.get_lldp_data()
-        livedata_list = []
-        livedata_list.append(LiveData(name="cpu", value=70, mapping=("my_data",)))
+        livedata_list = [LiveData(name="cpu", value=70, mapping=("my_data",))]
         time.sleep(5)
         livedata_list.append(LiveData(name="cpu", value=71, mapping=("my_data",)))
         return ModuleData({"neighbors": lldp}, livedata_list, {}, OutputType.DEFAULT)
@@ -168,6 +161,14 @@ class LLDP(UnifiAPI):
 class VLAN(UnifiAPI):
     def __init__(self, ip: str = None, *args, **kwargs):
         super().__init__(ip, *args, **kwargs)
+
+    @staticmethod
+    def config_template():
+        settings = Settings(default_timeout=30*60)
+        settings.add(SettingsItem(SettingsItemType.STRING, "UNIFI_HOSTNAME", "username", "unifi.htl-vil.local"))
+        settings.add(SettingsItem(SettingsItemType.STRING, "UNIFI_USERNAME", "username", "NetWatch"))
+        settings.add(SettingsItem(SettingsItemType.STRING, "UNIFI_PASSWORD", "password", "PASSWORD"))
+        return settings
 
     def worker(self):
         vlan = self.get_vlan_data()
