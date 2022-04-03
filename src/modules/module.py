@@ -79,8 +79,8 @@ class Module(threading.Thread):
             if (datetime.datetime.now() - self.last_updated) > datetime.timedelta(minutes=5):
                 self.stop()
             self.data = self.worker()
-            if "timeout" in self.config:
-                c_timeout = self.config["timeout"]
+            if self.get_config_value("timeout"):
+                c_timeout = self.get_config_value("timeout")
             else:
                 c_timeout = self.timeout
             time.sleep(int(c_timeout))
