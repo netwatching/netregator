@@ -145,6 +145,14 @@ class UnifiAPI(Module):
 
         return vlandata
 
+    @staticmethod
+    def config_template():
+        settings = Settings(default_timeout=30*60)
+        settings.add(SettingsItem(SettingsItemType.STRING, "UNIFI_HOSTNAME", "username", "unifi.htl-vil.local"))
+        settings.add(SettingsItem(SettingsItemType.STRING, "UNIFI_USERNAME", "username", "NetWatch"))
+        settings.add(SettingsItem(SettingsItemType.STRING, "UNIFI_PASSWORD", "password", "PASSWORD"))
+        return settings
+
 
 class LLDP(UnifiAPI):
     def __init__(self, ip: str = None, *args, **kwargs):
@@ -161,14 +169,6 @@ class LLDP(UnifiAPI):
 class VLAN(UnifiAPI):
     def __init__(self, ip: str = None, *args, **kwargs):
         super().__init__(ip, *args, **kwargs)
-
-    @staticmethod
-    def config_template():
-        settings = Settings(default_timeout=30*60)
-        settings.add(SettingsItem(SettingsItemType.STRING, "UNIFI_HOSTNAME", "username", "unifi.htl-vil.local"))
-        settings.add(SettingsItem(SettingsItemType.STRING, "UNIFI_USERNAME", "username", "NetWatch"))
-        settings.add(SettingsItem(SettingsItemType.STRING, "UNIFI_PASSWORD", "password", "PASSWORD"))
-        return settings
 
     def worker(self):
         vlan = self.get_vlan_data()
