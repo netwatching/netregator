@@ -39,7 +39,7 @@ class SNMP(Module):
         static_data.update({"network_interfaces": interfaces_static})
         for key, val in interfaces_live.items():
             for i_key, i_val in val.items():
-                live_data.append(LiveData(key+i_key, float(i_val), ()))  # TODO: mapping tuple?
+                live_data.append(LiveData(i_key, float(i_val), (key,)))  # TODO: mapping tuple?
         # data.update(self.__ds.get_ip_data())
         static_data.update(self.__ds.get_ip_addresses())
         # TODO: add other DataSource functions above
