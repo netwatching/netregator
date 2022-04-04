@@ -3,7 +3,6 @@ import math
 from src.modules.module import Module
 from src.device import Device
 from pyzabbix.api import ZabbixAPI
-from decouple import config
 from src.module_data import ModuleData, OutputType, LiveData
 import time
 from enum import Enum
@@ -89,17 +88,9 @@ class Zabbix(Module):
     @staticmethod
     def config_template():
         settings = Settings(default_timeout=30*60)
-        settings.add(SettingsItem(SettingsItemType.STRING, "ZABBIX_USERNAME", "username", ""))
-        settings.add(SettingsItem(SettingsItemType.STRING, "ZABBIX_PASSWORD", "password", ""))
+        settings.add(SettingsItem(SettingsItemType.STRING, "ZABBIX_USERNAME", "username", "NetWatch"))
+        settings.add(SettingsItem(SettingsItemType.STRING, "ZABBIX_PASSWORD", "password", "Password"))
         return settings
-
-    @staticmethod
-    def check_module_configuration():
-        # if config("ZABBIX_USERNAME") and config("ZABBIX_PASSWORD"):
-        #     return True
-        # else:
-        #     return False
-        return True
 
 
 class Problems(Zabbix):
