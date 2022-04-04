@@ -76,13 +76,13 @@ class Module(threading.Thread):
 
     def run(self):
         while self.is_running():
-            if (datetime.datetime.now() - self.last_updated) > datetime.timedelta(minutes=5):
-                self.stop()
-            self.data = self.worker()
             if self.get_config_value("timeout"):
                 c_timeout = self.get_config_value("timeout")
             else:
                 c_timeout = self.timeout
+            if (datetime.datetime.now() - self.last_updated) > datetime.timedelta(seconds=c_timeout*2):
+                self.stop()
+            self.data = self.worker()
             time.sleep(int(c_timeout))
 
     def get_config_value(self, identifier):
