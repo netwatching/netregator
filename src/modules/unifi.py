@@ -148,9 +148,9 @@ class UnifiAPI(Module):
     @staticmethod
     def config_template():
         settings = Settings(default_timeout=30*60)
-        settings.add(SettingsItem(SettingsItemType.STRING, "UNIFI_HOSTNAME", "username", "unifi.htl-vil.local"))
-        settings.add(SettingsItem(SettingsItemType.STRING, "UNIFI_USERNAME", "username", "NetWatch"))
-        settings.add(SettingsItem(SettingsItemType.STRING, "UNIFI_PASSWORD", "password", "PASSWORD"))
+        settings.add(SettingsItem(SettingsItemType.STRING, "UNIFI_HOSTNAME", "username", "unifi.local"))
+        settings.add(SettingsItem(SettingsItemType.STRING, "UNIFI_USERNAME", "username", "NetWatchUser"))
+        settings.add(SettingsItem(SettingsItemType.STRING, "UNIFI_PASSWORD", "password", "password"))
         return settings
 
 
