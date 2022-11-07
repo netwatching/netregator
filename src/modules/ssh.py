@@ -96,8 +96,8 @@ class SSH(Module):
     @staticmethod
     def config_template():
         settings = Settings(default_timeout=30*60)
-        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_USERNAME", "username", "NetWatch"))
-        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_PASSWORD", "password", "!NetWatch2021?"))
+        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_USERNAME", "username", "NetWatchUser"))
+        settings.add(SettingsItem(SettingsItemType.STRING, "SSH_PASSWORD", "password", "password"))
         settings.add(SettingsItem(SettingsItemType.STRING, "SSH_ENABLE_SECRET", "enable secret", "",
                                   settings_required=False))  # HTL-Villach
         # the enable secret is not needed at this time for anything - therefore it is optional
