@@ -21,7 +21,7 @@ class SNMP(Module):
     @staticmethod
     def config_template():
         settings = Settings(default_timeout=30*60)
-        settings.add(SettingsItem(SettingsItemType.STRING, "SNMP_COMMUNITY", "community string", "snmp_rw"))
+        settings.add(SettingsItem(SettingsItemType.STRING, "SNMP_COMMUNITY", "community string", "community_string"))
         settings.add(SettingsItem(SettingsItemType.NUMBER, "SNMP_PORT", "port", 161))
         return settings
 
