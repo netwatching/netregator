@@ -1,5 +1,5 @@
 requests==2.27.1
-PyJWT~=2.3.0
+PyJWT~=2.6.0
 py-zabbix~=1.1.7
 python-decouple==3.6
 pysnmp==4.4.12
