@@ -1,12 +1,12 @@
-requests==2.27.1
-PyJWT~=2.3.0
+requests==2.28.1
+PyJWT==2.6.0
 py-zabbix~=1.1.7
 python-decouple==3.6
 pysnmp==4.4.12
 pysnmp-mibs==0.1.6
-urllib3==1.26.8
+urllib3==1.26.12
 coloredlogs~=15.0.1
 verboselogs~=1.7
 napalm-s350~=0.3.1
-napalm~=3.3.1
+napalm==4.0.0
 unificontrol==0.2.9
