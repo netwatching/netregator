@@ -19,5 +19,4 @@ RUN mkdir --parents  /home/netapi/.local/lib/python$(python --version | sed -e '
 USER netapi
 COPY main.py ./
 COPY src/ ./src
-COPY ssl/ ./ssl
 CMD ["python", "main.py"]
