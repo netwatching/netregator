@@ -34,7 +34,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64,linux/arm
           push: true
-          tags: lordsimpson/unattended-setups-api:latest, lordsimpson/unattended-setups-api:${{ env.RELEASE }}
+          tags: netwatching/netregator:latest, netwatching/netregator:${{ env.RELEASE }}
       - name: Build and push other
         uses: docker/build-push-action@v3
         if: ${{ github.head_ref || github.ref_name }} != "main"
@@ -42,7 +42,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64,linux/arm
           push: true
-          tags: lordsimpson/unattended-setups-api:${{ github.head_ref || github.ref_name }}, lordsimpson/unattended-setups-api:${{ env.RELEASE }}-${{ github.head_ref || github.ref_name }}
+          tags: netwatching/netregator:${{ github.head_ref || github.ref_name }}, netwatching/netregator:${{ env.RELEASE }}-${{ github.head_ref || github.ref_name }}
 #  deploy:
 #    needs: build
 #    runs-on: ubuntu-latest

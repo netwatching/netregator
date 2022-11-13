@@ -24,4 +24,4 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64,linux/arm
           push: false
-          tags: lordsimpson/unattended-setups-api:pr-${{ github.event.number }}
+          tags: netwatching/netregator:pr-${{ github.event.number }}
