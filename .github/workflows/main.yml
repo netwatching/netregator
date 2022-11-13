@@ -32,7 +32,7 @@ jobs:
         if: ${{ github.head_ref || github.ref_name }} == "main"
         with:
           context: .
-          platforms: linux/amd64,linux/arm64,linux/arm
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: netwatching/netregator:latest, netwatching/netregator:${{ env.RELEASE }}
       - name: Build and push other
@@ -40,7 +40,7 @@ jobs:
         if: ${{ github.head_ref || github.ref_name }} != "main"
         with:
           context: .
-          platforms: linux/amd64,linux/arm64,linux/arm
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: netwatching/netregator:${{ github.head_ref || github.ref_name }}, netwatching/netregator:${{ env.RELEASE }}-${{ github.head_ref || github.ref_name }}
 #  deploy:
