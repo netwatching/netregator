@@ -8,5 +8,5 @@ urllib3==1.26.8
 coloredlogs~=15.0.1
 verboselogs~=1.7
 napalm-s350~=0.3.1
-napalm~=3.3.1
+napalm~=4.0.0
 unificontrol==0.2.9
