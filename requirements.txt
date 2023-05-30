@@ -1,7 +1,7 @@
 requests==2.31.0
 PyJWT==2.7.0
 py-zabbix~=1.1.7
-python-decouple==3.7
+python-decouple==3.8
 pysnmp==4.4.12
 pysnmp-mibs==0.1.6
 urllib3==2.0.2
